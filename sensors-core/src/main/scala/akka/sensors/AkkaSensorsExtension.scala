@@ -125,7 +125,7 @@ trait MetricsBuilders {
       .build()
       .namespace(namespace)
       .subsystem(subsystem)
-      .buckets(.0005, .001, .0025, .005, .01, .025, .05, .075, .1, .25, .5, .75, 1, 2.5, 5, 7.5, 10, 25, 50, 75, 100)
+      .buckets(.0005, .001, .0025, .005, .01, .025, .05, .075, .1, .25, .5, .75, 1, 2.5, 5, 7.5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000)
   def secondsHistogram: Histogram.Builder =
     Histogram
       .build()

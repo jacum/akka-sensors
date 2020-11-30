@@ -31,7 +31,7 @@ object DispatcherMetrics extends MetricsBuilders {
     .register(registry)
 
   val activeThreads: Histogram = valueHistogram(max = 32)
-    .name("active_threads_total")
+    .name("active_threads")
     .help(s"Active worker threads")
     .labelNames("dispatcher")
     .register(registry)
@@ -168,18 +168,18 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
     new ExecutorServiceFactory {
       def createExecutorService: ExecutorService = {
         val es                = esf.createExecutorService
-        val activeCount       = executorValue.labels(id, "activeCount")
-        val corePoolSize      = executorValue.labels(id, "corePoolSize")
-        val largestPoolSize   = executorValue.labels(id, "largestPoolSize")
-        val maximumPoolSize   = executorValue.labels(id, "maximumPoolSize")
-        val queueSize         = executorValue.labels(id, "queueSize")
-        val completedTasks    = executorValue.labels(id, "completedTasks")
-        val poolSize          = executorValue.labels(id, "queueSize")
-        val steals            = executorValue.labels(id, "steals")
-        val parallelism       = executorValue.labels(id, "parallelism")
-        val queuedSubmissions = executorValue.labels(id, "queuedSubmissions")
-        val queuedTasks       = executorValue.labels(id, "queuedTasks")
-        val runningThreads    = executorValue.labels(id, "runningThreads")
+        lazy val activeCount       = executorValue.labels(id, "activeCount")
+        lazy val corePoolSize      = executorValue.labels(id, "corePoolSize")
+        lazy val largestPoolSize   = executorValue.labels(id, "largestPoolSize")
+        lazy val maximumPoolSize   = executorValue.labels(id, "maximumPoolSize")
+        lazy val queueSize         = executorValue.labels(id, "queueSize")
+        lazy val completedTasks    = executorValue.labels(id, "completedTasks")
+        lazy val poolSize          = executorValue.labels(id, "queueSize")
+        lazy val steals            = executorValue.labels(id, "steals")
+        lazy val parallelism       = executorValue.labels(id, "parallelism")
+        lazy val queuedSubmissions = executorValue.labels(id, "queuedSubmissions")
+        lazy val queuedTasks       = executorValue.labels(id, "queuedTasks")
+        lazy val runningThreads    = executorValue.labels(id, "runningThreads")
 
         es match {
           case tp: ThreadPoolExecutor =>
@@ -263,11 +263,13 @@ trait InstrumentedDispatcher extends Dispatcher {
 
       interestingStates foreach { state =>
         val stateLabel = state.toString.toLowerCase
-        val count      = threads.count(_.getThreadState.name().equalsIgnoreCase(stateLabel))
         DispatcherMetrics.threadStates
           .labels(id, stateLabel)
-          .set(count)
+          .set(threads.count(_.getThreadState.name().equalsIgnoreCase(stateLabel)))
       }
+      DispatcherMetrics.threadStates
+        .labels(id, "total")
+        .set(threads.size)
     },
     1L,
     1L,

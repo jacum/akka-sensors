@@ -1,0 +1,6 @@
+irate(akka_sensors_dispatchers_executor_value{value="steals"}[1m])
+histogram_quantile(0.99, sum(rate(akka_sensors_dispatchers_run_time_millis_bucket[1m])) by (le))
+histogram_quantile(0.999, sum(rate(akka_sensors_dispatchers_queue_time_millis_bucket{dispatcher="akka.actor.default-dispatcher"}[1m])) by (le))
+histogram_quantile(0.99, sum(rate(akka_sensors_dispatchers_active_threads_bucket[1m])) by (le))
+akka_sensors_dispatchers_active_threads_bucket
+histogram_quantile(0.999, sum(rate(akka_sensors_dispatchers_active_threads_bucket{dispatcher="akka.actor.default-dispatcher"}[1m])) by (le))

@@ -2,22 +2,27 @@
 
 **Non-intrusive native Prometheus collectors for Akka internals, negligible performance overhead, suitable for production use.**
 
-Are you planning to run Akka in production full-throttle, and want to see what happens inside? 
+- Are you planning to run Akka in production full-throttle, and want to see what happens inside?  Did your load tests produce some ask timeouts? thread starvation? threads behaving non-reactively? legacy code doing nasty blocking I/O? 
 
-Would be nice to use Cinnamon, but LightBend subscription is out of reach? 
+- Would be nice to use Cinnamon Telemetry, but LightBend subscription is out of reach? 
 
-Maybe already tried Kamon instrumentation, but is looks fragile and slows your app down, especially when running full-throttle?
+- Maybe already tried Kamon instrumentation, but is looks fragile and slows your app down, especially when running full-throttle?
 
-Then Akka Sensors may be the right choice for you: Free as in MIT license, and no heavy bytecode instrumentation either, yet a treasure trove for a busy observability engineer.
+- Already familiar with Prometheus/Grafana observability stack?
 
-- Comprehensive feature set to make internals of your Akka visible, for performance tuning
-- Sensible metrics in native Prometheus collectors
-- Example pre-configured Akka cluster node with Cassandra persistence
-- Some Grafana dashboards included
+If you answer 'yes' to most of the questions above, Akka Sensors may be the right choice for you. 
+
+- It is OSS/free, as in MIT license, and uses explicit, very lightweight instrumentation - yet is a treasure trove for a busy observability engineer.
+
+- Contains a comprehensive feature set to make internals of your Akka visible, in any environment, including high-load production. 
+
+- Could spare you extra CPU costs, when running in public cloud.
+
+- Demo/Evaluation setup included: Akka w/Cassandra persistence, with Prometheus server and Grafana dashboards
 
 ## Features
 
-###  Dispatchers 
+###  Dispatcher stats
  - time of runnable waiting in queue (histogram) 
  - time of runnable run (histogram)
  - implementation-specific ForkJoinPool and ThreadPool stats (gauges)
@@ -49,6 +54,17 @@ Instrumented Cassandra session provider, leveraging Cassandra client metrics col
 
 ## Usage
 
+### Prometheus exporter
+
+If you already have Prometheus exporter in your application, `CollectorRegistry.defaultRegistry` will be used by Sensors and the metrics should appear automatically.
+
+For an example of HTTP exporter service, check `MetricService` implementation in example application (`app`) module. 
+
+### Application configuration
+
+Override `type` and `executor` with Sensors' instrumented executors.
+Add `akka.sensors.AkkaSensorsExtension` to extensions.
+
 ```
 akka {
 
@@ -69,7 +85,7 @@ akka {
       }
     }
 
-    # some other dispatcher
+    # some other dispatcher used in your app
 
     default-blocking-io-dispatcher {
       type = "akka.sensors.dispatch.InstrumentedDispatcherConfigurator"
@@ -90,9 +106,66 @@ akka {
 
 ```
 
-## Notes
+### Actors
 
-### Best practices for extensions
- - For anything additional to measure in actors, extend `*ActorMetrics` in your own traits.
- - Override `actorTag` for your own actor labelling schema. Just make sure you keep cardinality sane, make sure it's below 100.
+```
+ # Non-persistent actors
+ class MyImportantActor extends Actor with ActorMetrics {
 
+    # This becomes label 'actor', default is simple class name
+    # but you may segment it further
+    # Just make sure the cardinality is sane (<100)
+    override protected def actorTag: String = ... 
+
+      ... # your implementation
+  }
+
+ # Persistent actors
+ class MyImportantPersistentActor extends Actor with PersistentActorMetrics {
+  ...
+
+
+```
+
+### Additional metrics
+
+For anything additional to measure in actors, extend `*ActorMetrics` in your own trait.
+
+```
+trait CustomActorMetrics extends ActorMetrics  with MetricsBuilders {
+
+  val importantEvents: Counter = counter
+    .name("important_events_total")
+    .help(s"Important events")
+    .labelNames("actor")
+    .register(metrics.registry)
+
+}
+
+```
+
+### Why codahale is used alongside Prometheus?
+
+We would prefer 100% Prometheus, however Cassandra Datastax OSS driver doesn't support Prometheus collectors.
+Prometheus is our preferred main metrics engine, hence we brigde metrics from Codahale via JMX.
+This won't be needed anymore if Prometheus would be supported natively by Datastax driver.
+
+## Evaluation
+
+We assuming you have `docker` and `docker-compose` up and running.
+
+Prepare sample app:
+```
+sbt "project app; docker:publishLocal"
+```
+
+Start observability stack:
+```
+docker-compose -f observability/docker-compose.yml up
+```
+
+Send some events:
+```
+for z in {1..100}; do curl -X POST http://localhost:8080/api/ping-fj/$z/100; done
+for z in {101..200}; do curl -X POST http://localhost:8080/api/ping-tp/$z/100; done
+```

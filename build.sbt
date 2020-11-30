@@ -25,6 +25,9 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
       "Build-Time" -> new java.util.Date().toString,
       "Build-Commit" -> git.gitHeadCommit.value.getOrElse("No Git Revision Found")
     ),
+  sources in doc := Seq.empty,
+  publishArtifact in packageDoc := false,
+  publishArtifact in packageDoc := false,
   resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
 )
 
@@ -40,15 +43,27 @@ lazy val publishSettings = Seq(
 lazy val `sensors-core` = project.in(file("sensors-core"))
   .settings(commonSettings ++ publishSettings)
   .settings(
-    moduleName := "core-sensors",
+    moduleName := "sensors-core",
     libraryDependencies ++= Akka.deps ++ Prometheus.deps ++ Logging.deps ++ TestTools.deps,
     dependencyOverrides ++= Akka.deps
   )
 
-lazy val `example-app` = project.in(file("example-app"))
+lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
+  .settings(commonSettings ++ publishSettings)
+  .settings(
+    moduleName := "sensors-cassandra",
+    libraryDependencies ++= Akka.deps ++ Prometheus.deps ++ Cassandra.deps ++ Logging.deps ++ TestTools.deps,
+    dependencyOverrides ++= Akka.deps
+  )
+
+lazy val `app` = project.in(file("app"))
+  .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(commonSettings)
   .settings(
-    moduleName := "example-app",
+    moduleName := "app",
+    mainClass in Compile := Some("nl.pragmasoft.app.Main"),
+    version in Docker := Keys.version.value,
+    dockerUpdateLatest := true,
     libraryDependencies ++= App.deps,
     dependencyOverrides ++= Akka.deps
-  ).dependsOn(`sensors-core`)
+  ).dependsOn(`sensors-core`,`sensors-cassandra`)

@@ -1,6 +1,6 @@
 ### before first release
-- prometheus/grafana compose setup
 - grafana dashboard
+
 - app w/embedded cassandra
 - update dashboards for cassandra
 - assertions unit tests
@@ -11,6 +11,8 @@
 - article/release 0.3
 
 ### next version
+- sign grafana plugin
+https://www.npmjs.com/package/@grafana/toolkit
 - Cluster events - translate to cluster member/state numbers, how many up, how many unreachable etc.
 - Cluster sharding visibility/stats
 - akka remoting

@@ -6,6 +6,8 @@ import akka.sensors.AkkaSensorsExtension
 
 import scala.util.control.NonFatal
 
+
+
 trait ActorMetrics extends Actor with ActorLogging {
   _: Actor =>
   import akka.sensors.MetricOps._
