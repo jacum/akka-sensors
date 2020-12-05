@@ -4,6 +4,7 @@ import akka.actor.{Actor, ActorLogging}
 import akka.persistence.{PersistentActor, RecoveryCompleted}
 import akka.sensors.AkkaSensorsExtension
 
+import scala.collection.immutable
 import scala.util.control.NonFatal
 
 
@@ -72,7 +73,7 @@ trait PersistentActorMetrics extends ActorMetrics {
       this.internalPersist(event)(handler)
     )
 
-  override def persistAll[A](events: Seq[A])(handler: A => Unit): Unit =
+  override def persistAll[A](events: immutable.Seq[A])(handler: A => Unit): Unit =
     persistTime.observeExecution(
       this.internalPersistAll(events)(handler)
     )
@@ -82,10 +83,10 @@ trait PersistentActorMetrics extends ActorMetrics {
       this.internalPersistAsync(event)(handler)
     )
 
-  override def persistAllAsync[A](events: Seq[A])(handler: A => Unit): Unit =
+  override def persistAllAsync[A](events: immutable.Seq[A])(handler: A => Unit): Unit =
     persistTime.observeExecution(
-      this.internalPersistAllAsync(events)(handler)
-    )
+    this.internalPersistAllAsync(events)(handler)
+  )
 
   protected override def onRecoveryFailure(cause: Throwable, event: Option[Any]): Unit = {
     log.error(cause, "Recovery failed")
