@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 2,
+  "id": null,
   "iteration": 1607697123041,
   "links": [],
   "panels": [
@@ -256,7 +256,7 @@
         "y": 0
       },
       "hiddenSeries": false,
-      "id": null,
+      "id": 3,
       "interval": "10s",
       "isNew": true,
       "legend": {
