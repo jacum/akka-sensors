@@ -144,6 +144,10 @@ trait CustomActorMetrics extends ActorMetrics  with MetricsBuilders {
 
 ```
 
+### Queries in Prometheus
+
+sum(jvm_memory_pool_bytes_max{job="$job"}) by (pool) 
+
 ### Why codahale is used alongside Prometheus?
 
 We would prefer 100% Prometheus, however Cassandra Datastax OSS driver doesn't support Prometheus collectors.
@@ -169,3 +173,5 @@ Send some events:
 for z in {1..100}; do curl -X POST http://localhost:8080/api/ping-fj/$z/100; done
 for z in {101..200}; do curl -X POST http://localhost:8080/api/ping-tp/$z/100; done
 ```
+
+Check out grafana dashboards at http://localhost:3000.

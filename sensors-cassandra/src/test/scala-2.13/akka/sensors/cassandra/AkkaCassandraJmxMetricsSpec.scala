@@ -87,7 +87,7 @@ class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Even
 
     "ensure prometheus JMX scraping is working" in {
 
-      for (i <- 1 to 100000) {
+      for (_ <- 1 to 100000) {
         pingActor
       }
 

@@ -1,4 +1,4 @@
-name: v_$(Date:yyyyMMdd)$(Rev:.r)
+  name: v_$(Date:yyyyMMdd)$(Rev:.r)
 
 trigger:
   branches:

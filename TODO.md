@@ -1,6 +1,7 @@
 ### before first release
-- grafana dashboard
-
+- grafana dashboards
+ - JVM dashboard
+ - 
 - app w/embedded cassandra
 - update dashboards for cassandra
 - assertions unit tests
@@ -8,6 +9,7 @@
 - representative load test suite
 - oss signature/secrets
 - azure build + oss publishing
+- tests badges etc.
 - article/release 0.3
 
 ### next version

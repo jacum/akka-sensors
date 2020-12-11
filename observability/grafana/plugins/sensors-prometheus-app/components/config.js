@@ -49,7 +49,7 @@ System.register(['lodash'], function (_export, _context) {
                     this.appModel.jsonData.prometheusUrl = this.appModel.jsonData.prometheusUrl || "http://prometheus:9090";
                     this.validation = { prometheusUrlValid: true };
 
-                    backendSrv.get('/public/plugins/Sensors-prometheus-app/plugin.json').then(function (data) {
+                    backendSrv.get('/public/plugins/sensors-prometheus-app/plugin.json').then(function (data) {
                         _this.dashboards = _.filter(data.includes, { type: 'dashboard' });
                     });
                 }

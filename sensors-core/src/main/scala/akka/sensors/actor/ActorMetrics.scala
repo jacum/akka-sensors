@@ -1,6 +1,6 @@
 package akka.sensors.actor
 
-import akka.actor.{Actor, ActorLogging}
+import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef}
 import akka.persistence.{PersistentActor, RecoveryCompleted}
 import akka.sensors.AkkaSensorsExtension
 
@@ -49,8 +49,7 @@ trait ActorMetrics extends Actor with ActorLogging {
 
 }
 
-trait PersistentActorMetrics extends ActorMetrics {
-  _: PersistentActor =>
+trait PersistentActorMetrics extends ActorMetrics with PersistentActor  {
   import akka.sensors.MetricOps._
 
   private val persistTime           = metrics.persistTime.labels(actorTag)

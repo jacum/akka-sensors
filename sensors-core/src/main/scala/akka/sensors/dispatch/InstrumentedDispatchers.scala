@@ -37,9 +37,15 @@ object DispatcherMetrics extends MetricsBuilders {
     .register(registry)
 
   val threadStates: Gauge = gauge
-    .name("threads_total")
+    .name("thread_states")
     .help("Threads per state and dispatcher")
     .labelNames("dispatcher", "state")
+    .register(registry)
+
+  val threads: Gauge = gauge
+    .name("threads_total")
+    .help("Threads per dispatcher")
+    .labelNames("dispatcher")
     .register(registry)
 
   val executorValue: Gauge = gauge
@@ -258,7 +264,6 @@ trait InstrumentedDispatcher extends Dispatcher {
       val threads = threadMXBean
         .getThreadInfo(threadMXBean.getAllThreadIds, 0)
         .filter(t => t != null
-          && interestingStateNames.contains(t.getThreadState.name().toLowerCase)
           && t.getThreadName.startsWith(s"$actorSystemName-$id"))
 
       interestingStates foreach { state =>
@@ -267,9 +272,9 @@ trait InstrumentedDispatcher extends Dispatcher {
           .labels(id, stateLabel)
           .set(threads.count(_.getThreadState.name().equalsIgnoreCase(stateLabel)))
       }
-      DispatcherMetrics.threadStates
-        .labels(id, "total")
-        .set(threads.size)
+      DispatcherMetrics.threads
+        .labels(id)
+        .set(threads.length)
     },
     1L,
     1L,
