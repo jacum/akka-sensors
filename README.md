@@ -52,6 +52,7 @@ If you answer 'yes' to most of the questions above, Akka Sensors may be the righ
 ### Cassandra
 Instrumented Cassandra session provider, leveraging Cassandra client metrics collection.
 
-# Usage
+## Documentation
 
-- [Usage and evaluation guide](./docs/USAGE.md)
+- [Usage and tips](./docs/USAGE.md)
+- [Demo app with Prometheus and Grafana dashboards](./docs/DEMO.md)
