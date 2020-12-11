@@ -14,7 +14,10 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    volumes: ["./grafana/plugins/sensors-prometheus-app:/var/lib/grafana/plugins/sensors-prometheus-app"]
+    volumes: [
+    "./grafana/plugins/sensors-prometheus-app:/var/lib/grafana/plugins/sensors-prometheus-app",
+    "./grafana/grafana.ini:/etc/grafana/grafana.ini"
+    ]
     ports: ["3000:3000"]
     networks: [observability]
 
