@@ -17,13 +17,13 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 
 case class Settings(
-                     contactPoints: List[String],
-                     port: Int,
-                     username: String,
-                     password: String,
-                     profile: String,
-                     localDatacenter: String,
-                   )
+  contactPoints: List[String],
+  port: Int,
+  username: String,
+  password: String,
+  profile: String,
+  localDatacenter: String,
+)
 
 object Settings {
   def apply(config: Config) =
@@ -38,9 +38,7 @@ object Settings {
 
 }
 
-
-class InstrumentedCassandraSessionProvider(system: ActorSystem,
-                                           config: Config) extends DefaultSessionProvider(system, config) with LazyLogging {
+class InstrumentedCassandraSessionProvider(system: ActorSystem, config: Config) extends DefaultSessionProvider(system, config) with LazyLogging {
 
   private val settings = Settings(
     system.classicSystem.settings.config.getConfig(config.getString("session-provider-config"))
@@ -75,11 +73,12 @@ class InstrumentedCassandraSessionProvider(system: ActorSystem,
       override def close(): Unit = logger.info(s"Listener closed")
     }
 
-    val driverConfig = CqlSessionProvider.driverConfig(system, config)
+    val driverConfig       = CqlSessionProvider.driverConfig(system, config)
     val driverConfigLoader = DriverConfigLoaderFromConfig.fromConfig(driverConfig)
     logger.info("Creating new Cassandra connection")
     toScala(
-      CqlSession.builder()
+      CqlSession
+        .builder()
         .withMetricRegistry(metricRegistry)
         .withConfigLoader(driverConfigLoader)
         .withAuthCredentials(settings.username, settings.password)
@@ -90,4 +89,3 @@ class InstrumentedCassandraSessionProvider(system: ActorSystem,
         .buildAsync())
   }
 }
-

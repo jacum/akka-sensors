@@ -112,6 +112,9 @@ object InstrumentedActors {
   class PersistentInstrumentedProbe extends PersistentActor with PersistentActorMetrics {
     var counter = 0
 
+    def receiveRecover: Receive = {
+      case _ =>
+    }
     def receiveCommand: Receive = {
       case ValidCommand =>
         val replyTo = sender()

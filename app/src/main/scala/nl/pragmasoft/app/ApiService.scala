@@ -4,7 +4,8 @@ import java.net.InetSocketAddress
 
 import akka.actor.{Actor, ActorRef, ActorSystem, NoSerializationVerificationNeeded, Props, ReceiveTimeout}
 import akka.pattern.ask
-import akka.sensors.actor.ActorMetrics
+import akka.persistence.PersistentActor
+import akka.sensors.actor.{ActorMetrics, PersistentActorMetrics}
 import akka.util.Timeout
 import cats.effect.{ContextShift, IO, Resource, Timer}
 import com.typesafe.scalalogging.LazyLogging
@@ -15,6 +16,7 @@ import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server}
 
+import scala.Console.println
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.Random
@@ -23,8 +25,8 @@ object ApiService extends LazyLogging {
 
   def resource(socketAddress: InetSocketAddress, system: ActorSystem)(implicit cs: ContextShift[IO], timer: Timer[IO], ec: ExecutionContext): Resource[IO, Server[IO]] = {
 
-    def pingActor(maxSleep: String, actor: ActorRef): IO[Response[IO]] = {
-      val actorResponse = actor.ask(Ping(maxSleep.toInt))(Timeout.durationToTimeout(10 seconds))
+    def pingActor(event: Any, actor: ActorRef): IO[Response[IO]] = {
+      val actorResponse = actor.ask(event)(Timeout.durationToTimeout(10 seconds))
 
       if (Random.nextInt(100) <= 3) actor ! UnknownMessage
 
@@ -42,11 +44,15 @@ object ApiService extends LazyLogging {
 
           case POST -> Root / "ping-fj" / actorId / maxSleep =>
             val actor         = system.actorOf(Props(classOf[ResponderActor]), s"responder-fj-$actorId")
-            pingActor(maxSleep, actor)
+            pingActor(Ping(maxSleep.toInt), actor)
 
           case POST -> Root / "ping-tp" / actorId / maxSleep =>
             val actor         = system.actorOf(Props(classOf[ResponderActor]).withDispatcher("akka.actor.default-blocking-io-dispatcher"), s"responder-tp-$actorId")
-            pingActor(maxSleep, actor)
+            pingActor(Ping(maxSleep.toInt), actor)
+
+          case POST -> Root / "ping-persistence" / actorId / maxSleep =>
+            val actor         = system.actorOf(Props(classOf[PersistentResponderActor]), s"persistent-responder-$actorId")
+            pingActor(ValidCommand, actor)
 
         }) orNotFound
       )
@@ -83,4 +89,26 @@ class ResponderActor extends Actor with ActorMetrics {
     case ReceiveTimeout =>
       context.stop(self)
   }
+}
+
+class PersistentResponderActor extends PersistentActor with PersistentActorMetrics {
+  var counter = 0
+  context.setReceiveTimeout(10 + Random.nextInt(5) seconds)
+
+  def receiveRecover: Receive = {
+    case ValidEvent(e) => counter = e.toInt
+  }
+
+  def receiveCommand: Receive = {
+    case ValidCommand =>
+      val replyTo = sender()
+      persist(ValidEvent(counter.toString)) { _ =>
+        counter +=1
+        replyTo ! Pong
+      }
+    case ReceiveTimeout =>
+      context.stop(self)
+  }
+
+  def persistenceId: String = context.self.actorRef.path.name
 }

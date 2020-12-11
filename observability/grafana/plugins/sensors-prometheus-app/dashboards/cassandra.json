@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1607689610225,
+  "iteration": 1607702056148,
   "links": [],
   "panels": [
     {
@@ -74,10 +74,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(akka_sensors_actor_active_actors_total{job=\"$job\"}) by (actor)",
+          "expr": "sum(cassandra_cql_requests{job=\"$job\",rate=\"1min\"}) ",
           "format": "time_series",
           "interval": "",
-          "legendFormat": "{{actor}}",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -85,7 +85,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Running actors",
+      "title": "Cassandra requests 1min rate",
       "tooltip": {
         "msResolution": false,
         "shared": true,
@@ -102,7 +102,7 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "format": "pps",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -178,17 +178,23 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(akka_sensors_actor_receive_time_millis_bucket{job=\"$job\"}[1m])) by (le, actor))",
+          "expr": "sum(cassandra_bytes_sent{job=\"$job\", rate=\"1min\"}) ",
           "interval": "",
-          "legendFormat": "{{ actor }}",
+          "legendFormat": "sent",
           "refId": "B"
+        },
+        {
+          "expr": "sum(cassandra_bytes_received{job=\"$job\", rate=\"1min\"}) ",
+          "interval": "",
+          "legendFormat": "received",
+          "refId": "A"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Receive time p99",
+      "title": "Cassandra traffic 1min avg",
       "tooltip": {
         "msResolution": false,
         "shared": true,
@@ -205,7 +211,7 @@
       },
       "yaxes": [
         {
-          "format": "s",
+          "format": "Bps",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -281,7 +287,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(akka_sensors_actor_activity_time_seconds_bucket[1m])) by (le))",
+          "expr": "sum(irate(cassandra_cql_client_timeouts_total{job=\"$job\"}[1m]))",
           "interval": "",
           "legendFormat": "",
           "refId": "B"
@@ -291,213 +297,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Activity time p99",
-      "tooltip": {
-        "msResolution": false,
-        "shared": true,
-        "sort": 2,
-        "value_type": "cumulative"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "s",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": 0,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Sensors Prometheus",
-      "description": "",
-      "editable": true,
-      "error": false,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "grid": {},
-      "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 0,
-        "y": 7
-      },
-      "hiddenSeries": false,
-      "id": 11,
-      "interval": "10s",
-      "isNew": true,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 2,
-      "links": [],
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "7.3.4",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "sum(irate(akka_sensors_actor_unhandled_messages_total{job=\"$job\"}[1m])) by (actor)",
-          "interval": "",
-          "legendFormat": "{{ actor }}",
-          "refId": "B"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Unhahdled messages rate",
-      "tooltip": {
-        "msResolution": false,
-        "shared": true,
-        "sort": 2,
-        "value_type": "cumulative"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "pps",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": 0,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Sensors Prometheus",
-      "description": "",
-      "editable": true,
-      "error": false,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "grid": {},
-      "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 8,
-        "y": 7
-      },
-      "hiddenSeries": false,
-      "id": 12,
-      "interval": "10s",
-      "isNew": true,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 2,
-      "links": [],
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "7.3.4",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "sum(irate(akka_sensors_actor_exceptions_total{job=\"$job\"}[1m])) by (actor)",
-          "interval": "",
-          "legendFormat": "{{ actor }}",
-          "refId": "B"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Exceptions rate",
+      "title": "Client timeouts",
       "tooltip": {
         "msResolution": false,
         "shared": true,
@@ -572,7 +372,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {
@@ -601,7 +401,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Akka Actors",
-  "uid": "akka-sensors-actors",
-  "version": 1
+  "title": "Cassandra",
+  "uid": "akka-sensors-cassandra",
+  "version": 2
 }

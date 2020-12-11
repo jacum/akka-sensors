@@ -64,14 +64,14 @@ object Dependencies {
   }
 
   object Cassandra {
-    val akkaPersistenceCassandraVersion = "1.0.3"
+    val akkaPersistenceCassandraVersion = "1.0.4"
     val cassandraDriverVersion = "4.9.0"
 
     val cassandraDriverCore = "com.datastax.oss" % "java-driver-core" % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss" % "java-driver-query-builder" % cassandraDriverVersion
-    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.0.5"
+    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.1.2"
     val akkaPersistenceCassandra = "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
-    val cassandraUnit = "org.cassandraunit" % "cassandra-unit" % "4.3.1.0" % Test
+    val cassandraUnit = "org.cassandraunit" % "cassandra-unit" % "4.3.1.0"
 
     val deps = Seq(akkaPersistenceCassandra, cassandraDriverCore, cassandraUnit, cassandraDriverQueryBuilder, cassandraDriverMetrics)
   }

@@ -37,13 +37,19 @@
     {
       "type": "dashboard",
       "name": "Sensors - Actors",
-      "path": "dashboards/akka-actors.json",
+      "path": "dashboards/actors.json",
       "revision": "1.0.3"
     },
     {
       "type": "dashboard",
       "name": "Sensors - Dispatchers",
-      "path": "dashboards/akka-dispatchers.json",
+      "path": "dashboards/dispatchers.json",
+      "revision": "1.0.3"
+    },
+    {
+      "type": "dashboard",
+      "name": "Sensors - Cassandra",
+      "path": "dashboards/cassandra.json",
       "revision": "1.0.3"
     }
   ],

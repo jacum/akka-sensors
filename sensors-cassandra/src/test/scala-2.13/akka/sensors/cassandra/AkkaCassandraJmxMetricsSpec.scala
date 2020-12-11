@@ -81,7 +81,7 @@ class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Even
       val mbs = ManagementFactory.getPlatformMBeanServer
       mbs.queryMBeans(null, null).asScala.map(_.getObjectName).filter(_.toString.startsWith("akka")).foreach(println)
       val datastaxMbeans = mbs.queryMBeans(null, null).asScala.filter(_.getObjectName.getDomain == "com.datastax.oss.driver")
-      //      datastaxMbeans.foreach(println)
+            datastaxMbeans.foreach(println)
       assert(datastaxMbeans.nonEmpty)
     }
 
