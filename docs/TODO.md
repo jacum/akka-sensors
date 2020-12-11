@@ -1,7 +1,9 @@
 ### before first release
-- assertions unit tests
+
 - thread state snapshots period - make configurable
-- representative load test suite
+- assertions unit tests
+- load test/gatling
+
 - oss signature/secrets
 - oss build + oss publishing
 - tests badges etc.
