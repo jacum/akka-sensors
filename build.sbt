@@ -38,7 +38,7 @@ lazy val publishSettings = Seq(
   organizationHomepage := Some(url("http://pragmasoft.nl")),
   organization := "nl.pragmasoft",
   licenses := Seq("MIT" -> url("http://www.opensource.org/licenses/mit-license.html"))
-)
+) ++ Publish.settings
 
 lazy val `sensors-core` = project.in(file("sensors-core"))
   .settings(commonSettings ++ publishSettings)
