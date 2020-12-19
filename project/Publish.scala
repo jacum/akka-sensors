@@ -53,7 +53,7 @@ object Publish {
       checkSnapshotDependencies,
       inquireVersions,
       runClean,
-      runTest,
+//      runTest,
       setReleaseVersion,
 //      commitReleaseVersion,
 //      tagRelease,
