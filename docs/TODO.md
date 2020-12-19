@@ -1,7 +1,6 @@
 ### before first release
 - oss signature/secrets
 - oss build + oss publishing
-- tests badges etc.
 
 - load test/gatling
 - article/release 0.3
