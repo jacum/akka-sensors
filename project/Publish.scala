@@ -12,9 +12,6 @@ object Publish {
     publishArtifact in packageSrc := false
   )
 
-  protected val nexus = "https://oss.sonatype.org/"
-  protected val ossStaging = "Sonatype OSS Staging" at nexus + "service/local/staging/deploy/maven2/"
-
   val ReleaseToSonatype = Seq(
     credentials ++= Seq(
       Credentials(
@@ -44,7 +41,8 @@ object Publish {
       </developers>
     ),
     publishMavenStyle := true,
-    publishTo in ThisBuild := version(_ => Some(ossStaging)).value,
+    publishTo in ThisBuild :=
+      version(_ => Some("Sonatype OSS Staging" at "https://oss.sonatype.org/" + "service/local/staging/deploy/maven2/")).value,
     publishArtifact in Test := false,
     publishArtifact in packageDoc := true,
     publishArtifact in packageSrc := true,
@@ -69,7 +67,7 @@ object Publish {
 
   val settings =
     if ( sys.env.contains("USERNAME")) {
-      println(s"Releasing to Sonatype as ${sys.env.get("USERNAME")}")
+      println(s"Releasing to Sonatype as ${sys.env("USERNAME")}")
       ReleaseToSonatype
     }
     else SuppressJavaDocsAndSources
