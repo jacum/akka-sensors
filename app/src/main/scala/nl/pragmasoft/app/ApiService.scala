@@ -43,15 +43,15 @@ object ApiService extends LazyLogging {
           case GET -> Root / "health" => Ok()
 
           case POST -> Root / "ping-fj" / actorId / maxSleep =>
-            val actor         = system.actorOf(Props(classOf[ResponderActor]), s"responder-fj-$actorId")
+            val actor = system.actorOf(Props(classOf[ResponderActor]), s"responder-fj-$actorId")
             pingActor(Ping(maxSleep.toInt), actor)
 
           case POST -> Root / "ping-tp" / actorId / maxSleep =>
-            val actor         = system.actorOf(Props(classOf[ResponderActor]).withDispatcher("akka.actor.default-blocking-io-dispatcher"), s"responder-tp-$actorId")
+            val actor = system.actorOf(Props(classOf[ResponderActor]).withDispatcher("akka.actor.default-blocking-io-dispatcher"), s"responder-tp-$actorId")
             pingActor(Ping(maxSleep.toInt), actor)
 
           case POST -> Root / "ping-persistence" / actorId / maxSleep =>
-            val actor         = system.actorOf(Props(classOf[PersistentResponderActor]), s"persistent-responder-$actorId")
+            val actor = system.actorOf(Props(classOf[PersistentResponderActor]), s"persistent-responder-$actorId")
             pingActor(ValidCommand, actor)
 
         }) orNotFound
@@ -95,15 +95,15 @@ class PersistentResponderActor extends PersistentActor with PersistentActorMetri
   var counter = 0
   context.setReceiveTimeout(10 + Random.nextInt(5) seconds)
 
-  def receiveRecover: Receive = {
-    case ValidEvent(e) => counter = e.toInt
+  def receiveRecover: Receive = { case ValidEvent(e) =>
+    counter = e.toInt
   }
 
   def receiveCommand: Receive = {
     case ValidCommand =>
       val replyTo = sender()
       persist(ValidEvent(counter.toString)) { _ =>
-        counter +=1
+        counter += 1
         replyTo ! Pong
       }
     case ReceiveTimeout =>

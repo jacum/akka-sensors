@@ -7,7 +7,7 @@ import xerial.sbt.Sonatype.SonatypeKeys._
 object Publish {
 
   lazy val settings =
-    if ( (sys.env.contains("USERNAME"))) ReleaseToSonatype
+    if ((sys.env.contains("USERNAME"))) ReleaseToSonatype
     else SuppressJavaDocsAndSources
 
   val SuppressJavaDocsAndSources = Seq(
@@ -23,31 +23,29 @@ object Publish {
 //    logLevel in aetherDeploy := Level.Info
   )
 
-  protected val nexus = "https://oss.sonatype.org/"
+  protected val nexus      = "https://oss.sonatype.org/"
   protected val ossStaging = "Sonatype OSS Staging" at nexus + "service/local/staging/deploy/maven2/"
 
   val ReleaseToSonatype = Seq(
     credentials ++= Seq(
       Credentials(
-      "Sonatype Nexus Repository Manager",
-      "oss.sonatype.org",
-      sys.env.getOrElse("USERNAME", ""),
-      sys.env.getOrElse("PASSWORD", "")
-    ),
+        "Sonatype Nexus Repository Manager",
+        "oss.sonatype.org",
+        sys.env.getOrElse("USERNAME", ""),
+        sys.env.getOrElse("PASSWORD", "")
+      ),
       Credentials(
         "GnuPG Key ID",
         "gpg",
         "303489A85EBB77F6E93E2A254CCF1479F92AE2B7", // key identifier
-        "ignored" // this field is ignored; passwords are supplied by pinentry
+        "ignored"                                   // this field is ignored; passwords are supplied by pinentry
       )
     ),
     releaseIgnoreUntrackedFiles := true,
     sonatypeProfileName := "nl.pragmasoft",
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/jacum/akka-sensors")),
-    scmInfo := Some(ScmInfo(
-      browseUrl = url("https://github.com/jacum/akka-sensors-prometheus"),
-      connection = "scm:git@github.com:jacum/akka-sensors.git")),
+    scmInfo := Some(ScmInfo(browseUrl = url("https://github.com/jacum/akka-sensors-prometheus"), connection = "scm:git@github.com:jacum/akka-sensors.git")),
     pomExtra := (
       <developers>
         <developer>

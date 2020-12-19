@@ -26,10 +26,10 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(2, Seconds)), interval = scaled(Span(5, Millis)))
 
-  implicit val ec: ExecutionContext = ExecutionContext.global
-  private val system: ActorSystem = ActorSystem("instrumented")
-  private val probeActor = system.actorOf(Props(classOf[InstrumentedProbe]), s"probe")
-  private val persistentActor = system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
+  implicit val ec: ExecutionContext        = ExecutionContext.global
+  private val system: ActorSystem          = ActorSystem("instrumented")
+  private val probeActor                   = system.actorOf(Props(classOf[InstrumentedProbe]), s"probe")
+  private val persistentActor              = system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
   implicit val registry: CollectorRegistry = CollectorRegistry.defaultRegistry
 
   "Launch akka app, and ensure it works" - {
@@ -43,9 +43,8 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       for (_ <- 1 to 5) probeActor ! KnownError
       for (_ <- 1 to 100) probeActor ! UnknownMessage
       probeActor ! BlockTooLong
-      for (_ <- 1 to 1000) {
+      for (_ <- 1 to 1000)
         pingActor
-      }
 
       probeActor ! PoisonPill
 
@@ -56,15 +55,13 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       Thread.sleep(100) // todo better condition?
 
       val blockingIo = system.dispatchers.lookup("akka.actor.default-blocking-io-dispatcher")
-      blockingIo.execute(() => { Thread.sleep(100)})
+      blockingIo.execute(() => Thread.sleep(100))
 
       println(metrics)
 
       // todo assertions per feature
       val content = metrics.split("\n")
-      List("akka_sensors_actor", "akka_sensors_dispatchers").foreach(s =>
-        assert(content.exists(_.startsWith(s)), s"starts with $s")
-      )
+      List("akka_sensors_actor", "akka_sensors_dispatchers").foreach(s => assert(content.exists(_.startsWith(s)), s"starts with $s"))
     }
   }
 
@@ -75,54 +72,50 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
   }
 
   private def pingActor = {
-    val r = Await.result(
-      probeActor.ask(Ping)(Timeout.durationToTimeout(10 seconds)), 15 seconds)
+    val r = Await.result(probeActor.ask(Ping)(Timeout.durationToTimeout(10 seconds)), 15 seconds)
     assert(r.toString == "Pong")
   }
 
   private def sendEventAck = {
-    val r = Await.result(
-      persistentActor.ask(ValidCommand)(Timeout.durationToTimeout(10 seconds)), 15 seconds)
+    val r = Await.result(persistentActor.ask(ValidCommand)(Timeout.durationToTimeout(10 seconds)), 15 seconds)
     assert(r.toString == "Pong")
   }
-  override protected def afterAll(): Unit = {
+  protected override def afterAll(): Unit =
     system.terminate()
-  }
 }
 
 object InstrumentedActors {
 
-  case object Ping extends NoSerializationVerificationNeeded
-  case object KnownError  extends NoSerializationVerificationNeeded
-  case object UnknownMessage  extends NoSerializationVerificationNeeded
-  case object BlockTooLong extends NoSerializationVerificationNeeded
-  case object Pong extends NoSerializationVerificationNeeded
-  case object ValidCommand extends NoSerializationVerificationNeeded
+  case object Ping                  extends NoSerializationVerificationNeeded
+  case object KnownError            extends NoSerializationVerificationNeeded
+  case object UnknownMessage        extends NoSerializationVerificationNeeded
+  case object BlockTooLong          extends NoSerializationVerificationNeeded
+  case object Pong                  extends NoSerializationVerificationNeeded
+  case object ValidCommand          extends NoSerializationVerificationNeeded
   case class ValidEvent(id: String) extends NoSerializationVerificationNeeded
 
   class InstrumentedProbe extends Actor with ActorMetrics {
     def receive: Receive = {
-            case Ping =>
-              Thread.sleep(Random.nextInt(3))
-              sender() ! Pong
-            case KnownError =>
-              throw new Exception("known")
-            case BlockTooLong =>
-              Thread.sleep(6000)
+      case Ping =>
+        Thread.sleep(Random.nextInt(3))
+        sender() ! Pong
+      case KnownError =>
+        throw new Exception("known")
+      case BlockTooLong =>
+        Thread.sleep(6000)
     }
   }
 
   class PersistentInstrumentedProbe extends PersistentActor with PersistentActorMetrics {
     var counter = 0
 
-    def receiveRecover: Receive = {
-      case _ =>
+    def receiveRecover: Receive = { case _ =>
     }
     def receiveCommand: Receive = {
       case ValidCommand =>
         val replyTo = sender()
         persist(ValidEvent(counter.toString)) { _ =>
-          counter +=1
+          counter += 1
           replyTo ! Pong
         }
       case x => println(x)

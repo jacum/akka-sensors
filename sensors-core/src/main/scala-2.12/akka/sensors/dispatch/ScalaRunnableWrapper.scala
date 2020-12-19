@@ -7,8 +7,8 @@ import scala.concurrent.OnCompleteRunnable
 
 object ScalaRunnableWrapper {
   def unapply(runnable: Runnable): Option[Run => Runnable] =
-    condOpt(runnable) {
-      case runnable: OnCompleteRunnable => new OverrideOnComplete(runnable, _)
+    condOpt(runnable) { case runnable: OnCompleteRunnable =>
+      new OverrideOnComplete(runnable, _)
     }
 
   class OverrideOnComplete(self: Runnable, r: Run) extends OnCompleteRunnable with Runnable {

@@ -12,8 +12,8 @@ import scala.util.Try
 
 object AkkaSensors {
   // single-thread dedicated executor for low-frequency (some seconds between calls) sensors' internal business
-  val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
-  private val config = ConfigFactory.load().getConfig("akka.sensors")
+  val executor: ScheduledExecutorService     = Executors.newScheduledThreadPool(1)
+  private val config                         = ConfigFactory.load().getConfig("akka.sensors")
   val threadStateSnapshotPeriodSeconds: Long = Try(config.getDuration("thread-state-snapshot-period", TimeUnit.SECONDS)).getOrElse(1L)
 }
 

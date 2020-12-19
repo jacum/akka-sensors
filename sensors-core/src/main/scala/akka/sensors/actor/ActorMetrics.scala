@@ -7,8 +7,6 @@ import akka.sensors.AkkaSensorsExtension
 import scala.collection.immutable
 import scala.util.control.NonFatal
 
-
-
 trait ActorMetrics extends Actor with ActorLogging {
   _: Actor =>
   import akka.sensors.MetricOps._
@@ -26,14 +24,13 @@ trait ActorMetrics extends Actor with ActorLogging {
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit =
     internalAroundReceive(receive, msg)
 
-  protected def internalAroundReceive(receive: Receive, msg: Any): Unit = {
+  protected def internalAroundReceive(receive: Receive, msg: Any): Unit =
     try receiveTime.observeExecution(super.aroundReceive(receive, msg))
     catch {
       case NonFatal(e) =>
         exceptions.inc()
         throw e
     }
-  }
   protected[akka] override def aroundPreStart(): Unit = {
     super.aroundPreStart()
     activeActors.inc()
@@ -52,7 +49,7 @@ trait ActorMetrics extends Actor with ActorLogging {
 
 }
 
-trait PersistentActorMetrics extends ActorMetrics with PersistentActor  {
+trait PersistentActorMetrics extends ActorMetrics with PersistentActor {
   import akka.sensors.MetricOps._
 
   private val persistTime           = metrics.persistTime.labels(actorTag)
@@ -89,8 +86,8 @@ trait PersistentActorMetrics extends ActorMetrics with PersistentActor  {
 
   override def persistAllAsync[A](events: immutable.Seq[A])(handler: A => Unit): Unit =
     persistTime.observeExecution(
-    this.internalPersistAllAsync(events)(handler)
-  )
+      this.internalPersistAllAsync(events)(handler)
+    )
 
   protected override def onRecoveryFailure(cause: Throwable, event: Option[Any]): Unit = {
     log.error(cause, "Recovery failed")

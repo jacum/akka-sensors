@@ -17,12 +17,13 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
     "-language:existentials",
     "-language:implicitConversions",
     "-language:postfixOps",
-    "-encoding", "utf8",
+    "-encoding",
+    "utf8",
     "-Xfatal-warnings"
   ),
-  packageOptions in(Compile, packageBin) +=
+  packageOptions in (Compile, packageBin) +=
     Package.ManifestAttributes(
-      "Build-Time" -> new java.util.Date().toString,
+      "Build-Time"   -> new java.util.Date().toString,
       "Build-Commit" -> git.gitHeadCommit.value.getOrElse("No Git Revision Found")
     ),
   sources in doc := Seq.empty,
@@ -40,7 +41,8 @@ lazy val publishSettings = Seq(
   licenses := Seq("MIT" -> url("http://www.opensource.org/licenses/mit-license.html"))
 )
 
-lazy val `sensors-core` = project.in(file("sensors-core"))
+lazy val `sensors-core` = project
+  .in(file("sensors-core"))
   .settings(commonSettings ++ publishSettings)
   .settings(
     moduleName := "sensors-core",
@@ -48,7 +50,8 @@ lazy val `sensors-core` = project.in(file("sensors-core"))
     dependencyOverrides ++= Akka.deps
   )
 
-lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
+lazy val `sensors-cassandra` = project
+  .in(file("sensors-cassandra"))
   .settings(commonSettings ++ publishSettings)
   .settings(
     moduleName := "sensors-cassandra",
@@ -56,7 +59,8 @@ lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
     dependencyOverrides ++= Akka.deps
   )
 
-lazy val `app` = project.in(file("app"))
+lazy val `app` = project
+  .in(file("app"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(commonSettings)
   .settings(
@@ -66,4 +70,5 @@ lazy val `app` = project.in(file("app"))
     dockerUpdateLatest := true,
     libraryDependencies ++= App.deps,
     dependencyOverrides ++= Akka.deps
-  ).dependsOn(`sensors-core`,`sensors-cassandra`)
+  )
+  .dependsOn(`sensors-core`, `sensors-cassandra`)

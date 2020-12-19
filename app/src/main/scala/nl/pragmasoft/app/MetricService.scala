@@ -46,10 +46,9 @@ object MetricService extends LazyLogging {
         .withHttpApp(
           Router(
             "/metrics" ->
-                HttpRoutes.of[IO] {
-                  case GET -> Root =>
-                    IO(Response(status = Ok, body = encoder.toEntity(exportMetrics).body, headers = Headers.of(Header("Content-Type", TextFormat.CONTENT_TYPE_004))))
-                }
+              HttpRoutes.of[IO] { case GET -> Root =>
+                IO(Response(status = Ok, body = encoder.toEntity(exportMetrics).body, headers = Headers.of(Header("Content-Type", TextFormat.CONTENT_TYPE_004))))
+              }
           ) orNotFound
         )
         .resource

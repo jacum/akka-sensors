@@ -43,23 +43,21 @@ class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Even
     PatienceConfig(timeout = scaled(Span(2, Seconds)), interval = scaled(Span(5, Millis)))
 
   val cassandra = {
-    try {
-      startEmbeddedCassandra("cassandra-server.yaml")
-    } catch {
+    try startEmbeddedCassandra("cassandra-server.yaml")
+    catch {
       case e: Exception =>
     }
   }
   implicit val ec: ExecutionContext = ExecutionContext.global
-  private val system: ActorSystem = ActorSystem("instrumented")
-  private val persistenceInitActor = system.actorOf(Props(classOf[AwaitPersistenceInit]), s"persistenceInit-${UUID.randomUUID().toString}")
+  private val system: ActorSystem   = ActorSystem("instrumented")
+  private val persistenceInitActor  = system.actorOf(Props(classOf[AwaitPersistenceInit]), s"persistenceInit-${UUID.randomUUID().toString}")
 
-  def createSession = {
-    CqlSession.builder()
+  def createSession =
+    CqlSession
+      .builder()
       .withLocalDatacenter("datacenter1")
       .addContactPoints(List(InetSocketAddress.createUnresolved(getHost, getNativeTransportPort)).asJavaCollection)
       .build()
-  }
-
 
   "Launch cassandra and akka app, and ensure it works" - {
 
@@ -70,16 +68,13 @@ class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Even
     "after some activity exports some jmx metrics" in {
       val session = createSession
       session.execute("create table akka.test (id int, a text, b text, primary key(id))")
-      for (i <- 1 to 100) {
+      for (i <- 1 to 100)
         session
           .execute(
             insertInto("akka", "test")
-              .values(Map[String, Term](
-                "id" -> literal(i),
-                "a" -> literal(s"A${i}"),
-                "b" -> literal(s"B$i")).asJava).build()
+              .values(Map[String, Term]("id" -> literal(i), "a" -> literal(s"A${i}"), "b" -> literal(s"B$i")).asJava)
+              .build()
           )
-      }
 
       import java.lang.management.ManagementFactory
       val mbs = ManagementFactory.getPlatformMBeanServer
@@ -90,14 +85,11 @@ class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Even
 
     "ensure prometheus JMX scraping is working" in {
 
-      for (i <- 1 to 100000) {
+      for (i <- 1 to 100000)
         pingActor
-      }
 
       val content = metrics.split("\n")
-      List("cassandra_cql_requests", "cassandra_cql_client_timeout", "cassandra_bytes").foreach(s =>
-        assert(content.exists(_.startsWith(s)), s"starts with $s")
-      )
+      List("cassandra_cql_requests", "cassandra_cql_client_timeout", "cassandra_bytes").foreach(s => assert(content.exists(_.startsWith(s)), s"starts with $s"))
     }
 
   }
@@ -130,11 +122,9 @@ object TestActors {
     def receiveRecover: Receive = Map.empty
 
     // intentionally left empty
-    def receiveCommand: Receive = {
-      case Ping =>
-        sender() ! Pong
+    def receiveCommand: Receive = { case Ping =>
+      sender() ! Pong
     }
   }
-
 
 }

@@ -173,7 +173,7 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
     import DispatcherMetrics._
     new ExecutorServiceFactory {
       def createExecutorService: ExecutorService = {
-        val es                = esf.createExecutorService
+        val es                     = esf.createExecutorService
         lazy val activeCount       = executorValue.labels(id, "activeCount")
         lazy val corePoolSize      = executorValue.labels(id, "corePoolSize")
         lazy val largestPoolSize   = executorValue.labels(id, "largestPoolSize")
@@ -237,14 +237,13 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
         val args = List(classOf[Config] -> config, classOf[DispatcherPrerequisites] -> prerequisites)
         prerequisites.dynamicAccess
           .createInstanceFor[ExecutorServiceConfigurator](fqcn, args)
-          .recover({
-            case exception =>
-              throw new IllegalArgumentException(
-                """Cannot instantiate ExecutorServiceConfigurator ("executor = [%s]"), defined in [%s],
+          .recover({ case exception =>
+            throw new IllegalArgumentException(
+              """Cannot instantiate ExecutorServiceConfigurator ("executor = [%s]"), defined in [%s],
                 make sure it has an accessible constructor with a [%s,%s] signature"""
-                  .format(fqcn, config.getString("id"), classOf[Config], classOf[DispatcherPrerequisites]),
-                exception
-              )
+                .format(fqcn, config.getString("id"), classOf[Config], classOf[DispatcherPrerequisites]),
+              exception
+            )
           })
           .get
     }
@@ -257,15 +256,17 @@ trait InstrumentedDispatcher extends Dispatcher {
   private lazy val wrapper = new DispatcherInstrumentationWrapper(configurator.config)
 
   private val threadMXBean: ThreadMXBean = ManagementFactory.getThreadMXBean
-  private val interestingStateNames = Set("runnable", "waiting", "timed_waiting", "blocked")
-  private val interestingStates = Thread.State.values.filter(s => interestingStateNames.contains(s.name().toLowerCase))
+  private val interestingStateNames      = Set("runnable", "waiting", "timed_waiting", "blocked")
+  private val interestingStates          = Thread.State.values.filter(s => interestingStateNames.contains(s.name().toLowerCase))
 
   AkkaSensors.executor.scheduleWithFixedDelay(
     () => {
       val threads = threadMXBean
         .getThreadInfo(threadMXBean.getAllThreadIds, 0)
-        .filter(t => t != null
-          && t.getThreadName.startsWith(s"$actorSystemName-$id"))
+        .filter(t =>
+          t != null
+          && t.getThreadName.startsWith(s"$actorSystemName-$id")
+        )
 
       interestingStates foreach { state =>
         val stateLabel = state.toString.toLowerCase

@@ -22,7 +22,7 @@ case class Settings(
   username: String,
   password: String,
   profile: String,
-  localDatacenter: String,
+  localDatacenter: String
 )
 
 object Settings {
@@ -86,6 +86,7 @@ class InstrumentedCassandraSessionProvider(system: ActorSystem, config: Config) 
         .withLocalDatacenter(settings.localDatacenter)
         .withClientId(instanceId)
         .withNodeStateListener(nodeStateListener)
-        .buildAsync())
+        .buildAsync()
+    )
   }
 }
