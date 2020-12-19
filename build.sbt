@@ -64,7 +64,7 @@ lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
 
 lazy val `app` = project.in(file("app"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
-  .settings(commonSettings, noPublishSettings)
+  .settings(commonSettings ++ noPublishSettings)
   .settings(
     moduleName := "app",
     mainClass in Compile := Some("nl.pragmasoft.app.Main"),
@@ -76,4 +76,4 @@ lazy val `app` = project.in(file("app"))
 
 lazy val `root` =  project.in(file("."))
   .aggregate(app, `sensors-core`, `sensors-cassandra`)
-  .settings(commonSettings ++ publishSettings)
+  .settings(commonSettings ++ noPublishSettings)
