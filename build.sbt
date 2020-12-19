@@ -76,4 +76,4 @@ lazy val `app` = project.in(file("app"))
 
 lazy val `root` =  project.in(file("."))
   .aggregate(app, `sensors-core`, `sensors-cassandra`)
-  .settings(commonSettings, noPublishSettings)
+  .settings(commonSettings ++ publishSettings)

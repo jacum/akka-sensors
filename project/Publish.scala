@@ -54,11 +54,11 @@ object Publish {
       inquireVersions,
       runClean,
       runTest,
-//      setReleaseVersion,
+      setReleaseVersion,
 //      commitReleaseVersion,
 //      tagRelease,
       releaseStepCommandAndRemaining("+publishSigned"),
-//      setNextVersion,
+      setNextVersion,
 //     commitNextVersion,
       releaseStepCommand("sonatypeReleaseAll")
 //      pushChanges
