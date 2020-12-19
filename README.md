@@ -1,5 +1,9 @@
 # Minimalist Akka Observability
 
+[![Build Status](https://dev.azure.com/pragmasoftnl/akka-sensors/_apis/build/status/jacum.akka-sensors?branchName=featurea%2Fcurrent)](https://dev.azure.com/pragmasoftnl/akka-sensors/_build/latest?definitionId=30&branchName=featurea%2Fcurrent)
+[![codecov.io](http://codecov.io/github/jacum/akka-sensors/coverage.svg?branch=master)](https://codecov.io/gh/jacum/akka-sensors?branch=master)
+[![Maven Central](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/nl/pragmasoft/akka-sensors/maven-metadata.xml.svg)](https://maven-badges.herokuapp.com/maven-central/nl.pragmasoft/akka-sensors_2.12)
+
 **Non-intrusive native Prometheus collectors for Akka internals, negligible performance overhead, suitable for production use.**
 
 - Are you running (or about to run) Akka in production, full-throttle, and want to see what happens inside?  Did your load tests produce some ask timeouts? thread starvation? threads behaving non-reactively? legacy code doing nasty blocking I/O? 
@@ -9,9 +13,6 @@
 - Maybe already tried Kamon instrumentation, but is looks fragile and slows your app down - especially when running full-throttle?
 
 - Already familiar with Prometheus/Grafana observability stack and use it for observing your applications?
-[![Build Status]( )](https://dev.azure.com/pragmasoftnl/akka-sensors/)
-[![Maven Central](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/nl/pragmasoft/akka-sensors/maven-metadata.xml.svg)](https://maven-badges.herokuapp.com/maven-central/nl.pragmasoft/akka-sensors_2.12)
-[![codecov.io](http://codecov.io/github/jacum/akka-sensors/coverage.svg?branch=master)](https://codecov.io/gh/jacum/akka-sensors?branch=master)
 
 If you answer 'yes' to most of the questions above, Akka Sensors may be the right choice for you:
 
