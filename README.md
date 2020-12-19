@@ -1,5 +1,5 @@
 # Minimalist Akka Observability
-[![Build Status](https://dev.azure.com/pragmasoftnl/akka-sensors/_apis/build/status/jacum.akka-sensors?branchName=master)](https://dev.azure.com/pragmasoftnl/akka-sensors/_build/latest?definitionId=30&branchName=master)
+[![Build Status](https://dev.azure.com/pragmasoftnl/akka-sensors/_apis/build/status/jacum.akka-sensors)](https://dev.azure.com/pragmasoftnl/akka-sensors/_build/latest?definitionId=30)
 [![codecov.io](http://codecov.io/github/jacum/akka-sensors/coverage.svg?branch=master)](https://codecov.io/gh/jacum/akka-sensors?branch=master)
 [![Maven Central](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/nl/pragmasoft/akka-sensors/maven-metadata.xml.svg)](https://maven-badges.herokuapp.com/maven-central/nl.pragmasoft/akka-sensors_2.12)
 
