@@ -60,10 +60,10 @@ object Publish {
 //      commitReleaseVersion,
 //      tagRelease,
       releaseStepCommandAndRemaining("+publishSigned"),
-      setNextVersion,
-      commitNextVersion,
-      releaseStepCommand("sonatypeReleaseAll"),
-      pushChanges
+//      setNextVersion,
+//     commitNextVersion,
+      releaseStepCommand("sonatypeReleaseAll")
+//      pushChanges
     )
   )
 
