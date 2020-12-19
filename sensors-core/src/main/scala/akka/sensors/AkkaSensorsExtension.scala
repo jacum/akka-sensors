@@ -14,7 +14,7 @@ object AkkaSensors {
   // single-thread dedicated executor for low-frequency (some seconds between calls) sensors' internal business
   val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
   private val config = ConfigFactory.load().getConfig("akka.sensors")
-  val threadStateSnapshotPeriodSeconds: Long = Try(config.getDuration("hread-state-snapshot-period", TimeUnit.SECONDS)).getOrElse(1L)
+  val threadStateSnapshotPeriodSeconds: Long = Try(config.getDuration("thread-state-snapshot-period", TimeUnit.SECONDS)).getOrElse(1L)
 }
 
 class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension with MetricsBuilders with LazyLogging {

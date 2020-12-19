@@ -1,7 +1,5 @@
 ### before first release
-- oss signature/secrets
-- oss build + oss publishing
-
+- grafana illustrated in README
 - load test/gatling
 - article/release 0.3
 
