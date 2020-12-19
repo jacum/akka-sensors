@@ -31,12 +31,6 @@ steps:
       key: ivy_home_$(CACHE_RUN_ID)
       path: '$(IVY_HOME)'
 
-  - task: Bash@3
-    displayName: Generate artifacts' version
-    inputs:
-      targetType: 'inline'
-      script: bash ./set-version.sh
-
   - task: JavaToolInstaller@0
     inputs:
       versionSpec: '11'
