@@ -1,15 +1,20 @@
 package akka.sensors
 
-import java.util.concurrent.{Executors, ScheduledExecutorService}
+import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
 import akka.actor.{ActorSystem, ClassicActorSystemProvider, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider, Props}
 import akka.sensors.actor.ClusterEventWatchActor
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import io.prometheus.client.{CollectorRegistry, Counter, Gauge, Histogram}
+
+import scala.util.Try
 
 object AkkaSensors {
   // single-thread dedicated executor for low-frequency (some seconds between calls) sensors' internal business
   val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
+  private val config = ConfigFactory.load().getConfig("akka.sensors")
+  val threadStateSnapshotPeriodSeconds: Long = Try(config.getDuration("hread-state-snapshot-period", TimeUnit.SECONDS)).getOrElse(1L)
 }
 
 class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension with MetricsBuilders with LazyLogging {
@@ -125,7 +130,7 @@ trait MetricsBuilders {
       .build()
       .namespace(namespace)
       .subsystem(subsystem)
-      .buckets(.0005, .001, .0025, .005, .01, .025, .05, .075, .1, .25, .5, .75, 1, 2.5, 5, 7.5, 10, 25, 50, 75, 100)
+      .buckets(.0005, .001, .0025, .005, .01, .025, .05, .075, .1, .25, .5, .75, 1, 2.5, 5, 7.5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000)
   def secondsHistogram: Histogram.Builder =
     Histogram
       .build()

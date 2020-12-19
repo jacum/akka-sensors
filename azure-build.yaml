@@ -1,0 +1,47 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+      - feature*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: AzureSensors
+  - name: CACHE
+    value: $(HOME)/.cache
+  - name: IVY_HOME
+    value: $(Pipeline.Workspace)/.ivy2
+  - name: CACHE_RUN_ID
+    value: "201009"
+
+steps:
+
+  - task: CacheBeta@1
+    displayName: Package resolver cache
+    inputs:
+      key: cache_$(CACHE_RUN_ID)
+      path: '$(CACHE)'
+
+  - task: CacheBeta@1
+    displayName: Ivy resolver cache
+    inputs:
+      key: ivy_home_$(CACHE_RUN_ID)
+      path: '$(IVY_HOME)'
+
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '11'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+      cleanDestinationDirectory: false
+
+  - task: Bash@3
+    displayName: 'Building and testing main Baker'
+    inputs:
+      targetType: 'inline'
+      script: |
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} coverage test coverageReport && bash <(curl -s https://codecov.io/bash)
+      failOnStderr: false

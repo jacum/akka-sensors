@@ -31,15 +31,21 @@ object DispatcherMetrics extends MetricsBuilders {
     .register(registry)
 
   val activeThreads: Histogram = valueHistogram(max = 32)
-    .name("active_threads_total")
+    .name("active_threads")
     .help(s"Active worker threads")
     .labelNames("dispatcher")
     .register(registry)
 
   val threadStates: Gauge = gauge
-    .name("threads_total")
+    .name("thread_states")
     .help("Threads per state and dispatcher")
     .labelNames("dispatcher", "state")
+    .register(registry)
+
+  val threads: Gauge = gauge
+    .name("threads_total")
+    .help("Threads per dispatcher")
+    .labelNames("dispatcher")
     .register(registry)
 
   val executorValue: Gauge = gauge
@@ -168,18 +174,18 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
     new ExecutorServiceFactory {
       def createExecutorService: ExecutorService = {
         val es                = esf.createExecutorService
-        val activeCount       = executorValue.labels(id, "activeCount")
-        val corePoolSize      = executorValue.labels(id, "corePoolSize")
-        val largestPoolSize   = executorValue.labels(id, "largestPoolSize")
-        val maximumPoolSize   = executorValue.labels(id, "maximumPoolSize")
-        val queueSize         = executorValue.labels(id, "queueSize")
-        val completedTasks    = executorValue.labels(id, "completedTasks")
-        val poolSize          = executorValue.labels(id, "queueSize")
-        val steals            = executorValue.labels(id, "steals")
-        val parallelism       = executorValue.labels(id, "parallelism")
-        val queuedSubmissions = executorValue.labels(id, "queuedSubmissions")
-        val queuedTasks       = executorValue.labels(id, "queuedTasks")
-        val runningThreads    = executorValue.labels(id, "runningThreads")
+        lazy val activeCount       = executorValue.labels(id, "activeCount")
+        lazy val corePoolSize      = executorValue.labels(id, "corePoolSize")
+        lazy val largestPoolSize   = executorValue.labels(id, "largestPoolSize")
+        lazy val maximumPoolSize   = executorValue.labels(id, "maximumPoolSize")
+        lazy val queueSize         = executorValue.labels(id, "queueSize")
+        lazy val completedTasks    = executorValue.labels(id, "completedTasks")
+        lazy val poolSize          = executorValue.labels(id, "queueSize")
+        lazy val steals            = executorValue.labels(id, "steals")
+        lazy val parallelism       = executorValue.labels(id, "parallelism")
+        lazy val queuedSubmissions = executorValue.labels(id, "queuedSubmissions")
+        lazy val queuedTasks       = executorValue.labels(id, "queuedTasks")
+        lazy val runningThreads    = executorValue.labels(id, "runningThreads")
 
         es match {
           case tp: ThreadPoolExecutor =>
@@ -253,26 +259,28 @@ trait InstrumentedDispatcher extends Dispatcher {
   private val threadMXBean: ThreadMXBean = ManagementFactory.getThreadMXBean
   private val interestingStateNames = Set("runnable", "waiting", "timed_waiting", "blocked")
   private val interestingStates = Thread.State.values.filter(s => interestingStateNames.contains(s.name().toLowerCase))
+
   AkkaSensors.executor.scheduleWithFixedDelay(
     () => {
       val threads = threadMXBean
         .getThreadInfo(threadMXBean.getAllThreadIds, 0)
         .filter(t => t != null
-          && interestingStateNames.contains(t.getThreadState.name().toLowerCase)
           && t.getThreadName.startsWith(s"$actorSystemName-$id"))
 
       interestingStates foreach { state =>
         val stateLabel = state.toString.toLowerCase
-        val count      = threads.count(_.getThreadState.name().equalsIgnoreCase(stateLabel))
         DispatcherMetrics.threadStates
           .labels(id, stateLabel)
-          .set(count)
+          .set(threads.count(_.getThreadState.name().equalsIgnoreCase(stateLabel)))
       }
+      DispatcherMetrics.threads
+        .labels(id)
+        .set(threads.length)
     },
-    1L,
-    1L,
+    AkkaSensors.threadStateSnapshotPeriodSeconds,
+    AkkaSensors.threadStateSnapshotPeriodSeconds,
     TimeUnit.SECONDS
-  ) // todo configure thread state dump frequency?
+  )
 
   override def execute(runnable: Runnable): Unit = wrapper(runnable, super.execute)
 

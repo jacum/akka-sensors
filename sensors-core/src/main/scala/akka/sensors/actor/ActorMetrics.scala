@@ -1,10 +1,13 @@
 package akka.sensors.actor
 
-import akka.actor.{Actor, ActorLogging}
+import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef}
 import akka.persistence.{PersistentActor, RecoveryCompleted}
 import akka.sensors.AkkaSensorsExtension
 
+import scala.collection.immutable
 import scala.util.control.NonFatal
+
+
 
 trait ActorMetrics extends Actor with ActorLogging {
   _: Actor =>
@@ -14,20 +17,23 @@ trait ActorMetrics extends Actor with ActorLogging {
 
   protected val metrics              = AkkaSensorsExtension(this.context.system)
   private val receiveTime            = metrics.receiveTime.labels(actorTag)
-  private val activeActors           = metrics.activeActors.labels(actorTag)
   private lazy val exceptions        = metrics.exceptions.labels(actorTag)
+  private val activeActors           = metrics.activeActors.labels(actorTag)
   private lazy val unhandledMessages = metrics.unhandledMessages.labels(actorTag)
 
   private val activityTimer = metrics.activityTime.labels(actorTag).startTimer()
 
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit =
+    internalAroundReceive(receive, msg)
+
+  protected def internalAroundReceive(receive: Receive, msg: Any): Unit = {
     try receiveTime.observeExecution(super.aroundReceive(receive, msg))
     catch {
       case NonFatal(e) =>
         exceptions.inc()
         throw e
     }
-
+  }
   protected[akka] override def aroundPreStart(): Unit = {
     super.aroundPreStart()
     activeActors.inc()
@@ -46,8 +52,7 @@ trait ActorMetrics extends Actor with ActorLogging {
 
 }
 
-trait PersistentActorMetrics extends ActorMetrics {
-  _: PersistentActor =>
+trait PersistentActorMetrics extends ActorMetrics with PersistentActor  {
   import akka.sensors.MetricOps._
 
   private val persistTime           = metrics.persistTime.labels(actorTag)
@@ -57,12 +62,14 @@ trait PersistentActorMetrics extends ActorMetrics {
   private lazy val persistFailures  = metrics.persistFailures.labels(actorTag)
   private lazy val persistRejects   = metrics.persistRejects.labels(actorTag)
 
-  override def receiveRecover: Receive = {
-    case RecoveryCompleted =>
-      recoveryTime.observeDuration()
-    case e =>
-      recoveryEvents.inc()
-      this.receiveRecover(e)
+  protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit = {
+    msg match {
+      case RecoveryCompleted =>
+        recoveryTime.observeDuration()
+      case _ =>
+        if (recoveryRunning) recoveryEvents.inc()
+    }
+    internalAroundReceive(receive, msg)
   }
 
   override def persist[A](event: A)(handler: A => Unit): Unit =
@@ -70,7 +77,7 @@ trait PersistentActorMetrics extends ActorMetrics {
       this.internalPersist(event)(handler)
     )
 
-  override def persistAll[A](events: Seq[A])(handler: A => Unit): Unit =
+  override def persistAll[A](events: immutable.Seq[A])(handler: A => Unit): Unit =
     persistTime.observeExecution(
       this.internalPersistAll(events)(handler)
     )
@@ -80,10 +87,10 @@ trait PersistentActorMetrics extends ActorMetrics {
       this.internalPersistAsync(event)(handler)
     )
 
-  override def persistAllAsync[A](events: Seq[A])(handler: A => Unit): Unit =
+  override def persistAllAsync[A](events: immutable.Seq[A])(handler: A => Unit): Unit =
     persistTime.observeExecution(
-      this.internalPersistAllAsync(events)(handler)
-    )
+    this.internalPersistAllAsync(events)(handler)
+  )
 
   protected override def onRecoveryFailure(cause: Throwable, event: Option[Any]): Unit = {
     log.error(cause, "Recovery failed")
