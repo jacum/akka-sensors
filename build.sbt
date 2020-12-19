@@ -5,7 +5,7 @@ import sbt.file
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   organization := "nl.pragmasoft",
   crossScalaVersions in ThisBuild := Seq("2.13.3", "2.12.12"),
-  scalaVersion := crossScalaVersions.value.head,
+  scalaVersion :=  "2.13.3",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   javacOptions := Seq("-source", "1.8", "-target", "1.8"),
   scalacOptions := Seq(
@@ -76,4 +76,4 @@ lazy val `app` = project.in(file("app"))
 
 lazy val `root` =  project.in(file("."))
   .aggregate(app, `sensors-core`, `sensors-cassandra`)
-  .settings(noPublishSettings)
+  .settings(commonSettings, noPublishSettings)
