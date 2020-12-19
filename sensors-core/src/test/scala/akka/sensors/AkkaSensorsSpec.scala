@@ -61,7 +61,10 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       println(metrics)
 
       // todo assertions per feature
-//      assert(content.split("\n").exists(_.startsWith("cassandra_cql")))
+      val content = metrics.split("\n")
+      List("akka_sensors_actor", "akka_sensors_dispatchers").foreach(s =>
+        assert(content.exists(_.startsWith(s)), s"starts with $s")
+      )
     }
   }
 
@@ -127,7 +130,5 @@ object InstrumentedActors {
 
     def persistenceId: String = context.self.actorRef.path.name
   }
-
-
 
 }

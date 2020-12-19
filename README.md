@@ -9,18 +9,24 @@
 - Maybe already tried Kamon instrumentation, but is looks fragile and slows your app down - especially when running full-throttle?
 
 - Already familiar with Prometheus/Grafana observability stack and use it for observing your applications?
+[![Build Status]( )](https://dev.azure.com/pragmasoftnl/akka-sensors/)
+[![Maven Central](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/nl/pragmasoft/akka-sensors/maven-metadata.xml.svg)](https://maven-badges.herokuapp.com/maven-central/nl.pragmasoft/akka-sensors_2.12)
+[![codecov.io](http://codecov.io/github/jacum/akka-sensors/coverage.svg?branch=master)](https://codecov.io/gh/jacum/akka-sensors?branch=master)
 
-If you answer 'yes' to most of the questions above, Akka Sensors may be the right choice for you. 
+If you answer 'yes' to most of the questions above, Akka Sensors may be the right choice for you:
 
 - It is OSS/free, as in MIT license, and uses explicit, very lightweight instrumentation - yet is a treasure trove for a busy observability engineer.
 
 - Comprehensive feature set to make internals of your Akka visible, in any environment, including high-load production. 
 
-- Could spare CPU costs, when running in public cloud.
+- Won't affect CPU costs, when running in public cloud.
 
 - Demo/Evaluation setup included: Akka w/Cassandra persistence, with Prometheus server and Grafana dashboards.
 
 ## Features
+
+### Thread watcher
+ - thread watcher, keeping eye on threads running suspiciously long, and reporting their stacktraces - to help you find blocking code quickly 
 
 ###  Dispatcher stats
  - time of runnable waiting in queue (histogram) 
@@ -28,9 +34,6 @@ If you answer 'yes' to most of the questions above, Akka Sensors may be the righ
  - implementation-specific ForkJoinPool and ThreadPool stats (gauges)
  - thread states, as seen from JMX ThreadInfo (histogram, updated once in X seconds) 
  - active worker threads (histogram, updated on each runnable)
-
-### Thread watcher
- - thread watcher, keeping eye on threads running suspiciously long, and reporting their stacktraces - to help you find blocking code quickly 
 
 ### Basic actor stats
  - number of actors (gauge)
@@ -50,7 +53,7 @@ If you answer 'yes' to most of the questions above, Akka Sensors may be the righ
  - cluster events, per type (counter)
 
 ### Cassandra
-Instrumented Cassandra session provider, leveraging Cassandra client metrics collection.
+Instrumented Cassandra session provider, exposing Cassandra client metrics collection.
 
 ## Documentation
 

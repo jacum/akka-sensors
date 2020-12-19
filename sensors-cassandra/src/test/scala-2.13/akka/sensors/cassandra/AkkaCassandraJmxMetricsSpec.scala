@@ -17,18 +17,19 @@ import io.prometheus.client.exporter.common.TextFormat
 import io.prometheus.client.hotspot.DefaultExports
 import io.prometheus.jmx.JmxCollector
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper._
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.time.{Millis, Seconds, Span}
 
 import scala.Console.println
-import scala.jdk.CollectionConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 import scala.io.Source
+import scala.jdk.CollectionConverters._
 
 
-class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Eventually  {
+class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Eventually with BeforeAndAfterAll {
 
   implicit val prometheusRegistry = CollectorRegistry.defaultRegistry
   DefaultExports.register(prometheusRegistry)
@@ -81,7 +82,6 @@ class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Even
       val mbs = ManagementFactory.getPlatformMBeanServer
       mbs.queryMBeans(null, null).asScala.map(_.getObjectName).filter(_.toString.startsWith("akka")).foreach(println)
       val datastaxMbeans = mbs.queryMBeans(null, null).asScala.filter(_.getObjectName.getDomain == "com.datastax.oss.driver")
-            datastaxMbeans.foreach(println)
       assert(datastaxMbeans.nonEmpty)
     }
 
@@ -91,9 +91,10 @@ class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Even
         pingActor
       }
 
-      val content = metrics
-      println(content)
-      assert(content.split("\n").exists(_.startsWith("cassandra_cql")))
+      val content = metrics.split("\n")
+      List("cassandra_cql_requests", "cassandra_cql_client_timeout", "cassandra_bytes").foreach(s =>
+        assert(content.exists(_.startsWith(s)), s"starts with $s")
+      )
     }
 
   }

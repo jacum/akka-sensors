@@ -259,6 +259,7 @@ trait InstrumentedDispatcher extends Dispatcher {
   private val threadMXBean: ThreadMXBean = ManagementFactory.getThreadMXBean
   private val interestingStateNames = Set("runnable", "waiting", "timed_waiting", "blocked")
   private val interestingStates = Thread.State.values.filter(s => interestingStateNames.contains(s.name().toLowerCase))
+
   AkkaSensors.executor.scheduleWithFixedDelay(
     () => {
       val threads = threadMXBean
@@ -276,10 +277,10 @@ trait InstrumentedDispatcher extends Dispatcher {
         .labels(id)
         .set(threads.length)
     },
-    1L,
-    1L,
+    AkkaSensors.threadStateSnapshotPeriodSeconds,
+    AkkaSensors.threadStateSnapshotPeriodSeconds,
     TimeUnit.SECONDS
-  ) // todo configure thread state dump frequency?
+  )
 
   override def execute(runnable: Runnable): Unit = wrapper(runnable, super.execute)
 

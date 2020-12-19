@@ -12,7 +12,7 @@
       }
     ]
   },
-  "description": "JVM memory use, garbage collector, cpu and thread stats",
+  "description": "JVM memory use, garbage collector, CPU and thread stats",
   "editable": true,
   "gnetId": 8563,
   "graphTooltip": 0,

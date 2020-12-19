@@ -1,15 +1,12 @@
 ### before first release
-
-- thread state snapshots period - make configurable
-- assertions unit tests
-- load test/gatling
-
 - oss signature/secrets
 - oss build + oss publishing
 - tests badges etc.
+
+- load test/gatling
 - article/release 0.3
 
-### next version
+### future
 - sign grafana plugin
 https://www.npmjs.com/package/@grafana/toolkit
 - Cluster events - translate to cluster member/state numbers, how many up, how many unreachable etc.
