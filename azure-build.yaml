@@ -9,7 +9,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: AzureSensors
+  - group: AkkaSensors
   - name: CACHE
     value: $(HOME)/.cache
   - name: IVY_HOME
