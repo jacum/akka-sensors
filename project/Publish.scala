@@ -51,6 +51,7 @@ object Publish {
     publishArtifact in packageSrc := true,
     pomIncludeRepository := (_ => false),
     releaseCrossBuild := true,
+    releaseIgnoreUntrackedFiles := true,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
