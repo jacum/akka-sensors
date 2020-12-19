@@ -44,7 +44,7 @@ object Publish {
       </developers>
     ),
     publishMavenStyle := true,
-    publishTo := version(_ => Some(ossStaging)).value,
+    publishTo in ThisBuild := version(_ => Some(ossStaging)).value,
     publishArtifact in Test := false,
     publishArtifact in packageDoc := true,
     publishArtifact in packageSrc := true,
@@ -69,7 +69,7 @@ object Publish {
 
   val settings =
     if ( sys.env.contains("USERNAME")) {
-      println(s"Releasing to Sonatype as ${sys.env.contains("USERNAME")}")
+      println(s"Releasing to Sonatype as ${sys.env.get("USERNAME")}")
       ReleaseToSonatype
     }
     else SuppressJavaDocsAndSources
