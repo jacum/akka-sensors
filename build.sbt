@@ -4,7 +4,7 @@ import sbt.file
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   organization := "nl.pragmasoft",
-  crossScalaVersions in ThisBuild := Seq("2.13.3", "2.12.12"),
+  crossScalaVersions := Seq("2.13.3", "2.12.12"),
   scalaVersion :=  "2.13.3",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   javacOptions := Seq("-source", "1.8", "-target", "1.8"),
