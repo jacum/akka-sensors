@@ -8,6 +8,7 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   scalaVersion := crossScalaVersions.value.head,
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   javacOptions := Seq("-source", "1.8", "-target", "1.8"),
+  releaseIgnoreUntrackedFiles := true,
   scalacOptions := Seq(
     s"-target:jvm-1.8",
     "-unchecked",

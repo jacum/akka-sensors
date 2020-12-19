@@ -6,21 +6,10 @@ import xerial.sbt.Sonatype.SonatypeKeys._
 
 object Publish {
 
-  lazy val settings =
-    if ( (sys.env.contains("USERNAME"))) ReleaseToSonatype
-    else SuppressJavaDocsAndSources
-
   val SuppressJavaDocsAndSources = Seq(
     sources in doc := Seq(),
     publishArtifact in packageDoc := false,
     publishArtifact in packageSrc := false
-  )
-
-  val StableToAzureFeed = Seq(
-    credentials += Credentials(Path.userHome / ".credentials"),
-    publishTo := Some("pkgs.dev.azure.com" at sys.env.getOrElse("FEEDURL", "")),
-    publishMavenStyle := true
-//    logLevel in aetherDeploy := Level.Info
   )
 
   protected val nexus = "https://oss.sonatype.org/"
@@ -41,12 +30,11 @@ object Publish {
         "ignored" // this field is ignored; passwords are supplied by pinentry
       )
     ),
-    releaseIgnoreUntrackedFiles := true,
     sonatypeProfileName := "nl.pragmasoft",
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/jacum/akka-sensors")),
     scmInfo := Some(ScmInfo(
-      browseUrl = url("https://github.com/jacum/akka-sensors-prometheus"),
+      browseUrl = url("https://github.com/jacum/akka-sensors"),
       connection = "scm:git@github.com:jacum/akka-sensors.git")),
     pomExtra := (
       <developers>
@@ -78,4 +66,12 @@ object Publish {
       pushChanges
     )
   )
+
+  val settings =
+    if ( sys.env.contains("USERNAME")) {
+      println(s"Releasing to Sonatype as ${sys.env.contains("USERNAME")}")
+      ReleaseToSonatype
+    }
+    else SuppressJavaDocsAndSources
+
 }
