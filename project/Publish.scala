@@ -7,8 +7,7 @@ import xerial.sbt.Sonatype.SonatypeKeys._
 object Publish {
 
   lazy val settings =
-    if (sys.env.contains("FEEDURL")) StableToAzureFeed
-    else if ( (sys.env.contains("USERNAME"))) ReleaseToSonatype
+    if ( (sys.env.contains("USERNAME"))) ReleaseToSonatype
     else SuppressJavaDocsAndSources
 
   val SuppressJavaDocsAndSources = Seq(
