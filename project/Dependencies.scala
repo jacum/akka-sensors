@@ -77,7 +77,7 @@ object Dependencies {
   }
 
   object TestTools {
-    val scalaTest = "org.scalatest" %% "scalatest" % "3.2.2"
+    val scalaTest = "org.scalatest" %% "scalatest" % "3.2.3"
     val deps = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal)
   }
 
