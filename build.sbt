@@ -3,9 +3,9 @@ import Keys._
 import sbt.file
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
-  organization := "nl.pragmasoft",
+  organization := "nl.pragmasoft.sensors",
   crossScalaVersions := Seq("2.13.3", "2.12.12"),
-  scalaVersion := crossScalaVersions.value.head,
+  scalaVersion :=  "2.13.3",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   javacOptions := Seq("-source", "1.8", "-target", "1.8"),
   scalacOptions := Seq(
@@ -29,9 +29,10 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   publishArtifact in packageDoc := false,
   publishArtifact in packageDoc := false,
   resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
-)
+) ++ Publish.settings
 
 lazy val noPublishSettings = Seq(
+  publish / skip := true,
   publish := {},
   publishLocal := {},
   publishArtifact := false
@@ -47,7 +48,7 @@ lazy val publishSettings = Seq(
 ) ++ Publish.settings
 
 lazy val `sensors-core` = project.in(file("sensors-core"))
-  .settings(commonSettings ++ publishSettings)
+  .settings(commonSettings)
   .settings(
     moduleName := "sensors-core",
     libraryDependencies ++= Akka.deps ++ Prometheus.deps ++ Logging.deps ++ TestTools.deps,
@@ -55,7 +56,7 @@ lazy val `sensors-core` = project.in(file("sensors-core"))
   )
 
 lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
-  .settings(commonSettings ++ publishSettings)
+  .settings(commonSettings)
   .settings(
     moduleName := "sensors-cassandra",
     libraryDependencies ++= Akka.deps ++ Prometheus.deps ++ Cassandra.deps ++ Logging.deps ++ TestTools.deps,
@@ -64,7 +65,7 @@ lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
 
 lazy val `app` = project.in(file("app"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
-  .settings(commonSettings, noPublishSettings)
+  .settings(commonSettings ++ noPublishSettings)
   .settings(
     moduleName := "app",
     mainClass in Compile := Some("nl.pragmasoft.app.Main"),
@@ -76,7 +77,4 @@ lazy val `app` = project.in(file("app"))
 
 lazy val `root` =  project.in(file("."))
   .aggregate(app, `sensors-core`, `sensors-cassandra`)
-  .settings(noPublishSettings)
-  .settings(
-    crossScalaVersions := Nil,
-  )
+  .settings(commonSettings ++ noPublishSettings)

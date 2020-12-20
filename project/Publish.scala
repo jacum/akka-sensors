@@ -12,9 +12,6 @@ object Publish {
     publishArtifact in packageSrc := false
   )
 
-  protected val nexus = "https://oss.sonatype.org/"
-  protected val ossStaging = "Sonatype OSS Staging" at nexus + "service/local/staging/deploy/maven2/"
-
   val ReleaseToSonatype = Seq(
     credentials ++= Seq(
       Credentials(
@@ -26,11 +23,12 @@ object Publish {
       Credentials(
         "GnuPG Key ID",
         "gpg",
-        "303489A85EBB77F6E93E2A254CCF1479F92AE2B7", // key identifier
+        "E9F32B46ABCE86181ABDBF8ECE902ED363A2FA58", // key identifier
         "ignored" // this field is ignored; passwords are supplied by pinentry
       )
     ),
     sonatypeProfileName := "nl.pragmasoft",
+    licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/jacum/akka-sensors")),
     scmInfo := Some(ScmInfo(
       browseUrl = url("https://github.com/jacum/akka-sensors"),
@@ -44,7 +42,7 @@ object Publish {
       </developers>
     ),
     publishMavenStyle := true,
-    publishTo in ThisBuild := version(_ => Some(ossStaging)).value,
+    publishTo := sonatypePublishToBundle.value,
     publishArtifact in Test := false,
     publishArtifact in packageDoc := true,
     publishArtifact in packageSrc := true,
@@ -55,21 +53,15 @@ object Publish {
       checkSnapshotDependencies,
       inquireVersions,
       runClean,
-      runTest,
-//      setReleaseVersion,
-//      commitReleaseVersion,
-//      tagRelease,
+//      runTest, // can't run test w/cross-version release
       releaseStepCommandAndRemaining("+publishSigned"),
-//      setNextVersion,
-//     commitNextVersion,
-      releaseStepCommand("sonatypeReleaseAll")
-//      pushChanges
+      releaseStepCommand("sonatypeBundleRelease")
     )
   )
 
   val settings =
     if ( sys.env.contains("USERNAME")) {
-      println(s"Releasing to Sonatype as ${sys.env.get("USERNAME")}")
+      println(s"Releasing to Sonatype as ${sys.env("USERNAME")}")
       ReleaseToSonatype
     }
     else SuppressJavaDocsAndSources
