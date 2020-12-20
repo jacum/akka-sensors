@@ -58,7 +58,7 @@ object Publish {
 //      commitReleaseVersion,
 //      tagRelease,
       releaseStepCommandAndRemaining("+publishSigned"),
-      setNextVersion,
+//      setNextVersion,
 //     commitNextVersion,
       releaseStepCommand("sonatypeBundleRelease")
 //      pushChanges
