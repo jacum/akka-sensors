@@ -39,9 +39,17 @@ steps:
       cleanDestinationDirectory: false
 
   - task: Bash@3
-    displayName: 'Building and testing main Baker'
+    displayName: 'Building and testing 2.12'
     inputs:
       targetType: 'inline'
       script: |
-        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} coverage test coverageReport && bash <(curl -s https://codecov.io/bash)
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.10; coverage test coverageReport" && bash <(curl -s https://codecov.io/bash)
+      failOnStderr: false
+
+  - task: Bash@3
+    displayName: 'Building and testing 2.13'
+    inputs:
+      targetType: 'inline'
+      script: |
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.13.3; coverage test coverageReport" && bash <(curl -s https://codecov.io/bash)
       failOnStderr: false
