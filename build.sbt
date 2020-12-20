@@ -32,6 +32,12 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
 )
 
+lazy val noPublishSettings = Seq(
+  publish := {},
+  publishLocal := {},
+  publishArtifact := false
+)
+
 lazy val publishSettings = Seq(
   homepage := Some(new URL("http://github.com/jacum/akka-sensors")),
   startYear := Some(2020),
@@ -39,7 +45,7 @@ lazy val publishSettings = Seq(
   organizationHomepage := Some(url("http://pragmasoft.nl")),
   organization := "nl.pragmasoft",
   licenses := Seq("MIT" -> url("http://www.opensource.org/licenses/mit-license.html"))
-)
+) ++ Publish.settings
 
 lazy val `sensors-core` = project
   .in(file("sensors-core"))
@@ -62,7 +68,7 @@ lazy val `sensors-cassandra` = project
 lazy val `app` = project
   .in(file("app"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
-  .settings(commonSettings)
+  .settings(commonSettings, noPublishSettings)
   .settings(
     moduleName := "app",
     mainClass in Compile := Some("nl.pragmasoft.app.Main"),
@@ -70,5 +76,11 @@ lazy val `app` = project
     dockerUpdateLatest := true,
     libraryDependencies ++= App.deps,
     dependencyOverrides ++= Akka.deps
+  ).dependsOn(`sensors-core`,`sensors-cassandra`)
+
+lazy val `root` =  project.in(file("."))
+  .aggregate(app, `sensors-core`, `sensors-cassandra`)
+  .settings(noPublishSettings)
+  .settings(
+    crossScalaVersions := Nil,
   )
-  .dependsOn(`sensors-core`, `sensors-cassandra`)

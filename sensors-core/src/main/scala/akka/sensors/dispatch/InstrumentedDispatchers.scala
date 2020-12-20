@@ -285,9 +285,6 @@ trait InstrumentedDispatcher extends Dispatcher {
 
   override def execute(runnable: Runnable): Unit = wrapper(runnable, super.execute)
 
-  /**
-   * Clone of [[Dispatcher.executorServiceFactoryProvider]]
-   */
   protected[akka] override def registerForExecution(mbox: Mailbox, hasMessageHint: Boolean, hasSystemMessageHint: Boolean): Boolean =
     if (mbox.canBeScheduledForExecution(hasMessageHint, hasSystemMessageHint))
       if (mbox.setAsScheduled())
@@ -310,7 +307,6 @@ trait InstrumentedDispatcher extends Dispatcher {
     else false
 }
 
-/** Instrumented clone of [[akka.dispatch.DispatcherConfigurator]]. */
 class InstrumentedDispatcherConfigurator(config: Config, prerequisites: DispatcherPrerequisites) extends MessageDispatcherConfigurator(config, prerequisites) {
 
   import Helpers._
@@ -330,7 +326,6 @@ class InstrumentedDispatcherConfigurator(config: Config, prerequisites: Dispatch
 
 }
 
-/** Instrumented clone of [[akka.dispatch.PinnedDispatcherConfigurator]]. */
 class InstrumentedPinnedDispatcherConfigurator(config: Config, prerequisites: DispatcherPrerequisites) extends MessageDispatcherConfigurator(config, prerequisites) {
   import Helpers._
 
