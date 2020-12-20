@@ -1,5 +1,15 @@
 ### Usage
 
+## SBT dependency
+
+```
+libraryDependencies ++= 
+  Seq(
+     "nl.pragmasoft.sensors" % "sensors-core" % "0.0.2",
+     "nl.pragmasoft.sensors" % "sensors-cassandra" % "0.0.2"
+  )
+```
+
 ## Prometheus exporter
 
 If you already have Prometheus exporter in your application, `CollectorRegistry.defaultRegistry` will be used by Sensors and the metrics should appear automatically.
