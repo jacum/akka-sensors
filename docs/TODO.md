@@ -1,5 +1,4 @@
 ### before first release
-- grafana illustrated in README
 - load test/gatling
 - article/release 0.3
 

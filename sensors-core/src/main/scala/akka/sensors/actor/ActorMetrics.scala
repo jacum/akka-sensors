@@ -56,19 +56,17 @@ trait PersistentActorMetrics extends ActorMetrics with PersistentActor  {
   import akka.sensors.MetricOps._
 
   private val persistTime           = metrics.persistTime.labels(actorTag)
+  private var recovered: Boolean    = false
   private lazy val recoveryEvents   = metrics.recoveryEvents.labels(actorTag)
   private lazy val recoveryTime     = metrics.recoveryTime.labels(actorTag).startTimer()
   private lazy val recoveryFailures = metrics.recoveryFailures.labels(actorTag)
   private lazy val persistFailures  = metrics.persistFailures.labels(actorTag)
   private lazy val persistRejects   = metrics.persistRejects.labels(actorTag)
 
+
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit = {
-    msg match {
-      case RecoveryCompleted =>
-        recoveryTime.observeDuration()
-      case _ =>
-        if (recoveryRunning) recoveryEvents.inc()
-    }
+    if (recoveryRunning) recoveryEvents.inc()
+    else if (!recovered) { recoveryTime.observeDuration(); recovered  = true }
     internalAroundReceive(receive, msg)
   }
 

@@ -73,7 +73,7 @@ object ResponderActor {
 }
 
 class ResponderActor extends Actor with ActorMetrics {
-  context.setReceiveTimeout(10 + Random.nextInt(5) seconds)
+  context.setReceiveTimeout(30 + Random.nextInt(90) seconds)
 
   def receive: Receive = {
     case Ping(maxSleep) =>
@@ -93,7 +93,7 @@ class ResponderActor extends Actor with ActorMetrics {
 
 class PersistentResponderActor extends PersistentActor with PersistentActorMetrics {
   var counter = 0
-  context.setReceiveTimeout(10 + Random.nextInt(5) seconds)
+  context.setReceiveTimeout(30 + Random.nextInt(90) seconds)
 
   def receiveRecover: Receive = {
     case ValidEvent(e) => counter = e.toInt

@@ -58,6 +58,9 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       val blockingIo = system.dispatchers.lookup("akka.actor.default-blocking-io-dispatcher")
       blockingIo.execute(() => { Thread.sleep(100)})
 
+      val persistentActorRecovered = system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
+
+
       println(metrics)
 
       // todo assertions per feature
@@ -118,6 +121,7 @@ object InstrumentedActors {
     def receiveRecover: Receive = {
       case _ =>
     }
+
     def receiveCommand: Receive = {
       case ValidCommand =>
         val replyTo = sender()
