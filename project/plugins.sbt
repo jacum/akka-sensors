@@ -12,4 +12,3 @@ addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.1.1")
 addSbtPlugin("no.arktekk.sbt" % "aether-deploy" % "0.26.0")
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.1")
-libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.30"

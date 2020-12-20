@@ -14,7 +14,7 @@ object Dependencies {
     val logbackVersion = "1.2.3"
     val slf4jversion = "1.7.30"
     val log = "ch.qos.logback" % "logback-classic" % logbackVersion
-//    val slf4jApi = "org.slf4j" % "slf4j-api" % slf4jversion
+    val slf4jApi = "org.slf4j" % "slf4j-api" % slf4jversion
     val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
     val deps = Seq(log, scalaLogging)
   }
