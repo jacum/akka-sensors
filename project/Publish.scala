@@ -60,7 +60,7 @@ object Publish {
       releaseStepCommandAndRemaining("+publishSigned"),
       setNextVersion,
 //     commitNextVersion,
-      releaseStepCommand("sonatypeReleaseAll")
+      releaseStepCommand("sonatypeBundleRelease")
 //      pushChanges
     )
   )
