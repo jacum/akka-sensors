@@ -23,7 +23,7 @@ object Publish {
       Credentials(
         "GnuPG Key ID",
         "gpg",
-        "303489A85EBB77F6E93E2A254CCF1479F92AE2B7", // key identifier
+        "E9F32B46ABCE86181ABDBF8ECE902ED363A2FA58", // key identifier
         "ignored" // this field is ignored; passwords are supplied by pinentry
       )
     ),
@@ -47,7 +47,7 @@ object Publish {
     publishArtifact in packageDoc := true,
     publishArtifact in packageSrc := true,
     pomIncludeRepository := (_ => false),
-    releaseCrossBuild := true,
+    releaseCrossBuild := false,
     releaseIgnoreUntrackedFiles := true,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
