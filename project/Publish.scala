@@ -54,14 +54,8 @@ object Publish {
       inquireVersions,
       runClean,
 //      runTest, // can't run test w/cross-version release
-      setReleaseVersion,
-//      commitReleaseVersion,
-//      tagRelease,
       releaseStepCommandAndRemaining("+publishSigned"),
-//      setNextVersion,
-//     commitNextVersion,
       releaseStepCommand("sonatypeBundleRelease")
-//      pushChanges
     )
   )
 

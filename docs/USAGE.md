@@ -5,8 +5,8 @@
 ```
 libraryDependencies ++= 
   Seq(
-     "nl.pragmasoft.sensors" % "sensors-core" % "0.0.2",
-     "nl.pragmasoft.sensors" % "sensors-cassandra" % "0.0.2"
+     "nl.pragmasoft.sensors" %% "sensors-core" % "0.0.2",
+     "nl.pragmasoft.sensors" %% "sensors-cassandra" % "0.0.2"
   )
 ```
 
