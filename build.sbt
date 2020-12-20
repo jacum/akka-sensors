@@ -3,7 +3,7 @@ import Keys._
 import sbt.file
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
-  organization := "nl.pragmasoft",
+  organization := "nl.pragmasoft.sensors",
   crossScalaVersions := Seq("2.13.3", "2.12.12"),
   scalaVersion :=  "2.13.3",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
@@ -32,6 +32,7 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
 ) ++ Publish.settings
 
 lazy val noPublishSettings = Seq(
+  publish / skip := true,
   publish := {},
   publishLocal := {},
   publishArtifact := false
@@ -64,7 +65,7 @@ lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
 
 lazy val `app` = project.in(file("app"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
-  .settings(commonSettings)
+  .settings(commonSettings ++ noPublishSettings)
   .settings(
     moduleName := "app",
     mainClass in Compile := Some("nl.pragmasoft.app.Main"),

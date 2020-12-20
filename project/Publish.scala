@@ -28,6 +28,7 @@ object Publish {
       )
     ),
     sonatypeProfileName := "nl.pragmasoft",
+    licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/jacum/akka-sensors")),
     scmInfo := Some(ScmInfo(
       browseUrl = url("https://github.com/jacum/akka-sensors"),
@@ -41,8 +42,7 @@ object Publish {
       </developers>
     ),
     publishMavenStyle := true,
-    publishTo in ThisBuild :=
-      version(_ => Some("Sonatype OSS Staging" at "https://oss.sonatype.org/" + "service/local/staging/deploy/maven2/")).value,
+    publishTo := sonatypePublishToBundle.value,
     publishArtifact in Test := false,
     publishArtifact in packageDoc := true,
     publishArtifact in packageSrc := true,
