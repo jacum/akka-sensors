@@ -6,23 +6,25 @@
 
 **Non-intrusive native Prometheus collectors for Akka internals, negligible performance overhead, suitable for production use.**
 
-- Are you running (or about to run) Akka in production, full-throttle, and want to see what happens inside?  Did your load tests produce some ask timeouts? thread starvation? threads behaving non-reactively? legacy code doing nasty blocking I/O? 
+- Are you running (or about to run) Akka in production, full-throttle, and want to see what happens inside?  Did your load tests produce some ask timeouts? thread starvation? threads behaving non-reactively? old code doing nasty blocking I/O? 
 
 - Would be nice to use Cinnamon Telemetry, but LightBend subscription is out of reach? 
 
-- Maybe already tried Kamon instrumentation, but is looks fragile and slows your app down - especially when running full-throttle?
+- Overhead created by Kamon doesn't look acceptable, especially when running full-throttle?
 
-- Already familiar with Prometheus/Grafana observability stack and use it for observing your applications?
+- Already familiar with Prometheus/Grafana observability stack?
 
 If you answer 'yes' to most of the questions above, Akka Sensors may be the right choice for you:
 
-- It is OSS/free, as in MIT license, and uses explicit, very lightweight instrumentation - yet is a treasure trove for a busy observability engineer.
-
 - Comprehensive feature set to make internals of your Akka visible, in any environment, including high-load production. 
+
+- It is OSS/free, as in MIT license, and uses explicit, very lightweight instrumentation - yet is a treasure trove for a busy observability engineer.
 
 - Won't affect CPU costs, when running in public cloud.
 
-- Demo/Evaluation setup included: Akka w/Cassandra persistence, with Prometheus server and Grafana dashboards.
+- Easy Demo/Evaluation setup included: Akka with Cassandra persistence, Prometheus server and Grafana dashboards.
+
+
 
 ## Features
 
