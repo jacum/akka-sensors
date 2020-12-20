@@ -34,7 +34,8 @@ If you answer 'yes' to most of the questions above, Akka Sensors may be the righ
  - number of instances
  - start since / uptime
  - JVM version
- - 
+ - memory pools
+ - garbage collector
 
 ### Thread watcher
  - thread watcher, keeping eye on threads running suspiciously long, and reporting their stacktraces - to help you find blocking code quickly 
