@@ -76,12 +76,12 @@ We assuming you have `docker` and `docker-compose` up and running.
 
 Prepare sample app:
 ```
-sbt "compile; project app; docker:publishLocal"
+sbt "compile; project app``; docker:publishLocal"
 ```
 
 Start observability stack:
 ```
-docker-compose -f observability/docker-compose.yml up
+docker-compose -f examples/observability/docker-compose.yml up
 ```
 
 Send some events:
@@ -180,6 +180,16 @@ akka {
   ...
 
 
+```
+
+### Internal parameters
+
+Some parameters of the Sensors library itself, that you may want to tune:
+```
+akka.sensors {
+  thread-state-snapshot-period = 5s
+  cluster-watch-enabled = false
+}
 ```
 
 ### Additional metrics

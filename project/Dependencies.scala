@@ -11,12 +11,10 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-protobuf")
 
   object Logging {
-    val logbackVersion = "1.2.3"
     val slf4jversion = "1.7.30"
-    val log = "ch.qos.logback" % "logback-classic" % logbackVersion
     val slf4jApi = "org.slf4j" % "slf4j-api" % slf4jversion
     val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
-    val deps = Seq(log, scalaLogging)
+    val deps = Seq(slf4jApi, scalaLogging)
   }
 
   object Akka {
@@ -77,8 +75,9 @@ object Dependencies {
   }
 
   object TestTools {
+    val log = "ch.qos.logback" % "logback-classic" % "1.2.3"
     val scalaTest = "org.scalatest" %% "scalatest" % "3.2.3"
-    val deps = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal)
+    val deps = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal, log)
   }
 
   def scopeDeps(scope: String, modules: Seq[ModuleID]) = modules.map(m => m % scope)

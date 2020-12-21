@@ -1,4 +1,4 @@
-package akka.dispatch
+package akka.sensors.dispatch
 
 import akka.sensors.dispatch.DispatcherInstrumentationWrapper.Run
 

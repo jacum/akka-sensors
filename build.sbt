@@ -63,7 +63,7 @@ lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
     dependencyOverrides ++= Akka.deps
   )
 
-lazy val `app` = project.in(file("app"))
+lazy val `app` = project.in(file("examples/app"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(commonSettings ++ noPublishSettings)
   .settings(

@@ -277,8 +277,8 @@ trait InstrumentedDispatcher extends Dispatcher {
         .labels(id)
         .set(threads.length)
     },
-    AkkaSensors.threadStateSnapshotPeriodSeconds,
-    AkkaSensors.threadStateSnapshotPeriodSeconds,
+    AkkaSensors.ThreadStateSnapshotPeriodSeconds,
+    AkkaSensors.ThreadStateSnapshotPeriodSeconds,
     TimeUnit.SECONDS
   )
 

@@ -2,19 +2,23 @@ package akka.sensors
 
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
-import akka.actor.{ActorSystem, ClassicActorSystemProvider, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider, Props}
+import akka.Done
+import akka.actor.{ActorSystem, ClassicActorSystemProvider, CoordinatedShutdown, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider, Props}
 import akka.sensors.actor.ClusterEventWatchActor
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
-import io.prometheus.client.{CollectorRegistry, Counter, Gauge, Histogram}
+import io.prometheus.client.{Collector, CollectorRegistry, Counter, Gauge, Histogram, SimpleCollector}
 
+import scala.concurrent.Future
 import scala.util.Try
 
 object AkkaSensors {
   // single-thread dedicated executor for low-frequency (some seconds between calls) sensors' internal business
   val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
+
   private val config = ConfigFactory.load().getConfig("akka.sensors")
-  val threadStateSnapshotPeriodSeconds: Long = Try(config.getDuration("thread-state-snapshot-period", TimeUnit.SECONDS)).getOrElse(1L)
+  val ThreadStateSnapshotPeriodSeconds: Long = Try(config.getDuration("thread-state-snapshot-period", TimeUnit.SECONDS)).getOrElse(1L)
+  val ClusterWatchEnabled: Boolean = Try(config.getBoolean("cluster-watch-enabled")).getOrElse(false)
 }
 
 class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension with MetricsBuilders with LazyLogging {
@@ -24,7 +28,16 @@ class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension wi
   val namespace = "akka_sensors"
   val subsystem = "actor"
 
-  private val clusterWatcherActor = system.actorOf(Props(classOf[ClusterEventWatchActor]), s"ClusterEventWatchActor")
+  if (AkkaSensors.ClusterWatchEnabled) {
+    system.actorOf(Props(classOf[ClusterEventWatchActor]), s"ClusterEventWatchActor")
+  }
+
+  CoordinatedShutdown(system)
+    .addTask(CoordinatedShutdown.PhaseBeforeActorSystemTerminate, "clearPrometheusRegistry") { () =>
+    CollectorRegistry.defaultRegistry.clear()
+    logger.info("Cleared metrics")
+    Future.successful(Done)
+  }
 
   val activityTime: Histogram = secondsHistogram
     .name("activity_time_seconds")

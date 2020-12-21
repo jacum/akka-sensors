@@ -2,7 +2,7 @@ package akka.sensors
 
 import java.io.CharArrayWriter
 
-import akka.actor.{Actor, ActorSystem, NoSerializationVerificationNeeded, PoisonPill, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, NoSerializationVerificationNeeded, PoisonPill, Props}
 import akka.pattern.ask
 import akka.sensors.actor.{ActorMetrics, PersistentActorMetrics}
 import akka.persistence.PersistentActor
@@ -30,6 +30,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
   private val system: ActorSystem = ActorSystem("instrumented")
   private val probeActor = system.actorOf(Props(classOf[InstrumentedProbe]), s"probe")
   private val persistentActor = system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
+  private val persistentActor2 = system.actorOf(Props(classOf[AnotherPersistentInstrumentedProbe]), s"another-persistent")
   implicit val registry: CollectorRegistry = CollectorRegistry.defaultRegistry
 
   "Launch akka app, and ensure it works" - {
@@ -49,17 +50,20 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
 
       probeActor ! PoisonPill
 
-      for (_ <- 1 to 100) sendEventAck
+      for (_ <- 1 to 100) sendEventAck(persistentActor)
+
+      for (_ <- 1 to 100) sendEventAck(persistentActor2)
 
       persistentActor ! PoisonPill
+      persistentActor2 ! PoisonPill
 
       Thread.sleep(100) // todo better condition?
 
       val blockingIo = system.dispatchers.lookup("akka.actor.default-blocking-io-dispatcher")
       blockingIo.execute(() => { Thread.sleep(100)})
 
-      val persistentActorRecovered = system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
-
+      system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
+      system.actorOf(Props(classOf[AnotherPersistentInstrumentedProbe]), s"another-persistent")
 
       println(metrics)
 
@@ -83,9 +87,9 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
     assert(r.toString == "Pong")
   }
 
-  private def sendEventAck = {
+  private def sendEventAck(actor: ActorRef) = {
     val r = Await.result(
-      persistentActor.ask(ValidCommand)(Timeout.durationToTimeout(10 seconds)), 15 seconds)
+      actor.ask(ValidCommand)(Timeout.durationToTimeout(10 seconds)), 15 seconds)
     assert(r.toString == "Pong")
   }
   override protected def afterAll(): Unit = {
@@ -134,5 +138,7 @@ object InstrumentedActors {
 
     def persistenceId: String = context.self.actorRef.path.name
   }
+
+  class AnotherPersistentInstrumentedProbe extends PersistentInstrumentedProbe
 
 }
