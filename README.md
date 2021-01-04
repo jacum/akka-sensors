@@ -76,7 +76,7 @@ We assuming you have `docker` and `docker-compose` up and running.
 
 Prepare sample app:
 ```
-sbt "compile; project app``; docker:publishLocal"
+sbt "compile; project app; docker:publishLocal"
 ```
 
 Start observability stack:
@@ -160,6 +160,34 @@ akka {
 }
 
 ```
+
+### Using explicit executor definition
+
+```
+akka {
+ persistence {
+  cassandra {
+   default-dispatcher {
+        type = "akka.sensors.dispatch.InstrumentedDispatcherConfigurator"
+        executor = "akka.sensors.dispatch.InstrumentedExecutor"
+
+        instrumented-executor {
+          delegate = "fork-join-executor"
+          measure-runs = true
+          watch-long-runs = false
+        }
+
+        fork-join-executor {
+          parallelism-min = 6
+          parallelism-factor = 1
+          parallelism-max = 6
+        }
+      }
+    }
+  }
+}      
+```
+
 
 ### Actors
 
