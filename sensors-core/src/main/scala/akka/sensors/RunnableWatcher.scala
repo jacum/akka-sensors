@@ -34,7 +34,7 @@ object RunnableWatcher extends LazyLogging {
 
     val cache = TrieMap.empty[ThreadId, StartTime]
 
-    AkkaSensors.executor.scheduleWithFixedDelay(
+    AkkaSensors.schedule("RunnableWatcher",
       () =>
         try {
           val currentTime = System.nanoTime()
@@ -53,9 +53,7 @@ object RunnableWatcher extends LazyLogging {
         } catch {
           case NonFatal(failure) => logger.error(s"failed to check hanging threads: $failure", failure)
         },
-      checkInterval.length,
-      checkInterval.length,
-      checkInterval.unit
+      checkInterval
     )
 
     val startWatching = (threadId: ThreadId) => {

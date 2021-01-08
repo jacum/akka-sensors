@@ -1,10 +1,10 @@
 {
   "type": "app",
-  "name": "Sensors Prometheus",
+  "name": "Akka Sensors",
   "id": "sensors-prometheus-app",
 
   "info": {
-    "description": "Sensors dashboards for Prometheus data source",
+    "description": "Akka Sensors dashboards for Prometheus data source",
     "author": {
       "name": "PragmaSoft",
       "url": "https://pragmasoft.nl"

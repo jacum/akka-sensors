@@ -1,7 +1,7 @@
 package akka.sensors.actor
 
 import akka.actor.{Actor, ActorLogging}
-import akka.cluster.Cluster
+import akka.cluster.{Cluster, Member}
 import akka.cluster.ClusterEvent._
 import akka.sensors.{AkkaSensorsExtension, AkkaSensorsExtensionImpl}
 
@@ -18,23 +18,23 @@ class ClusterEventWatchActor extends Actor with ActorLogging {
 
   override def postStop(): Unit = cluster.unsubscribe(self)
 
-  private def registerEvent(e: ClusterDomainEvent): Unit = {
-    val eventName = e.getClass.getSimpleName
-    clusterEvents.labels(eventName).inc()
-  }
+  private def registerEvent(e: ClusterDomainEvent, member: Option[Member] = None): Unit =
+    clusterEvents
+      .labels(e.getClass.getSimpleName, member.map(_.address.toString).getOrElse(""))
+      .inc()
 
   def receive: Receive = {
     case e @ MemberUp(member) =>
-      registerEvent(e)
+      registerEvent(e, Some(member))
       log.info("Member is Up: {}", member.address)
     case e @ UnreachableMember(member) =>
-      registerEvent(e)
+      registerEvent(e, Some(member))
       log.info("Member detected as unreachable: {}", member)
     case e @ MemberRemoved(member, previousStatus) =>
-      registerEvent(e)
+      registerEvent(e, Some(member))
       log.info("Member is Removed: {} after {}", member.address, previousStatus)
     case e @ MemberDowned(member) =>
-      registerEvent(e)
+      registerEvent(e,Some(member))
       log.info("Member is Down: {}", member.address)
     case e: ClusterDomainEvent =>
       registerEvent(e)

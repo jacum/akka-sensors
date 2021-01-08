@@ -166,7 +166,7 @@ object DispatcherInstrumentationWrapper {
 class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrerequisites) extends ExecutorServiceConfigurator(config, prerequisites) {
 
   lazy val delegate: ExecutorServiceConfigurator =
-    configurator(config.getString("instrumented-executor.delegate"))
+    serviceConfigurator(config.getString("instrumented-executor.delegate"))
 
   override def createExecutorServiceFactory(id: String, threadFactory: ThreadFactory): ExecutorServiceFactory = {
     val esf = delegate.createExecutorServiceFactory(id, threadFactory)
@@ -174,6 +174,7 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
     new ExecutorServiceFactory {
       def createExecutorService: ExecutorService = {
         val es                = esf.createExecutorService
+
         lazy val activeCount       = executorValue.labels(id, "activeCount")
         lazy val corePoolSize      = executorValue.labels(id, "corePoolSize")
         lazy val largestPoolSize   = executorValue.labels(id, "largestPoolSize")
@@ -189,7 +190,7 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
 
         es match {
           case tp: ThreadPoolExecutor =>
-            AkkaSensors.executor.scheduleWithFixedDelay(
+            AkkaSensors.schedule(id,
               () => {
                 activeCount.set(tp.getActiveCount)
                 corePoolSize.set(tp.getCorePoolSize)
@@ -199,13 +200,10 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
                 completedTasks.set(tp.getCompletedTaskCount.toDouble)
                 poolSize.set(tp.getPoolSize)
               },
-              1L,
-              1L,
-              TimeUnit.SECONDS
-            ) // todo parametrise
+            )
 
           case fj: ForkJoinPool =>
-            AkkaSensors.executor.scheduleWithFixedDelay(
+            AkkaSensors.schedule(id,
               () => {
                 poolSize.set(fj.getPoolSize)
                 steals.set(fj.getStealCount.toDouble)
@@ -214,14 +212,11 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
                 queuedSubmissions.set(fj.getQueuedSubmissionCount)
                 queuedTasks.set(fj.getQueuedTaskCount.toDouble)
                 runningThreads.set(fj.getRunningThreadCount)
-              },
-              1L,
-              1L,
-              TimeUnit.SECONDS
-            ) // todo parametrise
+              }
+            )
 
           case _ =>
-          // don't
+
         }
 
         es
@@ -229,7 +224,7 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
     }
   }
 
-  def configurator(executor: String): ExecutorServiceConfigurator =
+  def serviceConfigurator(executor: String): ExecutorServiceConfigurator =
     executor match {
       case null | "" | "fork-join-executor" => new ForkJoinExecutorConfigurator(config.getConfig("fork-join-executor"), prerequisites)
       case "thread-pool-executor"           => new ThreadPoolExecutorConfigurator(config.getConfig("thread-pool-executor"), prerequisites)
@@ -260,7 +255,7 @@ trait InstrumentedDispatcher extends Dispatcher {
   private val interestingStateNames = Set("runnable", "waiting", "timed_waiting", "blocked")
   private val interestingStates = Thread.State.values.filter(s => interestingStateNames.contains(s.name().toLowerCase))
 
-  AkkaSensors.executor.scheduleWithFixedDelay(
+  AkkaSensors.schedule(s"$id-states",
     () => {
       val threads = threadMXBean
         .getThreadInfo(threadMXBean.getAllThreadIds, 0)
@@ -276,11 +271,7 @@ trait InstrumentedDispatcher extends Dispatcher {
       DispatcherMetrics.threads
         .labels(id)
         .set(threads.length)
-    },
-    AkkaSensors.ThreadStateSnapshotPeriodSeconds,
-    AkkaSensors.ThreadStateSnapshotPeriodSeconds,
-    TimeUnit.SECONDS
-  )
+    })
 
   override def execute(runnable: Runnable): Unit = wrapper(runnable, super.execute)
 

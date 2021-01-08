@@ -1,7 +1,6 @@
 package akka.sensors
 
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
-
 import akka.Done
 import akka.actor.{ActorSystem, ClassicActorSystemProvider, CoordinatedShutdown, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider, Props}
 import akka.sensors.actor.ClusterEventWatchActor
@@ -9,16 +8,35 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.LazyLogging
 import io.prometheus.client.{Collector, CollectorRegistry, Counter, Gauge, Histogram, SimpleCollector}
 
+import scala.collection.concurrent.TrieMap
 import scala.concurrent.Future
+import scala.concurrent.duration.Duration
 import scala.util.Try
 
-object AkkaSensors {
-  // single-thread dedicated executor for low-frequency (some seconds between calls) sensors' internal business
-  val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
+object AkkaSensors extends LazyLogging  {
 
   private val config = ConfigFactory.load().getConfig("akka.sensors")
-  val ThreadStateSnapshotPeriodSeconds: Long = Try(config.getDuration("thread-state-snapshot-period", TimeUnit.SECONDS)).getOrElse(1L)
+  private val defaultPollInterval: Long = Try(config.getDuration("thread-state-snapshot-period", TimeUnit.SECONDS)).getOrElse(1L)
   val ClusterWatchEnabled: Boolean = Try(config.getBoolean("cluster-watch-enabled")).getOrElse(false)
+
+  // single-thread dedicated executor for low-frequency (some seconds between calls) sensors' internal business
+  private val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
+  private val periodicPolls = new TrieMap[String, Runnable]
+
+  def schedule(id: String,
+               poll: Runnable,
+               interval: Duration = Duration(AkkaSensors.defaultPollInterval, TimeUnit.SECONDS)): Unit = {
+    periodicPolls.getOrElseUpdate(id, {
+      executor.scheduleWithFixedDelay(poll,
+        interval.length,
+        interval.length,
+        interval.unit
+      )
+      logger.info(s"Scheduled poll: $id")
+      poll
+    })
+  }
+
 }
 
 class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension with MetricsBuilders with LazyLogging {
@@ -68,6 +86,7 @@ class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension wi
     .name("cluster_events_total")
     .help(s"Number of cluster events, per type")
     .labelNames("event")
+    .labelNames("member")
     .register(registry)
   val clusterMembers: Gauge = gauge
     .name("cluster_members_total")
