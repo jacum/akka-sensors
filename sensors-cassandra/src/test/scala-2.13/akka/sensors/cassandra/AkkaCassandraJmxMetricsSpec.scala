@@ -27,11 +27,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 import scala.io.Source
 import scala.jdk.CollectionConverters._
-import akka.sensors.AkkaSensors
 
 class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Eventually with BeforeAndAfterAll {
 
-  implicit val prometheusRegistry = AkkaSensors.prometheusRegistry
+  implicit val prometheusRegistry = CollectorRegistry.defaultRegistry
   DefaultExports.register(prometheusRegistry)
   prometheusRegistry.register(new JmxCollector(Source.fromResource("prometheus-jmx-collector.yaml").mkString))
 
