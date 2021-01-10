@@ -41,7 +41,7 @@ System.register(['lodash'], function (_export, _context) {
                     _classCallCheck(this, SensorsPrometheusAppConfigCtrl);
 
                     this.backendSrv = backendSrv;
-                    this.datasourceName = 'Prometheus-local';
+                    this.datasourceName = 'Prometheus-Local';
                     this.isDatasourceCreated = false;
                     this.appEditCtrl.setPreUpdateHook(this.preUpdate.bind(this));
 
