@@ -24,21 +24,13 @@ If you answer 'yes' to most of the questions above, Akka Sensors may be the righ
 
 - Easy Demo/Evaluation setup included: Akka with Cassandra persistence, Prometheus server and Grafana dashboards.
 
-![Actors](./docs/akka-actors.png)|![JVM](./docs/jvm.png)
---- | ---
-![Dispatchers](./docs/akka-dispatchers.png)|![Cassandra](./docs/cassandra.png)
+Actor dashboard:
+[Actors](./docs/akka-actors.png)
+
+Dispatcher dashboard:
+[Dispatchers](./docs/akka-dispatchers.png)
 
 ## Features
-
-### Java Virtual Machine 
- - number of instances
- - start since / uptime
- - JVM version
- - memory pools
- - garbage collector
-
-### Thread watcher
- - thread watcher, keeping eye on threads running suspiciously long, and reporting their stacktraces - to help you find blocking code quickly 
 
 ###  Dispatchers
  - time of runnable waiting in queue (histogram) 
@@ -46,6 +38,9 @@ If you answer 'yes' to most of the questions above, Akka Sensors may be the righ
  - implementation-specific ForkJoinPool and ThreadPool stats (gauges)
  - thread states, as seen from JMX ThreadInfo (histogram, updated once in X seconds) 
  - active worker threads (histogram, updated on each runnable)
+
+### Thread watcher
+- thread watcher, keeping eye on threads running suspiciously long, and reporting their stacktraces - to help you find blocking code quickly
 
 ### Basic actor stats
  - number of actors (gauge)
@@ -62,13 +57,20 @@ If you answer 'yes' to most of the questions above, Akka Sensors may be the righ
  - persist failures (counter)
 
 ### Cluster
- - cluster events, per type (counter)
+ - cluster events, per type/member (counter)
 
 ### Cassandra
 Instrumented Cassandra session provider, exposing Cassandra client metrics collection.
  - requests
  - traffic in/out
  - timeouts
+
+### Java Virtual Machine (from Prometheus default collectors)
+- number of instances
+- start since / uptime
+- JVM version
+- memory pools
+- garbage collector
 
 ## Demo setup
 
@@ -104,8 +106,8 @@ Sensors' bundled dashboards will be imported.
 ```
 libraryDependencies ++= 
   Seq(
-     "nl.pragmasoft.sensors" %% "sensors-core" % "0.0.2",
-     "nl.pragmasoft.sensors" %% "sensors-cassandra" % "0.0.2"
+     "nl.pragmasoft.sensors" %% "sensors-core" % "0.0.7",
+     "nl.pragmasoft.sensors" %% "sensors-cassandra" % "0.0.7"
   )
 ```
 
@@ -162,7 +164,7 @@ akka {
 
 ```
 
-### Using explicit executor definition
+### Using explicit/inline executor definition
 
 ```
 akka {
@@ -173,12 +175,12 @@ akka {
         executor = "akka.sensors.dispatch.InstrumentedExecutor"
 
         instrumented-executor {
-          delegate = "fork-join-executor"
+          delegate = "cassandra-fork-join-executor"
           measure-runs = true
           watch-long-runs = false
         }
 
-        fork-join-executor {
+        cassandra-fork-join-executor {
           parallelism-min = 6
           parallelism-factor = 1
           parallelism-max = 6
