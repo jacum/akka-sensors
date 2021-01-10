@@ -25,10 +25,10 @@ If you answer 'yes' to most of the questions above, Akka Sensors may be the righ
 - Easy Demo/Evaluation setup included: Akka with Cassandra persistence, Prometheus server and Grafana dashboards.
 
 Actor dashboard:
-[Actors](./docs/akka-actors.png)
+![Actors](./docs/akka-actors.png)
 
 Dispatcher dashboard:
-[Dispatchers](./docs/akka-dispatchers.png)
+![Dispatchers](./docs/akka-dispatchers.png)
 
 ## Features
 
