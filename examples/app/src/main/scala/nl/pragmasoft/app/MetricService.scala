@@ -1,8 +1,9 @@
 package nl.pragmasoft.app
 
+import akka.sensors.AkkaSensors
+
 import java.io.CharArrayWriter
 import java.net.InetSocketAddress
-
 import cats.effect.{ContextShift, IO, Resource, Timer}
 import com.typesafe.scalalogging.LazyLogging
 import io.prometheus.client.exporter.common.TextFormat
@@ -20,7 +21,7 @@ import scala.io.Source
 
 object MetricService extends LazyLogging {
 
-  val registry: CollectorRegistry = CollectorRegistry.defaultRegistry
+  val registry: CollectorRegistry = AkkaSensors.prometheusRegistry
   DefaultExports.register(registry)
 
   try registry.register(new JmxCollector(Source.fromResource("prometheus-jmx-collector.yaml").mkString))

@@ -1,6 +1,6 @@
 package akka.sensors.actor
 
-import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef}
+import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, ReceiveTimeout}
 import akka.persistence.{PersistentActor, RecoveryCompleted}
 import akka.sensors.AkkaSensorsExtension
 
@@ -13,22 +13,33 @@ trait ActorMetrics extends Actor with ActorLogging {
   _: Actor =>
   import akka.sensors.MetricOps._
 
-  protected def actorTag: String = this.getClass.getSimpleName
+  protected def actorLabel: String = this.getClass.getSimpleName
+
+  protected def messageLabel(value: Any): Option[String] = Some(value.getClass.getSimpleName)
 
   protected val metrics              = AkkaSensorsExtension(this.context.system)
-  private val receiveTime            = metrics.receiveTime.labels(actorTag)
-  private lazy val exceptions        = metrics.exceptions.labels(actorTag)
-  private val activeActors           = metrics.activeActors.labels(actorTag)
-  private lazy val unhandledMessages = metrics.unhandledMessages.labels(actorTag)
+  private val receiveTimeouts        = metrics.receiveTimeouts.labels(actorLabel)
+  private lazy val exceptions        = metrics.exceptions.labels(actorLabel)
+  private val activeActors           = metrics.activeActors.labels(actorLabel)
+  private lazy val unhandledMessages = metrics.unhandledMessages.labels(actorLabel)
 
-  private val activityTimer = metrics.activityTime.labels(actorTag).startTimer()
+  private val activityTimer = metrics.activityTime.labels(actorLabel).startTimer()
 
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit =
     internalAroundReceive(receive, msg)
 
   protected def internalAroundReceive(receive: Receive, msg: Any): Unit = {
-    try receiveTime.observeExecution(super.aroundReceive(receive, msg))
-    catch {
+    msg match {
+      case ReceiveTimeout =>
+        receiveTimeouts.inc()
+      case _ =>
+    }
+    try {
+      messageLabel(msg).map(metrics.receiveTime
+          .labels(actorLabel, _)
+          .observeExecution(super.aroundReceive(receive, msg)))
+        .getOrElse(super.aroundReceive(receive, msg))
+    } catch {
       case NonFatal(e) =>
         exceptions.inc()
         throw e
@@ -55,38 +66,50 @@ trait ActorMetrics extends Actor with ActorLogging {
 trait PersistentActorMetrics extends ActorMetrics with PersistentActor  {
   import akka.sensors.MetricOps._
 
-  private val persistTime           = metrics.persistTime.labels(actorTag)
-  private var recovered: Boolean    = false
-  private lazy val recoveryEvents   = metrics.recoveryEvents.labels(actorTag)
-  private lazy val recoveryTime     = metrics.recoveryTime.labels(actorTag).startTimer()
-  private lazy val recoveryFailures = metrics.recoveryFailures.labels(actorTag)
-  private lazy val persistFailures  = metrics.persistFailures.labels(actorTag)
-  private lazy val persistRejects   = metrics.persistRejects.labels(actorTag)
+  // normally we don't need to watch internal akka persistence messages
+  override protected def messageLabel(value: Any): Option[String] =
+    if (!recoveryFinished) None else // ignore commands while doing recovery, these are auto-stashed
+    if (value.getClass.getPackageName.startsWith("akka.persistence")) None // ignore akka persistence internal buzz
+    else super.messageLabel(value)
 
+  protected def eventLabel(value: Any): Option[String] = messageLabel(value)
+
+  private var recovered: Boolean    = false
+  private lazy val recoveries       = metrics.recoveries.labels(actorLabel)
+  private lazy val recoveryEvents   = metrics.recoveryEvents.labels(actorLabel)
+  private lazy val recoveryTime     = metrics.recoveryTime.labels(actorLabel).startTimer()
+  private lazy val recoveryFailures = metrics.recoveryFailures.labels(actorLabel)
+  private lazy val persistFailures  = metrics.persistFailures.labels(actorLabel)
+  private lazy val persistRejects   = metrics.persistRejects.labels(actorLabel)
 
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit = {
-    if (recoveryRunning) recoveryEvents.inc()
-    else if (!recovered) { recoveryTime.observeDuration(); recovered  = true }
+    if (!recoveryFinished) {
+      if (msg.getClass.getSimpleName.startsWith("ReplayedMessage")) recoveryEvents.inc()
+    } else if (!recovered) {
+      recoveries.inc()
+      recoveryTime.observeDuration()
+      recovered  = true
+    }
     internalAroundReceive(receive, msg)
   }
 
   override def persist[A](event: A)(handler: A => Unit): Unit =
-    persistTime.observeExecution(
+    eventLabel(event).map(label => metrics.persistTime.labels(actorLabel, label).observeExecution(
       this.internalPersist(event)(handler)
-    )
+    )).getOrElse(this.internalPersist(event)(handler))
 
   override def persistAll[A](events: immutable.Seq[A])(handler: A => Unit): Unit =
-    persistTime.observeExecution(
+    metrics.persistTime.labels(actorLabel, "_all").observeExecution(
       this.internalPersistAll(events)(handler)
     )
 
   override def persistAsync[A](event: A)(handler: A => Unit): Unit =
-    persistTime.observeExecution(
+    eventLabel(event).map(label => metrics.persistTime.labels(actorLabel, label).observeExecution(
       this.internalPersistAsync(event)(handler)
-    )
+    )).getOrElse(this.internalPersistAsync(event)(handler))
 
   override def persistAllAsync[A](events: immutable.Seq[A])(handler: A => Unit): Unit =
-    persistTime.observeExecution(
+    metrics.persistTime.labels(actorLabel, "_all").observeExecution(
     this.internalPersistAllAsync(events)(handler)
   )
 

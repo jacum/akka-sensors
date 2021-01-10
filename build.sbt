@@ -62,6 +62,7 @@ lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
     libraryDependencies ++= Akka.deps ++ Prometheus.deps ++ Cassandra.deps ++ Logging.deps ++ TestTools.deps,
     dependencyOverrides ++= Akka.deps
   )
+  .dependsOn(`sensors-core`)
 
 lazy val `app` = project.in(file("examples/app"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
