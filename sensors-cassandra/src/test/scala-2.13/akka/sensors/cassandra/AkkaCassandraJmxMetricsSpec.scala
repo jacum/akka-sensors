@@ -28,7 +28,6 @@ import scala.concurrent.{Await, ExecutionContext}
 import scala.io.Source
 import scala.jdk.CollectionConverters._
 
-
 class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Eventually with BeforeAndAfterAll {
 
   implicit val prometheusRegistry = CollectorRegistry.defaultRegistry
@@ -132,6 +131,4 @@ object TestActors {
         sender() ! Pong
     }
   }
-
-
 }

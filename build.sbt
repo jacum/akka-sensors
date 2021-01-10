@@ -4,8 +4,8 @@ import sbt.file
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   organization := "nl.pragmasoft.sensors",
-  crossScalaVersions := Seq("2.13.3", "2.12.12"),
-  scalaVersion :=  "2.13.3",
+  crossScalaVersions := Seq("2.13.4", "2.12.12"),
+  scalaVersion :=  "2.13.4",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   javacOptions := Seq("-source", "1.8", "-target", "1.8"),
   scalacOptions := Seq(
@@ -62,6 +62,7 @@ lazy val `sensors-cassandra` = project.in(file("sensors-cassandra"))
     libraryDependencies ++= Akka.deps ++ Prometheus.deps ++ Cassandra.deps ++ Logging.deps ++ TestTools.deps,
     dependencyOverrides ++= Akka.deps
   )
+  .dependsOn(`sensors-core`)
 
 lazy val `app` = project.in(file("examples/app"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)

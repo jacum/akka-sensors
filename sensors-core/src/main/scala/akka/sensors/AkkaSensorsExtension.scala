@@ -1,13 +1,13 @@
 package akka.sensors
 
-import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 import akka.Done
 import akka.actor.{ActorSystem, ClassicActorSystemProvider, CoordinatedShutdown, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider, Props}
 import akka.sensors.actor.ClusterEventWatchActor
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import io.prometheus.client.{Collector, CollectorRegistry, Counter, Gauge, Histogram, SimpleCollector}
+import io.prometheus.client.{CollectorRegistry, Counter, Gauge, Histogram}
 
+import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -25,17 +25,19 @@ object AkkaSensors extends LazyLogging  {
 
   def schedule(id: String,
                poll: Runnable,
-               interval: Duration = Duration(AkkaSensors.defaultPollInterval, TimeUnit.SECONDS)): Unit = {
+               interval: Duration = Duration(defaultPollInterval, TimeUnit.SECONDS)): Unit = {
     periodicPolls.getOrElseUpdate(id, {
       executor.scheduleWithFixedDelay(poll,
         interval.length,
         interval.length,
         interval.unit
       )
-      logger.info(s"Scheduled poll: $id")
+      logger.info(s"Scheduled activity: $id")
       poll
     })
   }
+
+  def prometheusRegistry: CollectorRegistry = CollectorRegistry.defaultRegistry // todo how to parametrise/hook to other metric exports?
 
 }
 
@@ -52,7 +54,7 @@ class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension wi
 
   CoordinatedShutdown(system)
     .addTask(CoordinatedShutdown.PhaseBeforeActorSystemTerminate, "clearPrometheusRegistry") { () =>
-    CollectorRegistry.defaultRegistry.clear()
+    AkkaSensors.prometheusRegistry.clear()
     logger.info("Cleared metrics")
     Future.successful(Done)
   }
@@ -80,6 +82,11 @@ class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension wi
   val receiveTime: Histogram = millisHistogram
     .name("receive_time_millis")
     .help(s"Millis to process receive")
+    .labelNames("actor", "message")
+    .register(registry)
+  val receiveTimeouts: Counter = counter
+    .name("receive_timeouts_total")
+    .help("Number of receive timeouts")
     .labelNames("actor")
     .register(registry)
   val clusterEvents: Counter = counter
@@ -100,6 +107,11 @@ class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension wi
   val persistTime: Histogram = millisHistogram
     .name("persist_time_millis")
     .help(s"Millis to process single event persist")
+    .labelNames("actor", "event")
+    .register(registry)
+  val recoveries: Counter = counter
+    .name("recoveries_total")
+    .help(s"Recoveries by actors")
     .labelNames("actor")
     .register(registry)
   val recoveryEvents: Counter = counter
@@ -155,20 +167,20 @@ trait MetricsBuilders {
   def namespace: String
   def subsystem: String
 
-  val registry: CollectorRegistry = CollectorRegistry.defaultRegistry
+  val registry: CollectorRegistry = AkkaSensors.prometheusRegistry
 
   def millisHistogram: Histogram.Builder =
     Histogram
       .build()
       .namespace(namespace)
       .subsystem(subsystem)
-      .buckets(.0005, .001, .0025, .005, .01, .025, .05, .075, .1, .25, .5, .75, 1, 2.5, 5, 7.5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000)
+      .buckets(.0005, .001, .0025, .005, .01, .025, .05, .075, .1, .25, .5, .75, 1, 2.5, 5, 7.5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000, 15000, 20000, 30000)
   def secondsHistogram: Histogram.Builder =
     Histogram
       .build()
       .namespace(namespace)
       .subsystem(subsystem)
-      .buckets(0, 1, 2.5, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000)
+      .buckets(0, 1, 2.5, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000, 15000, 20000, 30000)
   def valueHistogram(max: Int): Histogram.Builder =
     Histogram
       .build()

@@ -111,7 +111,8 @@ libraryDependencies ++=
 
 ### Prometheus exporter
 
-If you already have Prometheus exporter in your application, `CollectorRegistry.defaultRegistry` will be used by Sensors and the metrics should appear automatically.
+If you already have Prometheus exporter in your application, `CollectorRegistry.defaultRegistry` will be used by default.
+To control this finely, `AkkaSensors.prometheusRegistry` needs to be overridden.
 
 For an example of HTTP exporter service, check `MetricService` implementation in example application (`app`) module. 
 
