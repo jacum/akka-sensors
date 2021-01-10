@@ -72,7 +72,7 @@ class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension wi
   val unhandledMessages: Counter = counter
     .name("unhandled_messages_total")
     .help(s"Unhandled messages")
-    .labelNames("actor")
+    .labelNames("actor", "message")
     .register(registry)
   val exceptions: Counter = counter
     .name("exceptions_total")

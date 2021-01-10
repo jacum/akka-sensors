@@ -21,7 +21,6 @@ trait ActorMetrics extends Actor with ActorLogging {
   private val receiveTimeouts        = metrics.receiveTimeouts.labels(actorLabel)
   private lazy val exceptions        = metrics.exceptions.labels(actorLabel)
   private val activeActors           = metrics.activeActors.labels(actorLabel)
-  private lazy val unhandledMessages = metrics.unhandledMessages.labels(actorLabel)
 
   private val activityTimer = metrics.activityTime.labels(actorLabel).startTimer()
 
@@ -57,7 +56,8 @@ trait ActorMetrics extends Actor with ActorLogging {
   }
 
   override def unhandled(message: Any): Unit = {
-    unhandledMessages.inc()
+    messageLabel(message)
+      .foreach(metrics.unhandledMessages.labels(actorLabel, _).inc())
     super.unhandled(message)
   }
 
