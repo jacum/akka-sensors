@@ -69,7 +69,7 @@ trait PersistentActorMetrics extends ActorMetrics with PersistentActor  {
   // normally we don't need to watch internal akka persistence messages
   override protected def messageLabel(value: Any): Option[String] =
     if (!recoveryFinished) None else // ignore commands while doing recovery, these are auto-stashed
-    if (value.getClass.getPackageName.startsWith("akka.persistence")) None // ignore akka persistence internal buzz
+    if (value.getClass.getName.startsWith("akka.persistence")) None // ignore akka persistence internal buzz
     else super.messageLabel(value)
 
   protected def eventLabel(value: Any): Option[String] = messageLabel(value)
