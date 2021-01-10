@@ -92,8 +92,7 @@ class AkkaSensorsExtensionImpl(system: ExtendedActorSystem) extends Extension wi
   val clusterEvents: Counter = counter
     .name("cluster_events_total")
     .help(s"Number of cluster events, per type")
-    .labelNames("event")
-    .labelNames("member")
+    .labelNames("event", "member")
     .register(registry)
   val clusterMembers: Gauge = gauge
     .name("cluster_members_total")

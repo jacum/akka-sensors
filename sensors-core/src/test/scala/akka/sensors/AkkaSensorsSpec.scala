@@ -76,7 +76,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
         system.actorOf(Props(classOf[MassProbe]), s"mass-$v")
       )
 
-      implicit val patienceConfig: PatienceConfig = PatienceConfig(10 seconds, 100 milliseconds)
+      implicit val patienceConfig: PatienceConfig = PatienceConfig(20 seconds, 100 milliseconds)
       eventually {
         assertMetrics(
           _.startsWith("akka_sensors_actor_active_actors_total{actor=\"MassProbe\""),
