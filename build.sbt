@@ -7,6 +7,8 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   crossScalaVersions := Seq("2.13.4", "2.12.12"),
   scalaVersion :=  "2.13.4",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
+  parallelExecution in Test := false,
+  Test / fork := true,
   javacOptions := Seq("-source", "1.8", "-target", "1.8"),
   scalacOptions := Seq(
     s"-target:jvm-1.8",
