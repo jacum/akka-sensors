@@ -71,7 +71,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
     }
 
     "ensure MANY actors are created and stopped, all accounted for" in {
-      val actors = 200000
+      val actors = 50000
       val refs = (1 to actors).map(v =>
         system.actorOf(Props(classOf[MassProbe]), s"mass-$v")
       )
