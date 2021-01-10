@@ -131,6 +131,4 @@ object TestActors {
         sender() ! Pong
     }
   }
-
-
 }
