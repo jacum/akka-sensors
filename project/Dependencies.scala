@@ -36,8 +36,8 @@ object Dependencies {
   }
 
   object Prometheus {
-    val hotspot = "io.prometheus" % "simpleclient_hotspot" % "0.9.0"
-    val common = "io.prometheus" % "simpleclient_common" % "0.9.0"
+    val hotspot = "io.prometheus" % "simpleclient_hotspot" % "0.10.0"
+    val common = "io.prometheus" % "simpleclient_common" % "0.10.0"
     val jmx = "io.prometheus.jmx" % "collector" % "0.14.0"
 
     val deps = Seq(hotspot, common, jmx)
