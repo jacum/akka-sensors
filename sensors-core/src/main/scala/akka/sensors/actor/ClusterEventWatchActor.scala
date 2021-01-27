@@ -3,7 +3,7 @@ package akka.sensors.actor
 import akka.actor.{Actor, ActorLogging}
 import akka.cluster.{Cluster, Member}
 import akka.cluster.ClusterEvent._
-import akka.sensors.{AkkaSensorsExtension, AkkaSensorsExtensionImpl}
+import akka.sensors.{AkkaSensorsExtension, AkkaSensorsExtensionImpl, ClassNameUtil}
 
 class ClusterEventWatchActor extends Actor with ActorLogging {
 
@@ -20,7 +20,7 @@ class ClusterEventWatchActor extends Actor with ActorLogging {
 
   private def registerEvent(e: ClusterDomainEvent, member: Option[Member] = None): Unit =
     clusterEvents
-      .labels(e.getClass.getSimpleName, member.map(_.address.toString).getOrElse(""))
+      .labels(ClassNameUtil.simpleName(e.getClass), member.map(_.address.toString).getOrElse(""))
       .inc()
 
   def receive: Receive = {

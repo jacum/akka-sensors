@@ -175,12 +175,12 @@ akka {
         executor = "akka.sensors.dispatch.InstrumentedExecutor"
 
         instrumented-executor {
-          delegate = "cassandra-fork-join-executor"
+          delegate = "fork-join-executor"
           measure-runs = true
           watch-long-runs = false
         }
 
-        cassandra-fork-join-executor {
+        fork-join-executor {
           parallelism-min = 6
           parallelism-factor = 1
           parallelism-max = 6

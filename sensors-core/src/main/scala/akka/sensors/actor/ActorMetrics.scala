@@ -2,7 +2,7 @@ package akka.sensors.actor
 
 import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, ReceiveTimeout}
 import akka.persistence.{PersistentActor, RecoveryCompleted}
-import akka.sensors.AkkaSensorsExtension
+import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
 
 import scala.collection.immutable
 import scala.util.control.NonFatal
@@ -13,9 +13,9 @@ trait ActorMetrics extends Actor with ActorLogging {
   _: Actor =>
   import akka.sensors.MetricOps._
 
-  protected def actorLabel: String = this.getClass.getSimpleName
+  protected def actorLabel: String = ClassNameUtil.simpleName(this.getClass)
 
-  protected def messageLabel(value: Any): Option[String] = Some(value.getClass.getSimpleName)
+  protected def messageLabel(value: Any): Option[String] = Some(ClassNameUtil.simpleName(value.getClass))
 
   protected val metrics              = AkkaSensorsExtension(this.context.system)
   private val receiveTimeouts        = metrics.receiveTimeouts.labels(actorLabel)
@@ -84,7 +84,7 @@ trait PersistentActorMetrics extends ActorMetrics with PersistentActor  {
 
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit = {
     if (!recoveryFinished) {
-      if (msg.getClass.getSimpleName.startsWith("ReplayedMessage")) recoveryEvents.inc()
+      if (ClassNameUtil.simpleName(msg.getClass).startsWith("ReplayedMessage")) recoveryEvents.inc()
     } else if (!recovered) {
       recoveries.inc()
       recoveryTime.observeDuration()
