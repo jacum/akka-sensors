@@ -18,7 +18,7 @@ object Dependencies {
   }
 
   object Akka {
-    val akkaVersion = "2.6.10"
+    val akkaVersion = "2.6.12"
     val akkaManagementVersion = "1.0.9"
     val akkaPersistenceCassandraVersion = "1.0.4"
     val akkaHttpVersion = "10.2.1"
@@ -36,15 +36,15 @@ object Dependencies {
   }
 
   object Prometheus {
-    val hotspot = "io.prometheus" % "simpleclient_hotspot" % "0.9.0"
-    val common = "io.prometheus" % "simpleclient_common" % "0.9.0"
-    val jmx = "io.prometheus.jmx" % "collector" % "0.14.0"
+    val hotspot = "io.prometheus" % "simpleclient_hotspot" % "0.10.0"
+    val common = "io.prometheus" % "simpleclient_common" % "0.10.0"
+    val jmx = "io.prometheus.jmx" % "collector" % "0.15.0"
 
     val deps = Seq(hotspot, common, jmx)
   }
 
   object App {
-    val http4sVersion = "0.21.15"
+    val http4sVersion = "0.21.19"
     val circeVersion = "0.13.0"
     val http4s = "org.http4s" %% "http4s-core" % http4sVersion
     val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
@@ -63,15 +63,15 @@ object Dependencies {
 
   object Cassandra {
     val akkaPersistenceCassandraVersion = "1.0.4"
-    val cassandraDriverVersion = "4.9.0"
+    val cassandraDriverVersion = "4.10.0"
 
     val cassandraDriverCore = "com.datastax.oss" % "java-driver-core" % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss" % "java-driver-query-builder" % cassandraDriverVersion
-    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.1.16"
+    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.1.17"
     val akkaPersistenceCassandra = "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
     val cassandraUnit = "org.cassandraunit" % "cassandra-unit" % "4.3.1.0"
 
-    val deps = Seq(akkaPersistenceCassandra, cassandraDriverCore, cassandraUnit, cassandraDriverQueryBuilder, cassandraDriverMetrics)
+    val deps = Seq(akkaPersistenceCassandra, cassandraDriverCore, cassandraDriverQueryBuilder, cassandraDriverMetrics)
   }
 
   object TestTools {

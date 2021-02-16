@@ -14,6 +14,7 @@
     <logger name="io.netty" level="ERROR"/>
     <logger name="org.cassandraunit" level="ERROR"/>
     <logger name="org.apache.cassandra" level="ERROR"/>
+    <logger name="org.apache.cassandra.service.StartupChecks" level="OFF"/>
     <logger name="com.datastax" level="ERROR"/>
 
 </configuration>
