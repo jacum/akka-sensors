@@ -18,7 +18,7 @@ object Dependencies {
   }
 
   object Akka {
-    val akkaVersion = "2.6.12"
+    val akkaVersion = "2.6.13"
     val akkaManagementVersion = "1.0.9"
     val akkaPersistenceCassandraVersion = "1.0.4"
     val akkaHttpVersion = "10.2.1"
