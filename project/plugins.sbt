@@ -5,7 +5,7 @@ addSbtPlugin("com.twilio" % "sbt-guardrail" % "0.62.2")
 addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.13")
 addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "3.1.1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.8.0")
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.1")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.2")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.5")
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.1.1") // 2.1.2 is released but unavailable??
