@@ -16,33 +16,8 @@ import scala.compat.java8.FutureConverters.toScala
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 
-case class Settings(
-  contactPoints: List[String],
-  port: Int,
-  username: String,
-  password: String,
-  profile: String,
-  localDatacenter: String,
-)
-
-object Settings {
-  def apply(config: Config) =
-    new Settings(
-      contactPoints = config.getString("contact-points").split(",").map(_.trim).toList,
-      port = config.getInt("port"),
-      username = config.getString("username"),
-      password = config.getString("password"),
-      profile = config.getString("profile"),
-      localDatacenter = config.getString("local-datacenter")
-    )
-
-}
 
 class InstrumentedCassandraSessionProvider(system: ActorSystem, config: Config) extends DefaultSessionProvider(system, config) with LazyLogging {
-
-  private val settings = Settings(
-    system.classicSystem.settings.config.getConfig(config.getString("session-provider-config"))
-  )
 
   private val instanceId = UUID.randomUUID()
 
@@ -81,9 +56,6 @@ class InstrumentedCassandraSessionProvider(system: ActorSystem, config: Config) 
         .builder()
         .withMetricRegistry(metricRegistry)
         .withConfigLoader(driverConfigLoader)
-        .withAuthCredentials(settings.username, settings.password)
-        .addContactPoints(settings.contactPoints.map(InetSocketAddress.createUnresolved(_, settings.port)).asJavaCollection)
-        .withLocalDatacenter(settings.localDatacenter)
         .withClientId(instanceId)
         .withNodeStateListener(nodeStateListener)
         .buildAsync())

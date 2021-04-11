@@ -3,7 +3,7 @@ version: "3"
 services:
   app:
     image: app:latest
-    ports: ["8080:8080", "8081:8081"]
+    ports: ["8080:8080", "9095:9095"]
     networks: [observability]
 
   prometheus:
