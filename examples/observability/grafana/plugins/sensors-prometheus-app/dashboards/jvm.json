@@ -22,7 +22,7 @@
   "panels": [
     {
       "collapsed": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -43,7 +43,7 @@
         "#e24d42",
         "#299c46"
       ],
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -145,7 +145,7 @@
         "#e24d42",
         "#73BF69"
       ],
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -234,7 +234,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -324,7 +324,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "decimals": null,
       "fieldConfig": {
         "defaults": {
@@ -414,7 +414,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -500,7 +500,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -610,7 +610,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -727,7 +727,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -857,7 +857,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -978,7 +978,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -995,7 +995,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -1105,7 +1105,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -1206,7 +1206,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1224,7 +1224,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1390,7 +1390,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1557,7 +1557,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1724,7 +1724,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1891,7 +1891,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus-local",
+      "datasource": "Prometheus-Local",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -2067,7 +2067,7 @@
           "text": "Sensors",
           "value": "Sensors"
         },
-        "datasource": "Prometheus-local",
+        "datasource": "Prometheus-Local",
         "definition": "label_values(up,job)",
         "error": null,
         "hide": 0,
@@ -2107,7 +2107,7 @@
             "PS Survivor Space"
           ]
         },
-        "datasource": "Prometheus-local",
+        "datasource": "Prometheus-Local",
         "definition": "label_values(jvm_memory_pool_bytes_max,pool)",
         "error": null,
         "hide": 2,
