@@ -4,8 +4,8 @@ import sbt.file
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   organization := "nl.pragmasoft.sensors",
-  crossScalaVersions := Seq("2.13.4", "2.12.13"),
-  scalaVersion :=  "2.13.4",
+  crossScalaVersions := Seq("2.13.5", "2.12.13"),
+  scalaVersion :=  "2.13.5",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   parallelExecution in Test := false,
   Test / fork := true,
@@ -82,3 +82,4 @@ lazy val `app` = project.in(file("examples/app"))
 lazy val `root` =  project.in(file("."))
   .aggregate(app, `sensors-core`, `sensors-cassandra`)
   .settings(commonSettings ++ noPublishSettings)
+  .settings(name := "Akka Sensors")

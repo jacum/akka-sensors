@@ -13,14 +13,14 @@ object Dependencies {
   object Logging {
     val slf4jversion = "1.7.30"
     val slf4jApi = "org.slf4j" % "slf4j-api" % slf4jversion
-    val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
+    val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.3"
     val deps = Seq(slf4jApi, scalaLogging)
   }
 
   object Akka {
-    val akkaVersion = "2.6.12"
+    val akkaVersion = "2.6.14"
     val akkaManagementVersion = "1.0.9"
-    val akkaPersistenceCassandraVersion = "1.0.4"
+    val akkaPersistenceCassandraVersion = "1.0.5"
     val akkaHttpVersion = "10.2.1"
 
 
@@ -44,7 +44,7 @@ object Dependencies {
   }
 
   object App {
-    val http4sVersion = "0.21.19"
+    val http4sVersion = "0.21.22"
     val circeVersion = "0.13.0"
     val http4s = "org.http4s" %% "http4s-core" % http4sVersion
     val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
@@ -63,11 +63,11 @@ object Dependencies {
 
   object Cassandra {
     val akkaPersistenceCassandraVersion = "1.0.4"
-    val cassandraDriverVersion = "4.10.0"
+    val cassandraDriverVersion = "4.11.0"
 
     val cassandraDriverCore = "com.datastax.oss" % "java-driver-core" % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss" % "java-driver-query-builder" % cassandraDriverVersion
-    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.1.17"
+    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.1.19"
     val akkaPersistenceCassandra = "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
     val cassandraUnit = "org.cassandraunit" % "cassandra-unit" % "4.3.1.0"
 
@@ -76,7 +76,7 @@ object Dependencies {
 
   object TestTools {
     val log = "ch.qos.logback" % "logback-classic" % "1.2.3"
-    val scalaTest = "org.scalatest" %% "scalatest" % "3.2.3"
+    val scalaTest = "org.scalatest" %% "scalatest" % "3.2.7"
     val deps = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal, log)
   }
 
