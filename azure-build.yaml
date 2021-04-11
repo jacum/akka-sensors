@@ -43,7 +43,9 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.13; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
+        # coverage disabled due to https://github.com/scoverage/sbt-scoverage/issues/319
+        # sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.13; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.13; test; "
       failOnStderr: false
 
   - task: Bash@3
@@ -51,5 +53,5 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.13.5; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.13.5; clean; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
       failOnStderr: false
