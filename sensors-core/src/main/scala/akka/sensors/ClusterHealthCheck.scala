@@ -7,7 +7,6 @@ import scala.concurrent.Future
 
 class ClusterHealthCheck(system: ActorSystem) extends (() => Future[Boolean]) {
   private val cluster = Cluster(system)
-  override def apply(): Future[Boolean] = {
+  override def apply(): Future[Boolean] =
     Future.successful(cluster.selfMember.status == MemberStatus.Up)
-  }
 }

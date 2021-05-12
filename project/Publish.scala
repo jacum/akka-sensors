@@ -7,9 +7,9 @@ import xerial.sbt.Sonatype.SonatypeKeys._
 object Publish {
 
   val SuppressJavaDocsAndSources = Seq(
-    sources in doc := Seq(),
-    publishArtifact in packageDoc := false,
-    publishArtifact in packageSrc := false
+    doc / sources := Seq(),
+    packageDoc / publishArtifact := false,
+    packageSrc / publishArtifact := false
   )
 
   val ReleaseToSonatype = Seq(
@@ -43,9 +43,9 @@ object Publish {
     ),
     publishMavenStyle := true,
     publishTo := sonatypePublishToBundle.value,
-    publishArtifact in Test := false,
-    publishArtifact in packageDoc := true,
-    publishArtifact in packageSrc := true,
+    Test / publishArtifact := false,
+    packageDoc / publishArtifact := false,
+    packageSrc / publishArtifact := true,
     pomIncludeRepository := (_ => false),
     releaseCrossBuild := true,
     releaseIgnoreUntrackedFiles := true,

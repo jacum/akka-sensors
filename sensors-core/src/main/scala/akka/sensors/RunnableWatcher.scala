@@ -34,7 +34,8 @@ object RunnableWatcher extends LazyLogging {
 
     val cache = TrieMap.empty[ThreadId, StartTime]
 
-    AkkaSensors.schedule("RunnableWatcher",
+    AkkaSensors.schedule(
+      "RunnableWatcher",
       () =>
         try {
           val currentTime = System.nanoTime()
