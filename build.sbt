@@ -7,7 +7,7 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   crossScalaVersions := Seq("2.13.5", "2.12.13"),
   scalaVersion :=  "2.13.5",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
-  parallelExecution in Test := false,
+  Test / parallelExecution := false,
   Test / fork := true,
   javacOptions := Seq("-source", "1.8", "-target", "1.8"),
   scalacOptions := Seq(
@@ -22,14 +22,15 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
     "-encoding", "utf8",
     "-Xfatal-warnings"
   ),
-  packageOptions in(Compile, packageBin) +=
+  Compile / packageBin / packageOptions
+    +=
     Package.ManifestAttributes(
       "Build-Time" -> new java.util.Date().toString,
       "Build-Commit" -> git.gitHeadCommit.value.getOrElse("No Git Revision Found")
     ),
-  sources in doc := Seq.empty,
-  publishArtifact in packageDoc := false,
-  publishArtifact in packageDoc := false,
+  doc / sources := Seq.empty,
+  packageSrc / publishArtifact  := false,
+  packageDoc / publishArtifact  := false,
   resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
 ) ++ Publish.settings
 
@@ -72,8 +73,8 @@ lazy val `app` = project.in(file("examples/app"))
   .settings(commonSettings ++ noPublishSettings)
   .settings(
     moduleName := "app",
-    mainClass in Compile := Some("nl.pragmasoft.app.Main"),
-    version in Docker := Keys.version.value,
+    Compile / mainClass  := Some("nl.pragmasoft.app.Main"),
+    Docker / version  := Keys.version.value,
     dockerUpdateLatest := true,
     libraryDependencies ++= App.deps :+ Cassandra.cassandraUnit,
     dependencyOverrides ++= Akka.deps

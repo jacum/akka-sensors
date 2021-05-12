@@ -40,21 +40,21 @@ object ApiService extends LazyLogging {
       .bindSocketAddress(socketAddress)
       .withHttpApp(
         Router("/api" -> HttpRoutes.of[IO] {
-          case GET -> Root / "health" => Ok()
+              case GET -> Root / "health" => Ok()
 
-          case POST -> Root / "ping-fj" / actorId / maxSleep =>
-            val actor         = system.actorOf(Props(classOf[ResponderActor]), s"responder-fj-$actorId")
-            pingActor(Ping(maxSleep.toInt), actor)
+              case POST -> Root / "ping-fj" / actorId / maxSleep =>
+                val actor = system.actorOf(Props(classOf[ResponderActor]), s"responder-fj-$actorId")
+                pingActor(Ping(maxSleep.toInt), actor)
 
-          case POST -> Root / "ping-tp" / actorId / maxSleep =>
-            val actor         = system.actorOf(Props(classOf[ResponderActor]).withDispatcher("akka.actor.default-blocking-io-dispatcher"), s"responder-tp-$actorId")
-            pingActor(Ping(maxSleep.toInt), actor)
+              case POST -> Root / "ping-tp" / actorId / maxSleep =>
+                val actor = system.actorOf(Props(classOf[ResponderActor]).withDispatcher("akka.actor.default-blocking-io-dispatcher"), s"responder-tp-$actorId")
+                pingActor(Ping(maxSleep.toInt), actor)
 
-          case POST -> Root / "ping-persistence" / actorId / maxSleep =>
-            val actor         = system.actorOf(Props(classOf[PersistentResponderActor]), s"persistent-responder-$actorId")
-            pingActor(ValidCommand, actor)
+              case POST -> Root / "ping-persistence" / actorId / maxSleep =>
+                val actor = system.actorOf(Props(classOf[PersistentResponderActor]), s"persistent-responder-$actorId")
+                pingActor(ValidCommand, actor)
 
-        }) orNotFound
+            }) orNotFound
       )
       .resource
   }
@@ -103,7 +103,7 @@ class PersistentResponderActor extends PersistentActor with PersistentActorMetri
     case ValidCommand =>
       val replyTo = sender()
       persist(ValidEvent(counter.toString)) { _ =>
-        counter +=1
+        counter += 1
         replyTo ! Pong
       }
     case ReceiveTimeout =>

@@ -1,15 +1,15 @@
 package akka.sensors.actor
 
 import akka.actor.{Actor, ActorLogging}
-import akka.cluster.{Cluster, Member}
 import akka.cluster.ClusterEvent._
-import akka.sensors.{AkkaSensorsExtension, AkkaSensorsExtensionImpl, ClassNameUtil}
+import akka.cluster.{Cluster, Member}
+import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
 
 class ClusterEventWatchActor extends Actor with ActorLogging {
 
-  private val cluster                           = Cluster(context.system)
-  private val metrics: AkkaSensorsExtensionImpl = AkkaSensorsExtension(this.context.system)
-  private val clusterEvents                     = metrics.clusterEvents
+  private val cluster                       = Cluster(context.system)
+  private val metrics: AkkaSensorsExtension = AkkaSensorsExtension(this.context.system)
+  private val clusterEvents                 = metrics.clusterEvents
 
   override def preStart(): Unit = {
     cluster.subscribe(self, initialStateMode = InitialStateAsEvents, classOf[ClusterDomainEvent])
@@ -34,7 +34,7 @@ class ClusterEventWatchActor extends Actor with ActorLogging {
       registerEvent(e, Some(member))
       log.info("Member is Removed: {} after {}", member.address, previousStatus)
     case e @ MemberDowned(member) =>
-      registerEvent(e,Some(member))
+      registerEvent(e, Some(member))
       log.info("Member is Down: {}", member.address)
     case e: ClusterDomainEvent =>
       registerEvent(e)

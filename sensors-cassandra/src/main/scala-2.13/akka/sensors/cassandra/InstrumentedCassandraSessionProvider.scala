@@ -16,7 +16,6 @@ import scala.compat.java8.FutureConverters.toScala
 import scala.concurrent.{ExecutionContext, Future}
 import scala.jdk.CollectionConverters._
 
-
 class InstrumentedCassandraSessionProvider(system: ActorSystem, config: Config) extends DefaultSessionProvider(system, config) with LazyLogging {
 
   private val instanceId = UUID.randomUUID()
@@ -58,6 +57,7 @@ class InstrumentedCassandraSessionProvider(system: ActorSystem, config: Config) 
         .withConfigLoader(driverConfigLoader)
         .withClientId(instanceId)
         .withNodeStateListener(nodeStateListener)
-        .buildAsync())
+        .buildAsync()
+    )
   }
 }

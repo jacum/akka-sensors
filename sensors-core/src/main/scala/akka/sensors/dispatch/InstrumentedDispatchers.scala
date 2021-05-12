@@ -173,7 +173,7 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
     import DispatcherMetrics._
     new ExecutorServiceFactory {
       def createExecutorService: ExecutorService = {
-        val es                = esf.createExecutorService
+        val es = esf.createExecutorService
 
         lazy val activeCount       = executorValue.labels(id, "activeCount")
         lazy val corePoolSize      = executorValue.labels(id, "corePoolSize")
@@ -190,7 +190,8 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
 
         es match {
           case tp: ThreadPoolExecutor =>
-            AkkaSensors.schedule(id,
+            AkkaSensors.schedule(
+              id,
               () => {
                 activeCount.set(tp.getActiveCount)
                 corePoolSize.set(tp.getCorePoolSize)
@@ -199,11 +200,12 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
                 queueSize.set(tp.getQueue.size())
                 completedTasks.set(tp.getCompletedTaskCount.toDouble)
                 poolSize.set(tp.getPoolSize)
-              },
+              }
             )
 
           case fj: ForkJoinPool =>
-            AkkaSensors.schedule(id,
+            AkkaSensors.schedule(
+              id,
               () => {
                 poolSize.set(fj.getPoolSize)
                 steals.set(fj.getStealCount.toDouble)
@@ -252,15 +254,18 @@ trait InstrumentedDispatcher extends Dispatcher {
   private lazy val wrapper = new DispatcherInstrumentationWrapper(configurator.config)
 
   private val threadMXBean: ThreadMXBean = ManagementFactory.getThreadMXBean
-  private val interestingStateNames = Set("runnable", "waiting", "timed_waiting", "blocked")
-  private val interestingStates = Thread.State.values.filter(s => interestingStateNames.contains(s.name().toLowerCase))
+  private val interestingStateNames      = Set("runnable", "waiting", "timed_waiting", "blocked")
+  private val interestingStates          = Thread.State.values.filter(s => interestingStateNames.contains(s.name().toLowerCase))
 
-  AkkaSensors.schedule(s"$id-states",
+  AkkaSensors.schedule(
+    s"$id-states",
     () => {
       val threads = threadMXBean
         .getThreadInfo(threadMXBean.getAllThreadIds, 0)
-        .filter(t => t != null
-          && t.getThreadName.startsWith(s"$actorSystemName-$id"))
+        .filter(t =>
+          t != null
+            && t.getThreadName.startsWith(s"$actorSystemName-$id")
+        )
 
       interestingStates foreach { state =>
         val stateLabel = state.toString.toLowerCase
@@ -271,7 +276,8 @@ trait InstrumentedDispatcher extends Dispatcher {
       DispatcherMetrics.threads
         .labels(id)
         .set(threads.length)
-    })
+    }
+  )
 
   override def execute(runnable: Runnable): Unit = wrapper(runnable, super.execute)
 
