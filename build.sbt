@@ -30,7 +30,7 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
     ),
   doc / sources := Seq.empty,
   packageSrc / publishArtifact  := false,
-  packageDoc / publishArtifact  := false,
+  packageDoc / publishArtifact  := true,
   resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
 ) ++ Publish.settings
 
@@ -40,15 +40,6 @@ lazy val noPublishSettings = Seq(
   publishLocal := {},
   publishArtifact := false
 )
-
-lazy val publishSettings = Seq(
-  homepage := Some(new URL("http://github.com/jacum/akka-sensors")),
-  startYear := Some(2020),
-  organizationName := "PragmaSoft",
-  organizationHomepage := Some(url("http://pragmasoft.nl")),
-  organization := "nl.pragmasoft",
-  licenses := Seq("MIT" -> url("http://www.opensource.org/licenses/mit-license.html"))
-) ++ Publish.settings
 
 lazy val `sensors-core` = project.in(file("sensors-core"))
   .settings(commonSettings)

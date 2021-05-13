@@ -12,6 +12,7 @@ object Publish {
     packageSrc / publishArtifact := false
   )
 
+
   val ReleaseToSonatype = Seq(
     credentials ++= Seq(
       Credentials(
@@ -44,7 +45,7 @@ object Publish {
     publishMavenStyle := true,
     publishTo := sonatypePublishToBundle.value,
     Test / publishArtifact := false,
-    packageDoc / publishArtifact := false,
+    packageDoc / publishArtifact := true,
     packageSrc / publishArtifact := true,
     pomIncludeRepository := (_ => false),
     releaseCrossBuild := true,
