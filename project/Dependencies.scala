@@ -27,7 +27,11 @@ object Dependencies {
     val actor = "com.typesafe.akka" %% "akka-actor" % akkaVersion
     val persistence = "com.typesafe.akka" %% "akka-persistence" % akkaVersion
     val persistenceQuery = "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion
-    val persistenceCassandra = "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
+    val persistenceCassandra = "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion excludeAll(
+      ExclusionRule("com.datastax.oss"),
+      ExclusionRule("com.fasterxml.jackson.core")
+    )
+
     val cluster = "com.typesafe.akka" %% "akka-cluster" % akkaVersion
     val clusterTools = "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
     val slf4j = "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
@@ -38,9 +42,10 @@ object Dependencies {
   object Prometheus {
     val hotspot = "io.prometheus" % "simpleclient_hotspot" % "0.10.0"
     val common = "io.prometheus" % "simpleclient_common" % "0.10.0"
-    val jmx = "io.prometheus.jmx" % "collector" % "0.15.0"
+    val jmx = "io.prometheus.jmx" % "collector" % "0.15.0" exclude("org.yaml", "snakeyaml")
+    val snakeYaml = "org.yaml" % "snakeyaml" % "1.28"
 
-    val deps = Seq(hotspot, common, jmx)
+    val deps = Seq(hotspot, common, jmx, snakeYaml)
   }
 
   object App {
