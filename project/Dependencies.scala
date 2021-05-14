@@ -81,7 +81,7 @@ object Dependencies {
 
   object TestTools {
     val log = "ch.qos.logback" % "logback-classic" % "1.2.3"
-    val scalaTest = "org.scalatest" %% "scalatest" % "3.2.8"
+    val scalaTest = "org.scalatest" %% "scalatest" % "3.2.9"
     val deps = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal, log)
   }
 
