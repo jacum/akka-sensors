@@ -4,7 +4,7 @@ import sbt.file
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   organization := "nl.pragmasoft.sensors",
-  crossScalaVersions := Seq("2.13.5", "2.12.13"),
+  crossScalaVersions := Seq("2.13.5", "2.12.14"),
   scalaVersion :=  "2.13.5",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   Test / parallelExecution := false,
