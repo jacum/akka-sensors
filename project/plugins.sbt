@@ -1,6 +1,6 @@
 import sbt.addSbtPlugin
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.0")
-addSbtPlugin("com.twilio" % "sbt-guardrail" % "0.64.1")
+addSbtPlugin("com.twilio" % "sbt-guardrail" % "0.64.2")
 addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.13")
 addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "3.1.3")
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.8.1")
