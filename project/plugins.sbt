@@ -6,7 +6,7 @@ addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "3.1.3")
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.8.1")
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.3")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.2")
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.7")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.8")
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.1.1") // 2.1.2 is released but unavailable??
 addSbtPlugin("no.arktekk.sbt" % "aether-deploy" % "0.26.0")
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13")
