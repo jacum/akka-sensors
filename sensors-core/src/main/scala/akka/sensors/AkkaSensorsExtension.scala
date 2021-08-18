@@ -74,7 +74,7 @@ object AkkaSensors extends LazyLogging {
     else {
       // The last char is a dollar sign
       // Find last non-dollar char
-      val lastNonDollarChar = s.findLast(_ != '$')
+      val lastNonDollarChar = s.reverse.find(_ != '$')
       lastNonDollarChar match {
         case None => s
         case Some(c) =>
