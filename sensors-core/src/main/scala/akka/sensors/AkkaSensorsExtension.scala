@@ -74,7 +74,7 @@ object AkkaSensors extends LazyLogging {
     else {
       // The last char is a dollar sign
       // Find last non-dollar char
-      val lastNonDollarChar = s.reverse.find(_ != '$')
+      val lastNonDollarChar = s.findLast(_ != '$')
       lastNonDollarChar match {
         case None => s
         case Some(c) =>
@@ -90,9 +90,12 @@ object AkkaSensors extends LazyLogging {
   }
 }
 
+/**
+ * For overrides, make a subclass and put it's name in 'akka.sensors.extension-class' config value
+ */
 class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with MetricsBuilders with LazyLogging {
 
-  logger.info("Akka Sensors extension has been activated")
+  logger.info(s"Akka Sensors extension has been activated: ${this.getClass.getName}")
 
   val namespace = "akka_sensors"
   val subsystem = "actor"
@@ -185,7 +188,13 @@ class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with M
 
 object AkkaSensorsExtension extends ExtensionId[AkkaSensorsExtension] with ExtensionIdProvider {
   override def lookup: ExtensionId[_ <: Extension]                           = AkkaSensorsExtension
-  override def createExtension(system: ExtendedActorSystem)                  = new AkkaSensorsExtension(system)
+  override def createExtension(system: ExtendedActorSystem)                  = {
+    val extensionClass = ConfigFactory.load().getString("akka.sensors.extension-class")
+      Class.forName(extensionClass).getDeclaredConstructor(classOf[ExtendedActorSystem]).newInstance(system) match {
+        case w: AkkaSensorsExtension => w
+        case _ => throw new IllegalArgumentException(s"Class $extensionClass must extend com.ing.bakery.baker.Watcher")
+      }
+  }
   override def get(system: ActorSystem): AkkaSensorsExtension                = super.get(system)
   override def get(system: ClassicActorSystemProvider): AkkaSensorsExtension = super.get(system)
 }
@@ -221,14 +230,13 @@ trait MetricsBuilders {
       .build()
       .namespace(namespace)
       .subsystem(subsystem)
-      .buckets(.0005, .001, .0025, .005, .01, .025, .05, .075, .1, .25, .5, .75, 1, 2.5, 5, 7.5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000, 15000, 20000,
-        30000)
+      .buckets(.0005, .001, .005, .01, .05, .1, .5, 1, 5, 10, 50, 100, 500, 1000, 5000)
   def secondsHistogram: Histogram.Builder =
     Histogram
       .build()
       .namespace(namespace)
       .subsystem(subsystem)
-      .buckets(0, 1, 2.5, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000, 15000, 20000, 30000)
+      .buckets(0, 1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000)
   def valueHistogram(max: Int): Histogram.Builder =
     Histogram
       .build()
