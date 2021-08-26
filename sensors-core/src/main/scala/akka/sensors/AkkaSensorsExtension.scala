@@ -2,6 +2,7 @@ package akka.sensors
 
 import akka.Done
 import akka.actor.{ActorSystem, ClassicActorSystemProvider, CoordinatedShutdown, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider, Props}
+import akka.persistence.typed.scaladsl.EffectBuilder
 import akka.sensors.actor.ClusterEventWatchActor
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
@@ -187,13 +188,13 @@ class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with M
 }
 
 object AkkaSensorsExtension extends ExtensionId[AkkaSensorsExtension] with ExtensionIdProvider {
-  override def lookup: ExtensionId[_ <: Extension]                           = AkkaSensorsExtension
-  override def createExtension(system: ExtendedActorSystem)                  = {
+  override def lookup: ExtensionId[_ <: Extension] = AkkaSensorsExtension
+  override def createExtension(system: ExtendedActorSystem) = {
     val extensionClass = ConfigFactory.load().getString("akka.sensors.extension-class")
-      Class.forName(extensionClass).getDeclaredConstructor(classOf[ExtendedActorSystem]).newInstance(system) match {
-        case w: AkkaSensorsExtension => w
-        case _ => throw new IllegalArgumentException(s"Class $extensionClass must extend com.ing.bakery.baker.Watcher")
-      }
+    Class.forName(extensionClass).getDeclaredConstructor(classOf[ExtendedActorSystem]).newInstance(system) match {
+      case w: AkkaSensorsExtension => w
+      case _                       => throw new IllegalArgumentException(s"Class $extensionClass must extend com.ing.bakery.baker.Watcher")
+    }
   }
   override def get(system: ActorSystem): AkkaSensorsExtension                = super.get(system)
   override def get(system: ClassicActorSystemProvider): AkkaSensorsExtension = super.get(system)
@@ -207,6 +208,11 @@ object MetricOps {
       try f
       finally timer.observeDuration()
     }
+
+    def observeEffect[E, S](eff: EffectBuilder[E, S]): EffectBuilder[E, S] = {
+      val timer = histogram.startTimer()
+      eff.thenRun(_ => timer.observeDuration())
+    }
   }
 
   implicit class HistogramChildExtensions(val histogram: Histogram.Child) {
@@ -214,6 +220,11 @@ object MetricOps {
       val timer = histogram.startTimer()
       try f
       finally timer.observeDuration()
+    }
+
+    def observeEffect[E, S](eff: EffectBuilder[E, S]): EffectBuilder[E, S] = {
+      val timer = histogram.startTimer()
+      eff.thenRun(_ => timer.observeDuration())
     }
   }
 
