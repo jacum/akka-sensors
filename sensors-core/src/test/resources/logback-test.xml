@@ -6,6 +6,9 @@
         </encoder>
     </appender>
 
+    <logger name="akka.persistence.typed.internal.EventSourcedBehaviorImpl" level="WARN"/>
+    <logger name="akka.sensors.InstrumentedActors" level="WARN"/>
+
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />
     </root>
