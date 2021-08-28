@@ -188,13 +188,13 @@ class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with M
 }
 
 object AkkaSensorsExtension extends ExtensionId[AkkaSensorsExtension] with ExtensionIdProvider {
-  override def lookup: ExtensionId[_ <: Extension] = AkkaSensorsExtension
-  override def createExtension(system: ExtendedActorSystem) = {
+  override def lookup: ExtensionId[_ <: Extension]                           = AkkaSensorsExtension
+  override def createExtension(system: ExtendedActorSystem)                  = {
     val extensionClass = ConfigFactory.load().getString("akka.sensors.extension-class")
-    Class.forName(extensionClass).getDeclaredConstructor(classOf[ExtendedActorSystem]).newInstance(system) match {
-      case w: AkkaSensorsExtension => w
-      case _                       => throw new IllegalArgumentException(s"Class $extensionClass must extend com.ing.bakery.baker.Watcher")
-    }
+      Class.forName(extensionClass).getDeclaredConstructor(classOf[ExtendedActorSystem]).newInstance(system) match {
+        case w: AkkaSensorsExtension => w
+        case _ => throw new IllegalArgumentException(s"Class $extensionClass must extend com.ing.bakery.baker.Watcher")
+      }
   }
   override def get(system: ActorSystem): AkkaSensorsExtension                = super.get(system)
   override def get(system: ClassicActorSystemProvider): AkkaSensorsExtension = super.get(system)
