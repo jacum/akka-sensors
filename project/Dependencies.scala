@@ -72,7 +72,7 @@ object Dependencies {
 
   object Cassandra {
     val akkaPersistenceCassandraVersion = "1.0.4"
-    val cassandraDriverVersion = "4.11.3"
+    val cassandraDriverVersion = "4.13.0"
 
     val cassandraDriverCore = "com.datastax.oss" % "java-driver-core" % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss" % "java-driver-query-builder" % cassandraDriverVersion
