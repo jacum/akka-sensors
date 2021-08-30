@@ -9,8 +9,8 @@ import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
 final case class BasicActorMetrics[C](
-    actorLabel: String,
-    metrics: AkkaSensorsExtension
+  actorLabel: String,
+  metrics: AkkaSensorsExtension
 ) {
 
   private lazy val exceptions = metrics.exceptions.labels(actorLabel)
@@ -24,9 +24,9 @@ final case class BasicActorMetrics[C](
     val interceptor = () =>
       new BehaviorInterceptor[C, C] {
         override def aroundSignal(
-            ctx: TypedActorContext[C],
-            signal: Signal,
-            target: BehaviorInterceptor.SignalTarget[C]
+          ctx: TypedActorContext[C],
+          signal: Signal,
+          target: BehaviorInterceptor.SignalTarget[C]
         ): Behavior[C] = {
           signal match {
             case PostStop =>
@@ -40,8 +40,8 @@ final case class BasicActorMetrics[C](
         }
 
         override def aroundStart(
-            ctx: TypedActorContext[C],
-            target: BehaviorInterceptor.PreStartTarget[C]
+          ctx: TypedActorContext[C],
+          target: BehaviorInterceptor.PreStartTarget[C]
         ): Behavior[C] = {
           activeActors.inc()
           target.start(ctx)
@@ -49,17 +49,16 @@ final case class BasicActorMetrics[C](
 
         @SuppressWarnings(Array("org.wartremover.warts.Throw"))
         override def aroundReceive(
-            ctx: TypedActorContext[C],
-            msg: C,
-            target: BehaviorInterceptor.ReceiveTarget[C]
-        ): Behavior[C] = {
+          ctx: TypedActorContext[C],
+          msg: C,
+          target: BehaviorInterceptor.ReceiveTarget[C]
+        ): Behavior[C] =
           try {
-            val next = messageLabel(msg)
-              .map {
-                metrics.receiveTime
-                  .labels(actorLabel, _)
-                  .observeExecution(target(ctx, msg))
-              }
+            val next = messageLabel(msg).map {
+              metrics.receiveTime
+                .labels(actorLabel, _)
+                .observeExecution(target(ctx, msg))
+            }
               .getOrElse(target(ctx, msg))
 
             if (Behavior.isUnhandled(next))
@@ -71,7 +70,6 @@ final case class BasicActorMetrics[C](
               exceptions.inc()
               throw e
           }
-        }
       }
 
     Behaviors.intercept(interceptor)(behavior)

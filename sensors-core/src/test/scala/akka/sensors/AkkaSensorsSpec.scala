@@ -31,11 +31,11 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(2, Seconds)), interval = scaled(Span(5, Millis)))
 
-  implicit val ec: ExecutionContext = ExecutionContext.global
-  private val system: ActorSystem = ActorSystem("instrumented")
-  private lazy val probeActor = system.actorOf(Props(classOf[InstrumentedProbe]), s"probe")
-  private lazy val persistentActor = system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
-  private lazy val persistentActor2 = system.actorOf(Props(classOf[AnotherPersistentInstrumentedProbe]), s"another-persistent")
+  implicit val ec: ExecutionContext        = ExecutionContext.global
+  private val system: ActorSystem          = ActorSystem("instrumented")
+  private lazy val probeActor              = system.actorOf(Props(classOf[InstrumentedProbe]), s"probe")
+  private lazy val persistentActor         = system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
+  private lazy val persistentActor2        = system.actorOf(Props(classOf[AnotherPersistentInstrumentedProbe]), s"another-persistent")
   implicit val registry: CollectorRegistry = AkkaSensors.prometheusRegistry
 
   "Launch akka app, and ensure it works" - {
@@ -49,9 +49,8 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       for (_ <- 1 to 5) probeActor ! KnownError
       for (_ <- 1 to 100) probeActor ! UnknownMessage
       probeActor ! BlockTooLong
-      for (_ <- 1 to 1000) {
+      for (_ <- 1 to 1000)
         pingActor
-      }
 
       probeActor ! PoisonPill
 
@@ -65,22 +64,18 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       Thread.sleep(100)
 
       val blockingIo = system.dispatchers.lookup("akka.actor.default-blocking-io-dispatcher")
-      blockingIo.execute(() => { Thread.sleep(100)})
+      blockingIo.execute(() => Thread.sleep(100))
 
       system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
       system.actorOf(Props(classOf[AnotherPersistentInstrumentedProbe]), s"another-persistent")
 
       val content = metrics.split("\n")
-      List("akka_sensors_actor", "akka_sensors_dispatchers").foreach(s =>
-        assert(content.exists(_.startsWith(s)), s"starts with $s")
-      )
+      List("akka_sensors_actor", "akka_sensors_dispatchers").foreach(s => assert(content.exists(_.startsWith(s)), s"starts with $s"))
     }
 
     "ensure MANY actors are created and stopped, all accounted for" in {
       val actors = 50000
-      val refs = (1 to actors).map(v =>
-        system.actorOf(Props(classOf[MassProbe]), s"mass-$v")
-      )
+      val refs   = (1 to actors).map(v => system.actorOf(Props(classOf[MassProbe]), s"mass-$v"))
 
       implicit val patienceConfig: PatienceConfig = PatienceConfig(20 seconds, 100 milliseconds)
       eventually {
@@ -130,15 +125,15 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
     }
 
     trait PersistentScope {
-      def actors = 1000
-      def commands = 10
+      def actors                                  = 1000
+      def commands                                = 10
       implicit val patienceConfig: PatienceConfig = PatienceConfig(10 seconds, 100 milliseconds)
 
       def actorName: String
 
       def createRef(idx: Int): ActorRef
 
-      val refs: Seq[ActorRef] = (1 to actors).map { createRef }
+      val refs: Seq[ActorRef] = (1 to actors).map(createRef)
 
       eventually {
         assertMetrics(
@@ -156,14 +151,14 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
         )
       }
 
-      for (e <- 1 to commands) refs.foreach(a => {
+      for (e <- 1 to commands) refs.foreach { a =>
         a ! ValidCommand(e.toString)
-      })
+      }
 
       eventually {
         assertMetrics(
           _.startsWith(s"""akka_sensors_actor_persist_time_millis_count{actor="$actorName"""),
-          _.endsWith(s" ${actors*commands}.0")
+          _.endsWith(s" ${actors * commands}.0")
         )
       }
 
@@ -185,10 +180,10 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
 
       assertMetrics(
         _.startsWith(s"""akka_sensors_actor_persist_time_millis_count{actor="$actorName",event="ValidEvent""""),
-        _.endsWith(s" ${actors*commands}.0")
+        _.endsWith(s" ${actors * commands}.0")
       )
 
-      val refRecovered = (1 to actors).map { createRef }
+      val refRecovered = (1 to actors).map(createRef)
 
       eventually {
         assertMetrics(
@@ -202,27 +197,25 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       eventually {
         assertMetrics(
           _.startsWith(s"""akka_sensors_actor_recoveries_total{actor="$actorName""""),
-          _.endsWith(s" ${actors*2}.0")
+          _.endsWith(s" ${actors * 2}.0")
         )
       }
 
       assertMetrics(
         _.startsWith(s"""akka_sensors_actor_recovery_events_total{actor="$actorName","""),
-        _.endsWith(s" ${actors*commands}.0")
+        _.endsWith(s" ${actors * commands}.0")
       )
     }
   }
 
-  private def assertMetrics(filter: String => Boolean, assertion: String => Boolean) = {
+  private def assertMetrics(filter: String => Boolean, assertion: String => Boolean) =
     metrics
       .split("\n")
       .find(filter)
-      .map(m =>
-        assert(assertion(m), s"assertion failed for $m")
-      ).getOrElse(
-      fail("No metric found")
-    )
-  }
+      .map(m => assert(assertion(m), s"assertion failed for $m"))
+      .getOrElse(
+        fail("No metric found")
+      )
 
   private def metrics(implicit registry: CollectorRegistry): String = {
     val writer = new CharArrayWriter(16 * 1024)
@@ -231,33 +224,30 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
   }
 
   private def pingActor = {
-    val r = Await.result(
-      probeActor.ask(Ping("1"))(Timeout.durationToTimeout(10 seconds)), 15 seconds)
+    val r = Await.result(probeActor.ask(Ping("1"))(Timeout.durationToTimeout(10 seconds)), 15 seconds)
     assert(r.toString == "Pong(1)")
   }
 
   private def sendEventAck(actor: ActorRef) = {
-    val r = Await.result(
-      actor.ask(ValidCommand("1"))(Timeout.durationToTimeout(10 seconds)), 15 seconds)
+    val r = Await.result(actor.ask(ValidCommand("1"))(Timeout.durationToTimeout(10 seconds)), 15 seconds)
     assert(r.toString == "Pong(1)")
   }
-  override protected def afterAll(): Unit = {
+  protected override def afterAll(): Unit =
     system.terminate()
-  }
 }
 
 object InstrumentedActors {
 
-  case class Ping(id: String) extends NoSerializationVerificationNeeded
-  case object KnownError  extends NoSerializationVerificationNeeded
-  case object UnknownMessage  extends NoSerializationVerificationNeeded
-  case object BlockTooLong extends NoSerializationVerificationNeeded
-  case class Pong(id: String) extends NoSerializationVerificationNeeded
+  case class Ping(id: String)       extends NoSerializationVerificationNeeded
+  case object KnownError            extends NoSerializationVerificationNeeded
+  case object UnknownMessage        extends NoSerializationVerificationNeeded
+  case object BlockTooLong          extends NoSerializationVerificationNeeded
+  case class Pong(id: String)       extends NoSerializationVerificationNeeded
   case class ValidEvent(id: String) extends NoSerializationVerificationNeeded
 
   sealed trait Commands
   case class ValidCommand(id: String) extends Commands with NoSerializationVerificationNeeded
-  case object ProbeTimeout extends Commands with NoSerializationVerificationNeeded
+  case object ProbeTimeout            extends Commands with NoSerializationVerificationNeeded
 
   class MassProbe extends Actor with ActorMetrics {
     context.setReceiveTimeout(2 seconds)
@@ -282,7 +272,7 @@ object InstrumentedActors {
     def receiveCommand: Receive = {
       case ValidCommand(x) =>
         persist(ValidEvent(x)) { _ =>
-          counter +=1
+          counter += 1
         }
 
       case ReceiveTimeout =>
@@ -304,7 +294,7 @@ object InstrumentedActors {
           val commandHandler: (Int, Commands) => Effect[ValidEvent, Int] = (_, cmd) =>
             cmd match {
               case ValidCommand(c) => Effect.persist(ValidEvent(c))
-              case ProbeTimeout => Effect.stop()
+              case ProbeTimeout    => Effect.stop()
             }
 
           val eventHandler =
@@ -323,13 +313,13 @@ object InstrumentedActors {
 
   class InstrumentedProbe extends Actor with ActorMetrics {
     def receive: Receive = {
-            case Ping(x) =>
-              Thread.sleep(Random.nextInt(3))
-              sender() ! Pong(x)
-            case KnownError =>
-              throw new Exception("known")
-            case BlockTooLong =>
-              Thread.sleep(6000)
+      case Ping(x) =>
+        Thread.sleep(Random.nextInt(3))
+        sender() ! Pong(x)
+      case KnownError =>
+        throw new Exception("known")
+      case BlockTooLong =>
+        Thread.sleep(6000)
     }
   }
 
@@ -345,7 +335,7 @@ object InstrumentedActors {
         val replyTo = sender()
         persist(ValidEvent(counter.toString)) { _ =>
           replyTo ! Pong(x)
-          counter +=1
+          counter += 1
         }
       case x => println(x)
     }

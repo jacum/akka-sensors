@@ -16,8 +16,8 @@ import scala.annotation.tailrec
 import scala.reflect.ClassTag
 
 final case class EventSourcedMetrics[C, E, S](
-    actorLabel: String,
-    metrics: AkkaSensorsExtension
+  actorLabel: String,
+  metrics: AkkaSensorsExtension
 ) extends LazyLogging {
 
   private lazy val recoveries       = metrics.recoveries.labels(actorLabel)
@@ -35,9 +35,9 @@ final case class EventSourcedMetrics[C, E, S](
     val interceptor = () =>
       new BehaviorInterceptor[Any, Any] {
         def aroundReceive(
-            ctx: TypedActorContext[Any],
-            msg: Any,
-            target: BehaviorInterceptor.ReceiveTarget[Any]
+          ctx: TypedActorContext[Any],
+          msg: Any,
+          target: BehaviorInterceptor.ReceiveTarget[Any]
         ): Behavior[Any] = {
           msg match {
             case res: P.Response =>
@@ -63,76 +63,78 @@ final case class EventSourcedMetrics[C, E, S](
     Behaviors.intercept(interceptor)(observedBehavior(behaviorToObserve).unsafeCast[Any]).narrow
   }
 
-  /** recursively inspects subsequent chain of behaviors in behaviorToObserve to find a [[EventSourcedBehaviorImpl]]
-    * then the function overrides behavior's command handler to start a [[metrics.persistTime]] timer when
-    * [[Persist]] / [[PersistAll]] / [[CompositeEffect]] effects being produced.
-    */
+  /**
+   * recursively inspects subsequent chain of behaviors in behaviorToObserve to find a [[EventSourcedBehaviorImpl]]
+   * then the function overrides behavior's command handler to start a [[metrics.persistTime]] timer when
+   * [[Persist]] / [[PersistAll]] / [[CompositeEffect]] effects being produced.
+   */
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
-  private def observedBehavior(behaviorToObserve: Behavior[C]): Behavior[C] = behaviorToObserve match {
+  private def observedBehavior(behaviorToObserve: Behavior[C]): Behavior[C] =
+    behaviorToObserve match {
 
-    case eventSourced: EventSourcedBehaviorImpl[C, E, S] =>
-      val observedCommandHandler: EventSourcedBehavior.CommandHandler[C, E, S] = (state: S, command: C) => {
-        eventSourced.commandHandler(state, command) match {
-          case eff: EffectBuilder[E, S] => observeEffect(eff)
-          case other                    => other
+      case eventSourced: EventSourcedBehaviorImpl[C, E, S] =>
+        val observedCommandHandler: EventSourcedBehavior.CommandHandler[C, E, S] = (state: S, command: C) => {
+          eventSourced.commandHandler(state, command) match {
+            case eff: EffectBuilder[E, S] => observeEffect(eff)
+            case other                    => other
+          }
         }
-      }
 
-      eventSourced.copy(commandHandler = observedCommandHandler)
+        eventSourced.copy(commandHandler = observedCommandHandler)
 
-    case deferred: DeferredBehavior[C] =>
-      Behaviors.setup { ctx => observedBehavior(deferred(ctx)) }
+      case deferred: DeferredBehavior[C] =>
+        Behaviors.setup(ctx => observedBehavior(deferred(ctx)))
 
-    case receive: ReceiveImpl[C] =>
-      Behaviors.receive { (ctx, msg) => observedBehavior(receive.onMessage(ctx, msg)) }
+      case receive: ReceiveImpl[C] =>
+        Behaviors.receive((ctx, msg) => observedBehavior(receive.onMessage(ctx, msg)))
 
-    case receive: ReceiveMessageImpl[C] =>
-      Behaviors.receiveMessage { msg => observedBehavior(receive.onMessage(msg)) }
+      case receive: ReceiveMessageImpl[C] =>
+        Behaviors.receiveMessage(msg => observedBehavior(receive.onMessage(msg)))
 
-    case interceptor: InterceptorImpl[_, C] =>
-      new InterceptorImpl(
-        interceptor    = interceptor.interceptor.asInstanceOf[BehaviorInterceptor[Any, C]],
-        nestedBehavior = observedBehavior(interceptor.nestedBehavior)
-      ).asInstanceOf[ExtensibleBehavior[C]]
+      case interceptor: InterceptorImpl[_, C] =>
+        new InterceptorImpl(
+          interceptor = interceptor.interceptor.asInstanceOf[BehaviorInterceptor[Any, C]],
+          nestedBehavior = observedBehavior(interceptor.nestedBehavior)
+        ).asInstanceOf[ExtensibleBehavior[C]]
 
-    case other => other
-  }
+      case other => other
+    }
 
   private def observeEffect(effect: EffectBuilder[E, S]): EffectBuilder[E, S] = {
 
     def foldComposites(
-        e: EffectBuilder[E, S],
-        composites: List[CompositeEffect[E, S]]
+      e: EffectBuilder[E, S],
+      composites: List[CompositeEffect[E, S]]
     ): EffectBuilder[E, S] =
-      composites.foldLeft(e) { (e, c) => c.copy(persistingEffect = e) }
+      composites.foldLeft(e)((e, c) => c.copy(persistingEffect = e))
 
     @tailrec
     def loop(
-        e: EffectBuilder[E, S],
-        composites: List[CompositeEffect[E, S]]
-    ): EffectBuilder[E, S] = e match {
+      e: EffectBuilder[E, S],
+      composites: List[CompositeEffect[E, S]]
+    ): EffectBuilder[E, S] =
+      e match {
 
-      case eff: Persist[E, S] =>
-        val withMetrics = messageLabel(eff.event)
-          .map { label =>
+        case eff: Persist[E, S] =>
+          val withMetrics = messageLabel(eff.event).map { label =>
             metrics.persistTime
               .labels(actorLabel, label)
               .observeEffect(eff)
           }
-          .getOrElse(eff)
-        foldComposites(withMetrics, composites)
+            .getOrElse(eff)
+          foldComposites(withMetrics, composites)
 
-      case eff: PersistAll[E, S] =>
-        val withMetrics = metrics.persistTime
-          .labels(actorLabel, "_all")
-          .observeEffect(eff)
-        foldComposites(withMetrics, composites)
+        case eff: PersistAll[E, S] =>
+          val withMetrics = metrics.persistTime
+            .labels(actorLabel, "_all")
+            .observeEffect(eff)
+          foldComposites(withMetrics, composites)
 
-      case eff: CompositeEffect[E, S] =>
-        loop(eff.persistingEffect, eff :: composites)
+        case eff: CompositeEffect[E, S] =>
+          loop(eff.persistingEffect, eff :: composites)
 
-      case other => foldComposites(other, composites)
-    }
+        case other => foldComposites(other, composites)
+      }
 
     loop(effect, Nil)
   }

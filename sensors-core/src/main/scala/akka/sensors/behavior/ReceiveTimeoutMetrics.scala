@@ -7,9 +7,9 @@ import akka.sensors.AkkaSensorsExtension
 import scala.reflect.ClassTag
 
 final case class ReceiveTimeoutMetrics[C](
-    actorLabel: String,
-    metrics: AkkaSensorsExtension,
-    timeoutCmd: C
+  actorLabel: String,
+  metrics: AkkaSensorsExtension,
+  timeoutCmd: C
 ) {
 
   private val receiveTimeouts = metrics.receiveTimeouts.labels(actorLabel)
@@ -20,9 +20,9 @@ final case class ReceiveTimeoutMetrics[C](
       new BehaviorInterceptor[C, C] {
         @SuppressWarnings(Array("org.wartremover.warts.Equals"))
         def aroundReceive(
-            ctx: TypedActorContext[C],
-            msg: C,
-            target: BehaviorInterceptor.ReceiveTarget[C]
+          ctx: TypedActorContext[C],
+          msg: C,
+          target: BehaviorInterceptor.ReceiveTarget[C]
         ): Behavior[C] = {
           if (msg == timeoutCmd) receiveTimeouts.inc()
           target(ctx, msg)
