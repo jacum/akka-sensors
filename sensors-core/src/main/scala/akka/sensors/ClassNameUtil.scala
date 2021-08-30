@@ -7,7 +7,7 @@ object ClassNameUtil {
    * This method mimics scalatest's getSimpleNameOfAnObjectsClass.
    */
   def simpleName(cls: Class[_]): String =
-    try cls.getSimpleName
+    try stripDollars(cls.getSimpleName)
     catch {
       // TODO: the value returned here isn't even quite right; it returns simple names
       // like UtilsSuite$MalformedClassObject$MalformedClass instead of MalformedClass

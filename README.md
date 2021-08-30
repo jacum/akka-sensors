@@ -192,7 +192,7 @@ akka {
 ```
 
 
-### Actors
+### Actors (classic)
 
 ```
  # Non-persistent actors
@@ -211,6 +211,17 @@ akka {
   ...
 
 
+```
+
+### Actors (typed)
+
+```
+val behavior = BehaviorMetrics[Command]("ActorLabel") # basic actor metrics
+    .withReceiveTimeoutMetrics(TimeoutCmd) # provides metric for amount of received timeout commands
+    .withPersistenceMetrics # if inner behavior is event sourced, persistence metrics would be collected
+    .setup { ctx: ActorContext[Command] =>
+      ... # your implementation
+    }
 ```
 
 ### Internal parameters

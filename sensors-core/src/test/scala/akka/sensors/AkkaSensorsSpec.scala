@@ -1,10 +1,16 @@
 package akka.sensors
 
+import akka.actor.typed.Behavior
+
 import java.io.CharArrayWriter
 import akka.actor.{Actor, ActorRef, ActorSystem, NoSerializationVerificationNeeded, PoisonPill, Props, ReceiveTimeout}
 import akka.pattern.ask
+import akka.persistence.typed.PersistenceId
+import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import akka.sensors.actor.{ActorMetrics, PersistentActorMetrics}
 import akka.persistence.{PersistentActor, RecoveryCompleted}
+import akka.sensors.behavior.BehaviorMetrics
+import akka.actor.typed.scaladsl.adapter._
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
 import io.prometheus.client.CollectorRegistry
@@ -109,17 +115,34 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       )
     }
 
-    "ensure many persistent are created and stopped, all accounted for" in {
-      val actors = 1000
-      val commands = 10
-      val refs = (1 to actors).map(v =>
-        system.actorOf(Props(classOf[MassPersistentProbe]), s"mass-persistent-$v")
-      )
+    "ensure many classic persistent are created and stopped, all accounted for" in new PersistentScope {
+      def actorName: String = "MassPersistentProbe"
 
+      def createRef(idx: Int): ActorRef =
+        system.actorOf(Props(classOf[MassPersistentProbe]), s"mass-classic-persistent-$idx")
+    }
+
+    "ensure many typed persistent are created and stopped, all accounted for" in new PersistentScope {
+      def actorName: String = "MassTypedPersistentProbe"
+
+      def createRef(idx: Int): ActorRef =
+        system.spawn(MassTypedPersistentProbe(), s"mass-typed-persistent-$idx").ref.toClassic
+    }
+
+    trait PersistentScope {
+      def actors = 1000
+      def commands = 10
       implicit val patienceConfig: PatienceConfig = PatienceConfig(10 seconds, 100 milliseconds)
+
+      def actorName: String
+
+      def createRef(idx: Int): ActorRef
+
+      val refs: Seq[ActorRef] = (1 to actors).map { createRef }
+
       eventually {
         assertMetrics(
-          _.startsWith("akka_sensors_actor_active_actors_total{actor=\"MassPersistentProbe\""),
+          _.startsWith(s"""akka_sensors_actor_active_actors_total{actor="$actorName""""),
           _.endsWith(s" $actors.0")
         )
       }
@@ -128,7 +151,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       }
       eventually {
         assertMetrics(
-          _.startsWith("akka_sensors_actor_active_actors_total{actor=\"MassPersistentProbe\""),
+          _.startsWith(s"""akka_sensors_actor_active_actors_total{actor="$actorName""""),
           _.endsWith(s" $actors.0")
         )
       }
@@ -139,39 +162,37 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
 
       eventually {
         assertMetrics(
-          _.startsWith("akka_sensors_actor_persist_time_millis_count{actor=\"MassPersistentProbe\""),
+          _.startsWith(s"""akka_sensors_actor_persist_time_millis_count{actor="$actorName"""),
           _.endsWith(s" ${actors*commands}.0")
         )
       }
 
       eventually {
         assertMetrics(
-          _.startsWith("akka_sensors_actor_active_actors_total{actor=\"MassPersistentProbe\""),
+          _.startsWith(s"""akka_sensors_actor_active_actors_total{actor="$actorName""""),
           _.endsWith(s" 0.0")
         )
         assertMetrics(
-          _.startsWith("akka_sensors_actor_receive_timeouts_total{actor=\"MassPersistentProbe\""),
+          _.startsWith(s"""akka_sensors_actor_receive_timeouts_total{actor="$actorName""""),
           _.endsWith(s" $actors.0")
         )
       }
 
       assertMetrics(
-        _.startsWith("akka_sensors_actor_activity_time_seconds_bucket{actor=\"MassPersistentProbe\",le=\"10.0\""),
+        _.startsWith(s"""akka_sensors_actor_activity_time_seconds_bucket{actor="$actorName",le="10.0""""),
         _.endsWith(s" $actors.0")
       )
 
       assertMetrics(
-        _.startsWith("akka_sensors_actor_persist_time_millis_count{actor=\"MassPersistentProbe\",event=\"ValidEvent\""),
+        _.startsWith(s"""akka_sensors_actor_persist_time_millis_count{actor="$actorName",event="ValidEvent""""),
         _.endsWith(s" ${actors*commands}.0")
       )
 
-      val refRecovered = (1 to actors).map(v =>
-        system.actorOf(Props(classOf[MassPersistentProbe]), s"mass-persistent-$v")
-      )
+      val refRecovered = (1 to actors).map { createRef }
 
       eventually {
         assertMetrics(
-          _.startsWith("akka_sensors_actor_active_actors_total{actor=\"MassPersistentProbe\""),
+          _.startsWith(s"""akka_sensors_actor_active_actors_total{actor="$actorName""""),
           _.endsWith(s" $actors.0")
         )
       }
@@ -180,16 +201,15 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
 
       eventually {
         assertMetrics(
-          _.startsWith("akka_sensors_actor_recoveries_total{actor=\"MassPersistentProbe\""),
+          _.startsWith(s"""akka_sensors_actor_recoveries_total{actor="$actorName""""),
           _.endsWith(s" ${actors*2}.0")
         )
       }
 
       assertMetrics(
-        _.startsWith("akka_sensors_actor_recovery_events_total{actor=\"MassPersistentProbe\","),
+        _.startsWith(s"""akka_sensors_actor_recovery_events_total{actor="$actorName","""),
         _.endsWith(s" ${actors*commands}.0")
       )
-
     }
   }
 
@@ -233,8 +253,11 @@ object InstrumentedActors {
   case object UnknownMessage  extends NoSerializationVerificationNeeded
   case object BlockTooLong extends NoSerializationVerificationNeeded
   case class Pong(id: String) extends NoSerializationVerificationNeeded
-  case class ValidCommand(id: String) extends NoSerializationVerificationNeeded
   case class ValidEvent(id: String) extends NoSerializationVerificationNeeded
+
+  sealed trait Commands
+  case class ValidCommand(id: String) extends Commands with NoSerializationVerificationNeeded
+  case object ProbeTimeout extends Commands with NoSerializationVerificationNeeded
 
   class MassProbe extends Actor with ActorMetrics {
     context.setReceiveTimeout(2 seconds)
@@ -269,6 +292,33 @@ object InstrumentedActors {
 
     def persistenceId: String = context.self.actorRef.path.name
 
+  }
+
+  object MassTypedPersistentProbe {
+
+    def apply(): Behavior[Commands] =
+      BehaviorMetrics[Commands]("MassTypedPersistentProbe")
+        .withReceiveTimeoutMetrics(ProbeTimeout)
+        .withPersistenceMetrics
+        .setup { context =>
+          val commandHandler: (Int, Commands) => Effect[ValidEvent, Int] = (_, cmd) =>
+            cmd match {
+              case ValidCommand(c) => Effect.persist(ValidEvent(c))
+              case ProbeTimeout => Effect.stop()
+            }
+
+          val eventHandler =
+            (state: Int, _: ValidEvent) => state + 1
+
+          context.setReceiveTimeout(2.second, ProbeTimeout)
+
+          EventSourcedBehavior(
+            persistenceId = PersistenceId.ofUniqueId(context.self.path.name),
+            emptyState = 0,
+            commandHandler = commandHandler,
+            eventHandler = eventHandler
+          )
+        }
   }
 
   class InstrumentedProbe extends Actor with ActorMetrics {
