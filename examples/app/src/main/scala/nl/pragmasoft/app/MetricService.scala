@@ -12,7 +12,7 @@ import io.prometheus.client.{Collector, CollectorRegistry}
 import io.prometheus.jmx.JmxCollector
 import org.http4s.dsl.io._
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
-import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.server.{Router, Server}
 import org.http4s.{HttpRoutes, _}
 
