@@ -12,32 +12,29 @@ object BehaviorMetrics {
   private type CreateBehaviorMetrics[C] = (AkkaSensorsExtension, Behavior[C]) => Behavior[C]
 
   def apply[C: ClassTag](actorLabel: String): BehaviorMetricsBuilder[C] = {
-    val defaultMetrics = (metrics: AkkaSensorsExtension, behavior: Behavior[C]) =>
-      BasicActorMetrics[C](actorLabel, metrics)(behavior)
+    val defaultMetrics = (metrics: AkkaSensorsExtension, behavior: Behavior[C]) => BasicActorMetrics[C](actorLabel, metrics)(behavior)
     new BehaviorMetricsBuilder(actorLabel, defaultMetrics :: Nil)
   }
 
   class BehaviorMetricsBuilder[C: ClassTag](
-      actorLabel: String,
-      createMetrics: List[CreateBehaviorMetrics[C]]
+    actorLabel: String,
+    createMetrics: List[CreateBehaviorMetrics[C]]
   ) { self =>
 
     def setup(factory: ActorContext[C] => Behavior[C]): Behavior[C] =
       Behaviors.setup { actorContext =>
         val behavior = factory(actorContext)
         val metrics  = AkkaSensorsExtension(actorContext.asScala.system)
-        createMetrics.foldLeft(behavior) { (b, createMetrics) => createMetrics(metrics, b) }
+        createMetrics.foldLeft(behavior)((b, createMetrics) => createMetrics(metrics, b))
       }
 
     def withReceiveTimeoutMetrics(timeoutCmd: C): BehaviorMetricsBuilder[C] = {
-      val receiveTimeoutMetrics = (metrics: AkkaSensorsExtension, behavior: Behavior[C]) =>
-        ReceiveTimeoutMetrics[C](actorLabel, metrics, timeoutCmd)(behavior)
+      val receiveTimeoutMetrics = (metrics: AkkaSensorsExtension, behavior: Behavior[C]) => ReceiveTimeoutMetrics[C](actorLabel, metrics, timeoutCmd)(behavior)
       new BehaviorMetricsBuilder[C](self.actorLabel, receiveTimeoutMetrics :: self.createMetrics)
     }
 
     def withPersistenceMetrics: BehaviorMetricsBuilder[C] = {
-      val eventSourcedMetrics = (metrics: AkkaSensorsExtension, behaviorToObserve: Behavior[C]) =>
-        EventSourcedMetrics(actorLabel, metrics)(behaviorToObserve)
+      val eventSourcedMetrics = (metrics: AkkaSensorsExtension, behaviorToObserve: Behavior[C]) => EventSourcedMetrics(actorLabel, metrics)(behaviorToObserve)
       new BehaviorMetricsBuilder[C](actorLabel, eventSourcedMetrics :: self.createMetrics)
     }
   }

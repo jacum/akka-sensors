@@ -1,7 +1,6 @@
 package nl.pragmasoft.app
 
 import java.net.InetSocketAddress
-
 import akka.actor.{Actor, ActorRef, ActorSystem, NoSerializationVerificationNeeded, Props, ReceiveTimeout}
 import akka.pattern.ask
 import akka.persistence.PersistentActor
@@ -16,7 +15,6 @@ import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
 import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server}
 
-import scala.Console.println
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.util.Random
