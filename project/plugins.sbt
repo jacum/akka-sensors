@@ -2,7 +2,7 @@ import sbt.addSbtPlugin
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "1.0.1")
 addSbtPlugin("com.twilio" % "sbt-guardrail" % "0.64.5")
 addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.16")
-addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "3.1.3")
+addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "3.2.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.8.1")
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.0")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.3")
