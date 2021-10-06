@@ -53,7 +53,7 @@ object Dependencies {
   }
 
   object App {
-    val http4sVersion = "0.21.26"
+    val http4sVersion = "0.21.30"
     val circeVersion = "0.14.0"
     val http4s = "org.http4s" %% "http4s-core" % http4sVersion
     val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
