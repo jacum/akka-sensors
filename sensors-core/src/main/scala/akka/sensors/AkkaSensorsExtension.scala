@@ -106,7 +106,7 @@ class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with M
 
   CoordinatedShutdown(system)
     .addTask(CoordinatedShutdown.PhaseBeforeActorSystemTerminate, "clearPrometheusRegistry") { () =>
-      AkkaSensors.prometheusRegistry.clear()
+      allCollectors.foreach(AkkaSensors.prometheusRegistry.unregister)
       logger.info("Cleared metrics")
       Future.successful(Done)
     }
@@ -185,6 +185,24 @@ class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with M
     .help(s"Persist rejects")
     .labelNames("actor")
     .register(registry)
+
+  val allCollectors = List(
+    activityTime,
+    activeActors,
+    unhandledMessages,
+    exceptions,
+    receiveTime,
+    receiveTimeouts,
+    clusterEvents,
+    clusterMembers,
+    recoveryTime,
+    persistTime,
+    recoveries,
+    recoveryEvents,
+    persistFailures,
+    recoveryFailures,
+    persistRejects
+  )
 }
 
 object AkkaSensorsExtension extends ExtensionId[AkkaSensorsExtension] with ExtensionIdProvider {
