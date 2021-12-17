@@ -176,6 +176,7 @@ akka {
 
         instrumented-executor {
           delegate = "fork-join-executor"
+          snapshot-runnable = false
           measure-runs = true
           watch-long-runs = false
         }

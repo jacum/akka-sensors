@@ -18,7 +18,7 @@ object Dependencies {
   }
 
   object Akka {
-    val akkaVersion = "2.6.16"
+    val akkaVersion = "2.6.17"
     val akkaManagementVersion = "1.0.9"
     val akkaPersistenceCassandraVersion = "1.0.5"
     val akkaHttpVersion = "10.2.1"
@@ -44,16 +44,16 @@ object Dependencies {
   }
 
   object Prometheus {
-    val hotspot = "io.prometheus" % "simpleclient_hotspot" % "0.11.0"
-    val common = "io.prometheus" % "simpleclient_common" % "0.11.0"
+    val hotspot = "io.prometheus" % "simpleclient_hotspot" % "0.13.0"
+    val common = "io.prometheus" % "simpleclient_common" % "0.13.0"
     val jmx = "io.prometheus.jmx" % "collector" % "0.16.1" exclude("org.yaml", "snakeyaml")
-    val snakeYaml = "org.yaml" % "snakeyaml" % "1.29"
+    val snakeYaml = "org.yaml" % "snakeyaml" % "1.30"
 
     val deps = Seq(hotspot, common, jmx, snakeYaml)
   }
 
   object App {
-    val http4sVersion = "0.21.26"
+    val http4sVersion = "0.21.31"
     val circeVersion = "0.14.0"
     val http4s = "org.http4s" %% "http4s-core" % http4sVersion
     val http4sDsl = "org.http4s" %% "http4s-dsl" % http4sVersion
@@ -72,11 +72,11 @@ object Dependencies {
 
   object Cassandra {
     val akkaPersistenceCassandraVersion = "1.0.4"
-    val cassandraDriverVersion = "4.11.3"
+    val cassandraDriverVersion = "4.13.0"
 
     val cassandraDriverCore = "com.datastax.oss" % "java-driver-core" % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss" % "java-driver-query-builder" % cassandraDriverVersion
-    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.2.0"
+    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.2.6"
     val akkaPersistenceCassandra = "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
     val cassandraUnit = "org.cassandraunit" % "cassandra-unit" % "4.3.1.0"
 
@@ -84,7 +84,7 @@ object Dependencies {
   }
 
   object TestTools {
-    val log = "ch.qos.logback" % "logback-classic" % "1.2.5"
+    val log = "ch.qos.logback" % "logback-classic" % "1.2.9"
     val scalaTest = "org.scalatest" %% "scalatest" % "3.2.9"
     val deps = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal, log)
   }
