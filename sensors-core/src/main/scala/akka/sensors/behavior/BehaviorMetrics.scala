@@ -3,16 +3,17 @@ package akka.sensors.behavior
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.persistence.sensors.EventSourcedMetrics
-import akka.sensors.AkkaSensorsExtension
+import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
 
 import scala.reflect.ClassTag
 
 object BehaviorMetrics {
 
   private type CreateBehaviorMetrics[C] = (AkkaSensorsExtension, Behavior[C]) => Behavior[C]
+  private val defaultMessageLabel: Any => Option[String] = msg => Some(ClassNameUtil.simpleName(msg.getClass))
 
-  def apply[C: ClassTag](actorLabel: String): BehaviorMetricsBuilder[C] = {
-    val defaultMetrics = (metrics: AkkaSensorsExtension, behavior: Behavior[C]) => BasicActorMetrics[C](actorLabel, metrics)(behavior)
+  def apply[C: ClassTag](actorLabel: String, getLabel: C => Option[String] = defaultMessageLabel): BehaviorMetricsBuilder[C] = {
+    val defaultMetrics = (metrics: AkkaSensorsExtension, behavior: Behavior[C]) => BasicActorMetrics[C](actorLabel, metrics, getLabel)(behavior)
     new BehaviorMetricsBuilder(actorLabel, defaultMetrics :: Nil)
   }
 
