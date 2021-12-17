@@ -10,14 +10,13 @@ import scala.util.control.NonFatal
 
 final case class BasicActorMetrics[C](
   actorLabel: String,
-  metrics: AkkaSensorsExtension
+  metrics: AkkaSensorsExtension,
+  messageLabel: C => Option[String]
 ) {
 
   private lazy val exceptions = metrics.exceptions.labels(actorLabel)
   private val activeActors    = metrics.activeActors.labels(actorLabel)
   private val activityTimer   = metrics.activityTime.labels(actorLabel).startTimer()
-
-  private def messageLabel(value: Any): Option[String] = Some(ClassNameUtil.simpleName(value.getClass))
 
   def apply(behavior: Behavior[C])(implicit ct: ClassTag[C]): Behavior[C] = {
 
