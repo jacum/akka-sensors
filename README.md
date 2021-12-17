@@ -106,8 +106,8 @@ Sensors' bundled dashboards will be imported.
 ```
 libraryDependencies ++= 
   Seq(
-     "nl.pragmasoft.sensors" %% "sensors-core" % "0.1.1",
-     "nl.pragmasoft.sensors" %% "sensors-cassandra" % "0.1.1"
+     "nl.pragmasoft.sensors" %% "sensors-core" % "0.2.2",
+     "nl.pragmasoft.sensors" %% "sensors-cassandra" % "0.2.2"
   )
 ```
 
