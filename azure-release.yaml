@@ -36,8 +36,8 @@ steps:
         git config --global user.email "tim@@pragmasoft.nl"
         git config --global user.name "Azure Devops release pipeline"
 
-        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.13; test"
-        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.13.5; test"
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.15; test"
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.13.6; test"
         sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "release with-defaults"
 
         rm -rf $(secring.secureFilePath)
