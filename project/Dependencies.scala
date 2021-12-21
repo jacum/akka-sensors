@@ -18,7 +18,7 @@ object Dependencies {
   }
 
   object Akka {
-    val akkaVersion = "2.6.17"
+    val akkaVersion = "2.6.18"
     val akkaManagementVersion = "1.0.9"
     val akkaPersistenceCassandraVersion = "1.0.5"
     val akkaHttpVersion = "10.2.1"
@@ -44,8 +44,8 @@ object Dependencies {
   }
 
   object Prometheus {
-    val hotspot = "io.prometheus" % "simpleclient_hotspot" % "0.13.0"
-    val common = "io.prometheus" % "simpleclient_common" % "0.13.0"
+    val hotspot = "io.prometheus" % "simpleclient_hotspot" % "0.14.1"
+    val common = "io.prometheus" % "simpleclient_common" % "0.14.1"
     val jmx = "io.prometheus.jmx" % "collector" % "0.16.1" exclude("org.yaml", "snakeyaml")
     val snakeYaml = "org.yaml" % "snakeyaml" % "1.30"
 
@@ -76,7 +76,7 @@ object Dependencies {
 
     val cassandraDriverCore = "com.datastax.oss" % "java-driver-core" % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss" % "java-driver-query-builder" % cassandraDriverVersion
-    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.2.6"
+    val cassandraDriverMetrics = "io.dropwizard.metrics" % "metrics-jmx" % "4.2.7"
     val akkaPersistenceCassandra = "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
     val cassandraUnit = "org.cassandraunit" % "cassandra-unit" % "4.3.1.0"
 
