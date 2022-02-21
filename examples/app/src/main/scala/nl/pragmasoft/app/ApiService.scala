@@ -12,7 +12,7 @@ import nl.pragmasoft.app.ResponderActor._
 import org.http4s.{HttpRoutes, Response}
 import org.http4s.dsl.io._
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
-import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server}
 
 import scala.concurrent.ExecutionContext

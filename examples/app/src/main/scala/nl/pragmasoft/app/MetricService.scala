@@ -12,13 +12,12 @@ import io.prometheus.client.{Collector, CollectorRegistry}
 import io.prometheus.jmx.JmxCollector
 import org.http4s.dsl.io._
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
-import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.server.blaze.BlazeServerBuilder
 import org.http4s.server.{Router, Server}
 import org.http4s.{HttpRoutes, _}
 
 import scala.concurrent.ExecutionContext
 import scala.io.Source
-import org.typelevel.ci._
 
 object MetricService extends LazyLogging {
 
@@ -50,7 +49,7 @@ object MetricService extends LazyLogging {
             "/metrics" ->
                 HttpRoutes.of[IO] {
                   case GET -> Root =>
-                    IO(Response(status = Ok, body = encoder.toEntity(exportMetrics).body, headers = Headers(Header("Content-Type", TextFormat.CONTENT_TYPE_004))Header.Rawci"Content-Type"))
+                    IO(Response(status = Ok, body = encoder.toEntity(exportMetrics).body, headers = Headers.of(Header("Content-Type", TextFormat.CONTENT_TYPE_004))))
                 }
           ) orNotFound
         )
