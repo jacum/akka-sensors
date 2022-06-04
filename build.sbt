@@ -9,10 +9,8 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   Test / parallelExecution := false,
   Test / fork := true,
-  javacOptions := Seq("-source", "1.8", "-target", "1.8"),
   scalacOptions := Seq(
-    s"-target:jvm-1.8",
-    "-unchecked",
+    s"-unchecked",
     "-deprecation",
     "-feature",
     "-language:higherKinds",
