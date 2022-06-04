@@ -13,7 +13,7 @@ object Dependencies {
   object Logging {
     val slf4jversion = "1.7.36"
     val slf4jApi     = "org.slf4j"                   % "slf4j-api"     % slf4jversion
-    val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4"
+    val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5"
     val deps         = Seq(slf4jApi, scalaLogging)
   }
 
@@ -81,7 +81,7 @@ object Dependencies {
 
   object Cassandra {
     val akkaPersistenceCassandraVersion = "1.0.4"
-    val cassandraDriverVersion          = "4.14.0"
+    val cassandraDriverVersion          = "4.14.1"
 
     val cassandraDriverCore         = "com.datastax.oss"      % "java-driver-core"           % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss"      % "java-driver-query-builder"  % cassandraDriverVersion
