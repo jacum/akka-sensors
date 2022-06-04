@@ -16,6 +16,14 @@ steps:
     inputs:
       secureFile: secring.asc
 
+
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '17'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+      cleanDestinationDirectory: false
+
   - task: Bash@3
     displayName: 'Build, sign and publish'
     inputs:
