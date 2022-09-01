@@ -20,7 +20,7 @@ object Dependencies {
   object Akka {
     val akkaVersion                     = "2.6.19"
     val akkaManagementVersion           = "1.0.9"
-    val akkaPersistenceCassandraVersion = "1.0.5"
+    val akkaPersistenceCassandraVersion = "1.0.6"
     val akkaHttpVersion                 = "10.2.1"
 
     val actor            = "com.typesafe.akka" %% "akka-actor"             % akkaVersion
