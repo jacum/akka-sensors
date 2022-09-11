@@ -44,7 +44,7 @@ object Dependencies {
   object Prometheus {
     val hotspot   = "io.prometheus"     % "simpleclient_hotspot" % "0.15.0"
     val common    = "io.prometheus"     % "simpleclient_common"  % "0.15.0"
-    val jmx       = "io.prometheus.jmx" % "collector"            % "0.17.0" exclude ("org.yaml", "snakeyaml")
+    val jmx       = "io.prometheus.jmx" % "collector"            % "0.17.1" exclude ("org.yaml", "snakeyaml")
     val snakeYaml = "org.yaml"          % "snakeyaml"            % "1.30"
 
     val deps = Seq(hotspot, common, jmx, snakeYaml)
