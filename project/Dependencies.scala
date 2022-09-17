@@ -11,7 +11,7 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-protobuf")
 
   object Logging {
-    val slf4jversion = "1.7.36"
+    val slf4jversion = "2.0.1"
     val slf4jApi     = "org.slf4j"                   % "slf4j-api"     % slf4jversion
     val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5"
     val deps         = Seq(slf4jApi, scalaLogging)
