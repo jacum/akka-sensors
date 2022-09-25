@@ -44,9 +44,9 @@ class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Even
       case e: Exception =>
     }
   }
-  implicit val ec: ExecutionContext = ExecutionContext.global
-  private lazy val system: ActorSystem   = ActorSystem("instrumented")
-  private val persistenceInitActor  = system.actorOf(Props(classOf[AwaitPersistenceInit]), s"persistenceInit-${UUID.randomUUID().toString}")
+  implicit val ec: ExecutionContext    = ExecutionContext.global
+  private lazy val system: ActorSystem = ActorSystem("instrumented")
+  private val persistenceInitActor     = system.actorOf(Props(classOf[AwaitPersistenceInit]), s"persistenceInit-${UUID.randomUUID().toString}")
 
   def createSession =
     CqlSession

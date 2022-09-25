@@ -10,7 +10,6 @@ pool:
 
 variables:
   - group: AkkaSensors
-    value: $(HOME)/.cache
   - name: IVY_HOME
     value: $(Pipeline.Workspace)/.ivy2
 
