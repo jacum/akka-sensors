@@ -28,8 +28,8 @@ steps:
       targetType: 'inline'
       script: |
         # coverage disabled due to https://github.com/scoverage/sbt-scoverage/issues/319
-        # sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.15; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
-        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.15; test; "
+        # sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.17; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.17; test; "
       failOnStderr: false
 
   - task: Bash@3
