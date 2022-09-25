@@ -1,10 +1,10 @@
 package nl.pragmasoft.app
 
 import java.net.InetSocketAddress
-
 import akka.actor.ActorSystem
 import akka.cluster.Cluster
 import cats.effect.{ExitCode, IO, IOApp, Resource}
+import cats.implicits.catsSyntaxOptionId
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import org.http4s.server.Server
@@ -20,12 +20,14 @@ object Main extends IOApp with LazyLogging {
     implicit val system: ActorSystem                = ActorSystem("app", config)
     implicit val executionContext: ExecutionContext = system.dispatcher
 
-    val mainResource: Resource[IO, Server[IO]] =
+    val mainResource: Resource[IO, Server] =
       for {
         _ <- Resource.eval(IO.async[Unit] { callback =>
-          Cluster(system).registerOnMemberUp {
-            logger.info("Akka cluster is now up")
-            callback(Right(()))
+          IO {
+            IO(Cluster(system).registerOnMemberUp {
+              logger.info("Akka cluster is now up")
+              callback(Right(()))
+            }).some
           }
         })
         _ <- MetricService.resource(

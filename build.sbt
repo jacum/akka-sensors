@@ -4,8 +4,8 @@ import sbt.file
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   organization := "nl.pragmasoft.sensors",
-  crossScalaVersions := Seq("2.13.8", "2.12.15"),
-  scalaVersion :=  "2.13.8",
+  crossScalaVersions := Seq("2.13.8", "2.12.17"),
+  scalaVersion :=  "2.13.9",
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   Test / parallelExecution := false,
   Test / fork := true,
@@ -28,9 +28,7 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
     ),
   doc / sources := Seq.empty,
   packageSrc / publishArtifact  := false,
-  packageDoc / publishArtifact  := true,
-  resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
-) ++ Publish.settings
+  packageDoc / publishArtifact  := true) ++ Publish.settings
 
 lazy val noPublishSettings = Seq(
   publish / skip := true,
