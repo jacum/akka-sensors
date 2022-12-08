@@ -1,5 +1,5 @@
 import sbt.addSbtPlugin
-addSbtPlugin("com.github.sbt"    % "sbt-git"              % "2.0.0")
+addSbtPlugin("com.github.sbt"    % "sbt-git"              % "2.0.1")
 addSbtPlugin("dev.guardrail"     % "sbt-guardrail"        % "0.75.0")
 addSbtPlugin("org.wartremover"   % "sbt-wartremover"      % "3.0.6")
 addSbtPlugin("net.vonbuchholtz"  % "sbt-dependency-check" % "4.1.0")
