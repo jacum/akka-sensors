@@ -54,7 +54,7 @@ object Dependencies {
     // unfortunately, http4s modules' versions not synced anymore
     val http4sVersion02312  = "0.23.12"
     val http4sVersion02314  = "0.23.16"
-    val http4sVersion0241   = "0.24.1"
+    val http4sVersion0241   = "0.24.3"
     val server              = "org.http4s"       %% "http4s-blaze-server"       % http4sVersion02312
     val client              = "org.http4s"       %% "http4s-blaze-client"       % http4sVersion02312
     val jdkClient           = "org.http4s"       %% "http4s-jdk-http-client"    % "0.7.0"
