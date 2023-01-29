@@ -11,7 +11,7 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-protobuf")
 
   object Logging {
-    val slf4jversion = "1.7.36"
+    val slf4jversion = "2.0.6"
     val slf4jApi     = "org.slf4j"                   % "slf4j-api"     % slf4jversion
     val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5"
     val deps         = Seq(slf4jApi, scalaLogging)
@@ -45,23 +45,23 @@ object Dependencies {
     val hotspot   = "io.prometheus"     % "simpleclient_hotspot" % "0.16.0"
     val common    = "io.prometheus"     % "simpleclient_common"  % "0.16.0"
     val jmx       = "io.prometheus.jmx" % "collector"            % "0.17.1" exclude ("org.yaml", "snakeyaml")
-    val snakeYaml = "org.yaml"          % "snakeyaml"            % "1.32"
+    val snakeYaml = "org.yaml"          % "snakeyaml"            % "1.33"
 
     val deps = Seq(hotspot, common, jmx, snakeYaml)
   }
 
   object Http4s {
     // unfortunately, http4s modules' versions not synced anymore
-    val http4sVersion02312  = "0.23.12"
-    val http4sVersion02314  = "0.23.16"
-    val http4sVersion0241   = "0.24.1"
-    val server              = "org.http4s"       %% "http4s-blaze-server"       % http4sVersion02312
-    val client              = "org.http4s"       %% "http4s-blaze-client"       % http4sVersion02312
+    val http4sVersionBase = "0.23.13"
+    val http4sVersionModules = "0.23.18"
+    val http4sVersionMetrics = "0.24.3"
+    val server              = "org.http4s"       %% "http4s-blaze-server"       % http4sVersionBase
+    val client              = "org.http4s"       %% "http4s-blaze-client"       % http4sVersionBase
     val jdkClient           = "org.http4s"       %% "http4s-jdk-http-client"    % "0.7.0"
-    val xml                 = "org.http4s"       %% "http4s-scala-xml"          % http4sVersion02312
-    val circe               = "org.http4s"       %% "http4s-circe"              % http4sVersion02314
-    val dsl                 = "org.http4s"       %% "http4s-dsl"                % http4sVersion02314
-    val metrics             = "org.http4s"       %% "http4s-prometheus-metrics" % http4sVersion0241
+    val xml                 = "org.http4s"       %% "http4s-scala-xml"          % http4sVersionBase
+    val circe               = "org.http4s"       %% "http4s-circe"              % http4sVersionModules
+    val dsl                 = "org.http4s"       %% "http4s-dsl"                % http4sVersionModules
+    val metrics             = "org.http4s"       %% "http4s-prometheus-metrics" % http4sVersionMetrics
     val prometheusJmx       = "io.prometheus.jmx" % "collector"                 % "0.17.2"
     val deps: Seq[ModuleID] = Seq(server, client, circe, xml, dsl, metrics, prometheusJmx)
   }
@@ -75,11 +75,11 @@ object Dependencies {
 
   object Cassandra {
     val akkaPersistenceCassandraVersion = "1.0.6"
-    val cassandraDriverVersion          = "4.14.1"
+    val cassandraDriverVersion          = "4.15.0"
 
     val cassandraDriverCore         = "com.datastax.oss"      % "java-driver-core"           % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss"      % "java-driver-query-builder"  % cassandraDriverVersion
-    val cassandraDriverMetrics      = "io.dropwizard.metrics" % "metrics-jmx"                % "4.2.12"
+    val cassandraDriverMetrics      = "io.dropwizard.metrics" % "metrics-jmx"                % "4.2.15"
     val akkaPersistenceCassandra    = "com.typesafe.akka"    %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
     val cassandraUnit               = "org.cassandraunit"     % "cassandra-unit"             % "4.3.1.0"
 
@@ -87,8 +87,8 @@ object Dependencies {
   }
 
   object TestTools {
-    val log       = "ch.qos.logback" % "logback-classic" % "1.4.1"
-    val scalaTest = "org.scalatest" %% "scalatest"       % "3.2.13"
+    val log       = "ch.qos.logback" % "logback-classic" % "1.4.5"
+    val scalaTest = "org.scalatest" %% "scalatest"       % "3.2.15"
     val deps      = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal, log)
   }
 
