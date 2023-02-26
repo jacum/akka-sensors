@@ -45,25 +45,25 @@ object Dependencies {
     val hotspot   = "io.prometheus"     % "simpleclient_hotspot" % "0.16.0"
     val common    = "io.prometheus"     % "simpleclient_common"  % "0.16.0"
     val jmx       = "io.prometheus.jmx" % "collector"            % "0.17.1" exclude ("org.yaml", "snakeyaml")
-    val snakeYaml = "org.yaml"          % "snakeyaml"            % "1.33"
+    val snakeYaml = "org.yaml"          % "snakeyaml"            % "2.0"
 
     val deps = Seq(hotspot, common, jmx, snakeYaml)
   }
 
   object Http4s {
     // unfortunately, http4s modules' versions not synced anymore
-    val http4sVersionBase = "0.23.13"
+    val http4sVersionBase    = "0.23.13"
     val http4sVersionModules = "0.23.18"
     val http4sVersionMetrics = "0.24.3"
-    val server              = "org.http4s"       %% "http4s-blaze-server"       % http4sVersionBase
-    val client              = "org.http4s"       %% "http4s-blaze-client"       % http4sVersionBase
-    val jdkClient           = "org.http4s"       %% "http4s-jdk-http-client"    % "0.7.0"
-    val xml                 = "org.http4s"       %% "http4s-scala-xml"          % http4sVersionBase
-    val circe               = "org.http4s"       %% "http4s-circe"              % http4sVersionModules
-    val dsl                 = "org.http4s"       %% "http4s-dsl"                % http4sVersionModules
-    val metrics             = "org.http4s"       %% "http4s-prometheus-metrics" % http4sVersionMetrics
-    val prometheusJmx       = "io.prometheus.jmx" % "collector"                 % "0.17.2"
-    val deps: Seq[ModuleID] = Seq(server, client, circe, xml, dsl, metrics, prometheusJmx)
+    val server               = "org.http4s"       %% "http4s-blaze-server"       % http4sVersionBase
+    val client               = "org.http4s"       %% "http4s-blaze-client"       % http4sVersionBase
+    val jdkClient            = "org.http4s"       %% "http4s-jdk-http-client"    % "0.7.0"
+    val xml                  = "org.http4s"       %% "http4s-scala-xml"          % http4sVersionBase
+    val circe                = "org.http4s"       %% "http4s-circe"              % http4sVersionModules
+    val dsl                  = "org.http4s"       %% "http4s-dsl"                % http4sVersionModules
+    val metrics              = "org.http4s"       %% "http4s-prometheus-metrics" % http4sVersionMetrics
+    val prometheusJmx        = "io.prometheus.jmx" % "collector"                 % "0.17.2"
+    val deps: Seq[ModuleID]  = Seq(server, client, circe, xml, dsl, metrics, prometheusJmx)
   }
 
   object App {
