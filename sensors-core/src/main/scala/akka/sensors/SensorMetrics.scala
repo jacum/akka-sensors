@@ -2,7 +2,7 @@ package akka.sensors
 
 import io.prometheus.client._
 
-final case class Metrics(
+final case class SensorMetrics(
   activityTime: Histogram,
   activeActors: Gauge,
   unhandledMessages: Counter,
@@ -38,10 +38,10 @@ final case class Metrics(
   )
 }
 
-object Metrics {
-  def makeAndRegister(metricBuilders: BasicMetricBuilders, cr: CollectorRegistry): Metrics = {
+object SensorMetrics {
+  def makeAndRegister(metricBuilders: BasicMetricBuilders, cr: CollectorRegistry): SensorMetrics = {
     import metricBuilders._
-    Metrics(
+    SensorMetrics(
       activityTime = secondsHistogram
         .name("activity_time_seconds")
         .help(s"Seconds of activity")

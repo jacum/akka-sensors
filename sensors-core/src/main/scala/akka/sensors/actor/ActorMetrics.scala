@@ -15,7 +15,7 @@ trait ActorMetrics extends Actor with ActorLogging {
 
   protected def messageLabel(value: Any): Option[String] = Some(ClassNameUtil.simpleName(value.getClass))
 
-  protected val metrics       = AkkaSensorsExtension(this.context.system)
+  protected val metrics       = AkkaSensorsExtension(this.context.system).metrics
   private val receiveTimeouts = metrics.receiveTimeouts.labels(actorLabel)
   private lazy val exceptions = metrics.exceptions.labels(actorLabel)
   private val activeActors    = metrics.activeActors.labels(actorLabel)

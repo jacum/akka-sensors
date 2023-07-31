@@ -111,7 +111,7 @@ class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with M
       Future.successful(Done)
     }
 
-  val metrics: Metrics = Metrics.makeAndRegister(this, this.registry)
+  val metrics: SensorMetrics = SensorMetrics.makeAndRegister(this, this.registry)
 
   def activityTime: Histogram    = metrics.activityTime
   def activeActors: Gauge        = metrics.activeActors
