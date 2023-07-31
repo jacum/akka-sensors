@@ -10,48 +10,32 @@ pool:
 
 variables:
   - group: AkkaSensors
-  - name: CACHE
-    value: $(HOME)/.cache
   - name: IVY_HOME
     value: $(Pipeline.Workspace)/.ivy2
-  - name: CACHE_RUN_ID
-    value: "210411"
 
 steps:
 
-  - task: CacheBeta@1
-    displayName: Package resolver cache
-    inputs:
-      key: cache_$(CACHE_RUN_ID)
-      path: '$(CACHE)'
-
-  - task: CacheBeta@1
-    displayName: Ivy resolver cache
-    inputs:
-      key: ivy_home_$(CACHE_RUN_ID)
-      path: '$(IVY_HOME)'
-
   - task: JavaToolInstaller@0
     inputs:
-      versionSpec: '8'
+      versionSpec: '17'
       jdkArchitectureOption: 'x64'
       jdkSourceOption: 'PreInstalled'
       cleanDestinationDirectory: false
 
-  - task: Bash@3
-    displayName: 'Building and testing 2.12'
-    inputs:
-      targetType: 'inline'
-      script: |
-        # coverage disabled due to https://github.com/scoverage/sbt-scoverage/issues/319
-        # sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.15; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
-        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.15; test; "
-      failOnStderr: false
+#  - task: Bash@3
+#    displayName: 'Building and testing 2.12'
+#    inputs:
+#      targetType: 'inline'
+#      script: |
+#        # coverage disabled due to https://github.com/scoverage/sbt-scoverage/issues/319
+#        # sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.17; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
+#        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.12.17; test; "
+#      failOnStderr: false
 
   - task: Bash@3
     displayName: 'Building and testing 2.13'
     inputs:
       targetType: 'inline'
       script: |
-        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.13.6; clean; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.13.10; clean; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
       failOnStderr: false

@@ -72,7 +72,7 @@ final case class EventSourcedMetrics[C, E, S](
   private def observedBehavior(behaviorToObserve: Behavior[C]): Behavior[C] =
     behaviorToObserve match {
 
-      case eventSourced: EventSourcedBehaviorImpl[C, E, S] =>
+      case eventSourced: EventSourcedBehaviorImpl[C @unchecked, E @unchecked, S @unchecked] =>
         val observedCommandHandler: EventSourcedBehavior.CommandHandler[C, E, S] = (state: S, command: C) => {
           eventSourced.commandHandler(state, command) match {
             case eff: EffectBuilder[E, S] => observeEffect(eff)
@@ -88,10 +88,10 @@ final case class EventSourcedMetrics[C, E, S](
       case receive: ReceiveImpl[C] =>
         Behaviors.receive((ctx, msg) => observedBehavior(receive.onMessage(ctx, msg)))
 
-      case receive: ReceiveMessageImpl[C] =>
+      case receive: ReceiveMessageImpl[C @unchecked] =>
         Behaviors.receiveMessage(msg => observedBehavior(receive.onMessage(msg)))
 
-      case interceptor: InterceptorImpl[_, C] =>
+      case interceptor: InterceptorImpl[_, C @unchecked] =>
         new InterceptorImpl(
           interceptor = interceptor.interceptor.asInstanceOf[BehaviorInterceptor[Any, C]],
           nestedBehavior = observedBehavior(interceptor.nestedBehavior)

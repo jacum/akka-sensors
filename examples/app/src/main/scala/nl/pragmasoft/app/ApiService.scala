@@ -6,13 +6,14 @@ import akka.pattern.ask
 import akka.persistence.PersistentActor
 import akka.sensors.actor.{ActorMetrics, PersistentActorMetrics}
 import akka.util.Timeout
-import cats.effect.{ContextShift, IO, Resource, Timer}
+import cats.effect.kernel.Temporal
+import cats.effect.{IO, Resource}
 import com.typesafe.scalalogging.LazyLogging
 import nl.pragmasoft.app.ResponderActor._
 import org.http4s.{HttpRoutes, Response}
 import org.http4s.dsl.io._
 import org.http4s.implicits.http4sKleisliResponseSyntaxOptionT
-import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.server.{Router, Server}
 
 import scala.concurrent.ExecutionContext
@@ -21,7 +22,7 @@ import scala.util.Random
 
 object ApiService extends LazyLogging {
 
-  def resource(socketAddress: InetSocketAddress, system: ActorSystem)(implicit cs: ContextShift[IO], timer: Timer[IO], ec: ExecutionContext): Resource[IO, Server[IO]] = {
+  def resource(socketAddress: InetSocketAddress, system: ActorSystem)(implicit cs: Temporal[IO], ec: ExecutionContext): Resource[IO, Server] = {
 
     def pingActor(event: Any, actor: ActorRef): IO[Response[IO]] = {
       val actorResponse = actor.ask(event)(Timeout.durationToTimeout(10 seconds))
@@ -34,7 +35,7 @@ object ApiService extends LazyLogging {
       }
     }
 
-    BlazeServerBuilder[IO](ec)
+    BlazeServerBuilder[IO]
       .bindSocketAddress(socketAddress)
       .withHttpApp(
         Router("/api" -> HttpRoutes.of[IO] {
