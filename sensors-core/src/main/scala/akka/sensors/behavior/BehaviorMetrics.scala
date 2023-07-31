@@ -25,9 +25,8 @@ object BehaviorMetrics {
 
     def setup(factory: ActorContext[C] => Behavior[C]): Behavior[C] =
       Behaviors.setup { actorContext =>
-        val behavior = factory(actorContext)
-        val metrics  = AkkaSensorsExtension(actorContext.asScala.system).metrics
-        createMetrics.foldLeft(behavior)((b, createMetrics) => createMetrics(metrics, b))
+        val metrics = AkkaSensorsExtension(actorContext.asScala.system).metrics
+        setupWithMetrics(metrics, factory)
       }
 
     def setupWithMetrics(metrics: SensorMetrics, factory: ActorContext[C] => Behavior[C]): Behavior[C] =
