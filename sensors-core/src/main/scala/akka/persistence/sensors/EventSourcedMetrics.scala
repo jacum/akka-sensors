@@ -9,7 +9,7 @@ import akka.persistence.typed.internal.{CompositeEffect, EventSourcedBehaviorImp
 import akka.persistence.typed.scaladsl.{EffectBuilder, EventSourcedBehavior}
 import akka.persistence.{JournalProtocol => P}
 import akka.sensors.MetricOps._
-import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
+import akka.sensors.{AkkaSensorsExtension, ClassNameUtil, Metrics}
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.annotation.tailrec
@@ -17,7 +17,7 @@ import scala.reflect.ClassTag
 
 final case class EventSourcedMetrics[C, E, S](
   actorLabel: String,
-  metrics: AkkaSensorsExtension
+  metrics: Metrics
 ) extends LazyLogging {
 
   private lazy val recoveries       = metrics.recoveries.labels(actorLabel)

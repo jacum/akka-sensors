@@ -3,14 +3,14 @@ package akka.sensors.behavior
 import akka.actor.typed._
 import akka.actor.typed.scaladsl.Behaviors
 import akka.sensors.MetricOps._
-import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
+import akka.sensors.{AkkaSensorsExtension, ClassNameUtil, Metrics}
 
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
 final case class BasicActorMetrics[C](
   actorLabel: String,
-  metrics: AkkaSensorsExtension,
+  metrics: Metrics,
   messageLabel: C => Option[String]
 ) {
 

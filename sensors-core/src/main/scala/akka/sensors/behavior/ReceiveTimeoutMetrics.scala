@@ -2,13 +2,13 @@ package akka.sensors.behavior
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{Behavior, BehaviorInterceptor, TypedActorContext}
-import akka.sensors.AkkaSensorsExtension
+import akka.sensors.{AkkaSensorsExtension, Metrics}
 
 import scala.reflect.ClassTag
 
 final case class ReceiveTimeoutMetrics[C](
   actorLabel: String,
-  metrics: AkkaSensorsExtension,
+  metrics: Metrics,
   timeoutCmd: C
 ) {
 
