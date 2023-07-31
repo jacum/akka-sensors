@@ -176,31 +176,5 @@ object MetricOps {
 }
 
 trait MetricsBuilders extends BasicMetricBuilders {
-  def namespace: String
-  def subsystem: String
-
   val registry: CollectorRegistry = AkkaSensors.prometheusRegistry
-
-  def millisHistogram: Histogram.Builder =
-    Histogram
-      .build()
-      .namespace(namespace)
-      .subsystem(subsystem)
-      .buckets(.0005, .001, .005, .01, .05, .1, .5, 1, 5, 10, 50, 100, 500, 1000, 5000)
-  def secondsHistogram: Histogram.Builder =
-    Histogram
-      .build()
-      .namespace(namespace)
-      .subsystem(subsystem)
-      .buckets(0, 1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000)
-  def valueHistogram(max: Int): Histogram.Builder =
-    Histogram
-      .build()
-      .namespace(namespace)
-      .subsystem(subsystem)
-      .linearBuckets(0, 1, max)
-
-  def counter: Counter.Builder = Counter.build().namespace(namespace).subsystem(subsystem)
-  def gauge: Gauge.Builder     = Gauge.build().namespace(namespace).subsystem(subsystem)
-
 }
