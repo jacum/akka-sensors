@@ -28,6 +28,8 @@ trait BasicMetricBuilders {
 }
 
 object BasicMetricBuilders {
+  val ForActors: BasicMetricBuilders = make("akka_sensors", "actor")
+
   private final class Impl(nameSpace: String, subSystem: String) extends BasicMetricBuilders {
     override val namespace: String = nameSpace
     override val subsystem: String = subSystem
