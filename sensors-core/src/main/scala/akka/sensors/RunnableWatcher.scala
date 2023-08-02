@@ -2,10 +2,10 @@ package akka.sensors
 
 import java.lang.management.{ManagementFactory, ThreadMXBean}
 import java.util.concurrent.Executors
-
 import akka.sensors.RunnableWatcher.stackTraceToString
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.annotation.nowarn
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.BlockContext.withBlockContext
 import scala.concurrent.duration._
@@ -83,6 +83,7 @@ object RunnableWatcher extends LazyLogging {
         finally stop()
       }
 
+      @nowarn // we don't care about [highly theoretical] thread ID mutability
       def start(): () => Unit = {
         val threadId = Thread.currentThread().getId
         startWatching(threadId)
