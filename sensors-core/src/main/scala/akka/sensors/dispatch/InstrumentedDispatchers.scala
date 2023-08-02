@@ -181,7 +181,7 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
         lazy val maximumPoolSize   = executorValue.labels(id, "maximumPoolSize")
         lazy val queueSize         = executorValue.labels(id, "queueSize")
         lazy val completedTasks    = executorValue.labels(id, "completedTasks")
-        lazy val poolSize          = executorValue.labels(id, "queueSize")
+        lazy val poolSize          = executorValue.labels(id, "poolSize")
         lazy val steals            = executorValue.labels(id, "steals")
         lazy val parallelism       = executorValue.labels(id, "parallelism")
         lazy val queuedSubmissions = executorValue.labels(id, "queuedSubmissions")
