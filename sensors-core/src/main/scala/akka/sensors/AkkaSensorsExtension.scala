@@ -6,7 +6,7 @@ import akka.persistence.typed.scaladsl.EffectBuilder
 import akka.sensors.actor.ClusterEventWatchActor
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import io.prometheus.client.{CollectorRegistry, Counter, Gauge, Histogram}
+import io.prometheus.client.{Collector, CollectorRegistry, Counter, Gauge, Histogram}
 
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 import scala.collection.concurrent.TrieMap
@@ -106,103 +106,30 @@ class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with M
 
   CoordinatedShutdown(system)
     .addTask(CoordinatedShutdown.PhaseBeforeActorSystemTerminate, "clearPrometheusRegistry") { () =>
-      allCollectors.foreach(AkkaSensors.prometheusRegistry.unregister)
+      allCollectors.foreach(this.registry.unregister)
       logger.info("Cleared metrics")
       Future.successful(Done)
     }
 
-  val activityTime: Histogram = secondsHistogram
-    .name("activity_time_seconds")
-    .help(s"Seconds of activity")
-    .labelNames("actor")
-    .register(registry)
-  val activeActors: Gauge = gauge
-    .name("active_actors_total")
-    .help(s"Active actors")
-    .labelNames("actor")
-    .register(registry)
-  val unhandledMessages: Counter = counter
-    .name("unhandled_messages_total")
-    .help(s"Unhandled messages")
-    .labelNames("actor", "message")
-    .register(registry)
-  val exceptions: Counter = counter
-    .name("exceptions_total")
-    .help(s"Exceptions thrown by actors")
-    .labelNames("actor")
-    .register(registry)
-  val receiveTime: Histogram = millisHistogram
-    .name("receive_time_millis")
-    .help(s"Millis to process receive")
-    .labelNames("actor", "message")
-    .register(registry)
-  val receiveTimeouts: Counter = counter
-    .name("receive_timeouts_total")
-    .help("Number of receive timeouts")
-    .labelNames("actor")
-    .register(registry)
-  val clusterEvents: Counter = counter
-    .name("cluster_events_total")
-    .help(s"Number of cluster events, per type")
-    .labelNames("event", "member")
-    .register(registry)
-  val clusterMembers: Gauge = gauge
-    .name("cluster_members_total")
-    .help(s"Cluster members")
-    .register(registry)
-  val recoveryTime: Histogram = millisHistogram
-    .name("recovery_time_millis")
-    .help(s"Millis to process recovery")
-    .labelNames("actor")
-    .register(registry)
-  val persistTime: Histogram = millisHistogram
-    .name("persist_time_millis")
-    .help(s"Millis to process single event persist")
-    .labelNames("actor", "event")
-    .register(registry)
-  val recoveries: Counter = counter
-    .name("recoveries_total")
-    .help(s"Recoveries by actors")
-    .labelNames("actor")
-    .register(registry)
-  val recoveryEvents: Counter = counter
-    .name("recovery_events_total")
-    .help(s"Recovery events by actors")
-    .labelNames("actor")
-    .register(registry)
-  val persistFailures: Counter = counter
-    .name("persist_failures_total")
-    .help(s"Persist failures")
-    .labelNames("actor")
-    .register(registry)
-  val recoveryFailures: Counter = counter
-    .name("recovery_failures_total")
-    .help(s"Recovery failures")
-    .labelNames("actor")
-    .register(registry)
-  val persistRejects: Counter = counter
-    .name("persist_rejects_total")
-    .help(s"Persist rejects")
-    .labelNames("actor")
-    .register(registry)
+  val metrics: SensorMetrics = SensorMetrics.makeAndRegister(this, this.registry)
 
-  val allCollectors = List(
-    activityTime,
-    activeActors,
-    unhandledMessages,
-    exceptions,
-    receiveTime,
-    receiveTimeouts,
-    clusterEvents,
-    clusterMembers,
-    recoveryTime,
-    persistTime,
-    recoveries,
-    recoveryEvents,
-    persistFailures,
-    recoveryFailures,
-    persistRejects
-  )
+  def activityTime: Histogram    = metrics.activityTime
+  def activeActors: Gauge        = metrics.activeActors
+  def unhandledMessages: Counter = metrics.unhandledMessages
+  def exceptions: Counter        = metrics.exceptions
+  def receiveTime: Histogram     = metrics.receiveTime
+  def receiveTimeouts: Counter   = metrics.receiveTimeouts
+  def clusterEvents: Counter     = metrics.clusterEvents
+  def clusterMembers: Gauge      = metrics.clusterMembers
+  def recoveryTime: Histogram    = metrics.recoveryTime
+  def persistTime: Histogram     = metrics.persistTime
+  def recoveries: Counter        = metrics.recoveries
+  def recoveryEvents: Counter    = metrics.recoveryEvents
+  def persistFailures: Counter   = metrics.persistFailures
+  def recoveryFailures: Counter  = metrics.recoveryFailures
+  def persistRejects: Counter    = metrics.persistRejects
+
+  def allCollectors: List[Collector] = metrics.allCollectors
 }
 
 object AkkaSensorsExtension extends ExtensionId[AkkaSensorsExtension] with ExtensionIdProvider {
@@ -248,32 +175,6 @@ object MetricOps {
 
 }
 
-trait MetricsBuilders {
-  def namespace: String
-  def subsystem: String
-
+trait MetricsBuilders extends BasicMetricBuilders {
   val registry: CollectorRegistry = AkkaSensors.prometheusRegistry
-
-  def millisHistogram: Histogram.Builder =
-    Histogram
-      .build()
-      .namespace(namespace)
-      .subsystem(subsystem)
-      .buckets(.0005, .001, .005, .01, .05, .1, .5, 1, 5, 10, 50, 100, 500, 1000, 5000)
-  def secondsHistogram: Histogram.Builder =
-    Histogram
-      .build()
-      .namespace(namespace)
-      .subsystem(subsystem)
-      .buckets(0, 1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000)
-  def valueHistogram(max: Int): Histogram.Builder =
-    Histogram
-      .build()
-      .namespace(namespace)
-      .subsystem(subsystem)
-      .linearBuckets(0, 1, max)
-
-  def counter: Counter.Builder = Counter.build().namespace(namespace).subsystem(subsystem)
-  def gauge: Gauge.Builder     = Gauge.build().namespace(namespace).subsystem(subsystem)
-
 }

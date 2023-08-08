@@ -3,15 +3,15 @@ package akka.sensors.behavior
 import akka.actor.typed._
 import akka.actor.typed.scaladsl.Behaviors
 import akka.sensors.MetricOps._
-import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
+import akka.sensors.{AkkaSensorsExtension, ClassNameUtil, SensorMetrics}
 
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
 final case class BasicActorMetrics[C](
-  actorLabel: String,
-  metrics: AkkaSensorsExtension,
-  messageLabel: C => Option[String]
+                                       actorLabel: String,
+                                       metrics: SensorMetrics,
+                                       messageLabel: C => Option[String]
 ) {
 
   private lazy val exceptions = metrics.exceptions.labels(actorLabel)
