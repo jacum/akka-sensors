@@ -30,7 +30,7 @@ import scala.jdk.CollectionConverters._
 
 class AkkaCassandraJmxMetricsSpec extends AnyFreeSpec with LazyLogging with Eventually with BeforeAndAfterAll {
 
-  implicit val prometheusRegistry = CollectorRegistry.defaultRegistry
+  implicit val prometheusRegistry: CollectorRegistry = CollectorRegistry.defaultRegistry
   DefaultExports.register(prometheusRegistry)
   prometheusRegistry.register(new JmxCollector(Source.fromResource("prometheus-jmx-collector.yaml").mkString))
 
