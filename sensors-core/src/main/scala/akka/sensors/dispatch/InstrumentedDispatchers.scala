@@ -14,47 +14,6 @@ import io.prometheus.client.{Gauge, Histogram}
 import scala.PartialFunction.condOpt
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
-object DispatcherMetrics extends MetricsBuilders {
-  def namespace: String = "akka_sensors"
-  def subsystem: String = "dispatchers"
-
-  val queueTime: Histogram = millisHistogram
-    .name("queue_time_millis")
-    .help(s"Milliseconds in queue")
-    .labelNames("dispatcher")
-    .register(registry)
-
-  val runTime: Histogram = millisHistogram
-    .name("run_time_millis")
-    .help(s"Milliseconds running")
-    .labelNames("dispatcher")
-    .register(registry)
-
-  val activeThreads: Histogram = valueHistogram(max = 32)
-    .name("active_threads")
-    .help(s"Active worker threads")
-    .labelNames("dispatcher")
-    .register(registry)
-
-  val threadStates: Gauge = gauge
-    .name("thread_states")
-    .help("Threads per state and dispatcher")
-    .labelNames("dispatcher", "state")
-    .register(registry)
-
-  val threads: Gauge = gauge
-    .name("threads_total")
-    .help("Threads per dispatcher")
-    .labelNames("dispatcher")
-    .register(registry)
-
-  val executorValue: Gauge = gauge
-    .name("executor_value")
-    .help("Internal executor values per type")
-    .labelNames("dispatcher", "value")
-    .register(registry)
-}
-
 object AkkaRunnableWrapper {
   def unapply(runnable: Runnable): Option[Run => Runnable] =
     condOpt(runnable) {
@@ -125,7 +84,7 @@ object DispatcherInstrumentationWrapper {
 
   val Empty: InstrumentedRun = () => () => () => ()
 
-  import DispatcherMetrics._
+  import DispatcherMetricsRegistration._
   def meteredRun(id: String): InstrumentedRun = {
     val currentWorkers = new LongAdder
     val queue          = queueTime.labels(id)
@@ -170,7 +129,7 @@ class InstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrer
 
   override def createExecutorServiceFactory(id: String, threadFactory: ThreadFactory): ExecutorServiceFactory = {
     val esf = delegate.createExecutorServiceFactory(id, threadFactory)
-    import DispatcherMetrics._
+    import DispatcherMetricsRegistration._
     new ExecutorServiceFactory {
       def createExecutorService: ExecutorService = {
         val es = esf.createExecutorService
@@ -269,11 +228,11 @@ trait InstrumentedDispatcher extends Dispatcher {
 
       interestingStates foreach { state =>
         val stateLabel = state.toString.toLowerCase
-        DispatcherMetrics.threadStates
+        DispatcherMetricsRegistration.threadStates
           .labels(id, stateLabel)
           .set(threads.count(_.getThreadState.name().equalsIgnoreCase(stateLabel)))
       }
-      DispatcherMetrics.threads
+      DispatcherMetricsRegistration.threads
         .labels(id)
         .set(threads.length)
     }
