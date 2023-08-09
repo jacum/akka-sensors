@@ -59,19 +59,18 @@ class DispatcherInstrumentationWrapper(config: Config) {
     }
     execute(RunnableWrapper(runnable, run))
   }
+}
 
-  object RunnableWrapper {
-
-    def apply(runnableParam: Runnable, r: Run): Runnable =
-      runnableParam match {
-        case AkkaRunnableWrapper(runnable)  => runnable(r)
-        case ScalaRunnableWrapper(runnable) => runnable(r)
-        case runnable                       => new Default(runnable, r)
-      }
-
-    class Default(self: Runnable, r: Run) extends Runnable {
-      def run(): Unit = r(() => self.run())
+object RunnableWrapper {
+  def apply(runnableParam: Runnable, r: Run): Runnable =
+    runnableParam match {
+      case AkkaRunnableWrapper(runnable)  => runnable(r)
+      case ScalaRunnableWrapper(runnable) => runnable(r)
+      case runnable                       => new Default(runnable, r)
     }
+
+  private class Default(self: Runnable, r: Run) extends Runnable {
+    def run(): Unit = r(() => self.run())
   }
 }
 

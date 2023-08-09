@@ -1,4 +1,4 @@
-package akka.sensors.setup
+package akka.sensors.metered
 
 import akka.dispatch.{Dispatcher, Mailbox}
 import akka.event.Logging.Error
@@ -7,7 +7,7 @@ import akka.sensors.{AkkaSensors, DispatcherMetrics}
 import java.lang.management.{ManagementFactory, ThreadMXBean}
 import java.util.concurrent.RejectedExecutionException
 
-private[setup] trait LocalInstrumentedDispatcher extends Dispatcher {
+private[metered] trait MeteredInstrumentedDispatcher extends Dispatcher {
   protected def actorSystemName: String
   protected def metrics: DispatcherMetrics
 

@@ -1,4 +1,4 @@
-package akka.sensors.setup
+package akka.sensors.metered
 
 import akka.dispatch.{DispatcherPrerequisites, ExecutorServiceConfigurator, ExecutorServiceFactory, ForkJoinExecutorConfigurator, ThreadPoolExecutorConfigurator}
 import akka.sensors.AkkaSensors
@@ -6,8 +6,8 @@ import com.typesafe.config.Config
 
 import java.util.concurrent.{ExecutorService, ForkJoinPool, ThreadFactory, ThreadPoolExecutor}
 
-class LocalInstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrerequisites) extends ExecutorServiceConfigurator(config, prerequisites) {
-  private val metrics = LocalDispatcherSetup.setupOrThrow(prerequisites).metrics
+class MeteredInstrumentedExecutor(val config: Config, val prerequisites: DispatcherPrerequisites) extends ExecutorServiceConfigurator(config, prerequisites) {
+  private val metrics = MeteredDispatcherSetup.setupOrThrow(prerequisites).metrics
 
   private lazy val delegate: ExecutorServiceConfigurator =
     serviceConfigurator(config.getString("instrumented-executor.delegate"))

@@ -1,12 +1,14 @@
-package akka.sensors.setup
+package akka.sensors.metered
 
+import akka.sensors.dispatch.DispatcherInstrumentationWrapper.{InstrumentedRun, Run}
+import akka.sensors.dispatch.RunnableWrapper
 import akka.sensors.{DispatcherMetrics, RunnableWatcher}
 import com.typesafe.config.Config
 
 import java.util.concurrent.atomic.LongAdder
 import scala.concurrent.duration.Duration
 
-class DispatcherInstrumentationWrapper(metrics: DispatcherMetrics, config: Config) {
+private[metered] class DispatcherInstrumentationWrapper(metrics: DispatcherMetrics, config: Config) {
   import DispatcherInstrumentationWrapper._
   import akka.sensors.dispatch.Helpers._
 
@@ -31,28 +33,8 @@ class DispatcherInstrumentationWrapper(metrics: DispatcherMetrics, config: Confi
     }
     execute(RunnableWrapper(runnable, run))
   }
-
-  object RunnableWrapper {
-    def apply(runnableParam: Runnable, r: Run): Runnable =
-      runnableParam match {
-        case AkkaRunnableWrapper(runnable)  => runnable(r)
-        case ScalaRunnableWrapper(runnable) => runnable(r)
-        case runnable                       => new Default(runnable, r)
-      }
-
-    class Default(self: Runnable, r: Run) extends Runnable {
-      def run(): Unit = r(() => self.run())
-    }
-  }
 }
 object DispatcherInstrumentationWrapper {
-  trait Run { def apply[T](f: () => T): T }
-
-  type InstrumentedRun = () => BeforeRun
-  type BeforeRun       = () => AfterRun
-  type AfterRun        = () => Unit
-
-  val Empty: InstrumentedRun = () => () => () => ()
   def meteredRun(metrics: DispatcherMetrics, id: String): InstrumentedRun = {
     val currentWorkers = new LongAdder
     val queue          = metrics.queueTime.labels(id)
@@ -77,7 +59,7 @@ object DispatcherInstrumentationWrapper {
     }
   }
 
-  def watchedRun(id: String, tooLongThreshold: Duration, checkInterval: Duration): InstrumentedRun = {
+  private def watchedRun(id: String, tooLongThreshold: Duration, checkInterval: Duration): InstrumentedRun = {
     val watcher = RunnableWatcher(tooLongRunThreshold = tooLongThreshold, checkInterval = checkInterval)
 
     () => { () =>
