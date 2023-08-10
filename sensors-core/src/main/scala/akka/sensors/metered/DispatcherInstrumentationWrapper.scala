@@ -34,7 +34,7 @@ private[metered] class DispatcherInstrumentationWrapper(metrics: DispatcherMetri
     execute(RunnableWrapper(runnable, run))
   }
 }
-object DispatcherInstrumentationWrapper {
+private[metered] object DispatcherInstrumentationWrapper {
   def meteredRun(metrics: DispatcherMetrics, id: String): InstrumentedRun = {
     val currentWorkers = new LongAdder
     val queue          = metrics.queueTime.labels(id)

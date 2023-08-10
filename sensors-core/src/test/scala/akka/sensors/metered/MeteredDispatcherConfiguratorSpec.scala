@@ -4,12 +4,12 @@ import akka.ConfigurationException
 import akka.actor.BootstrapSetup
 import akka.actor.setup.ActorSystemSetup
 import akka.actor.typed.{ActorSystem, DispatcherSelector, SpawnProtocol}
+import akka.sensors.DispatcherMetrics
+import akka.sensors.MetricsTestUtils._
 import akka.sensors.metered.MeteredDispatcherConfiguratorSpec._
-import akka.sensors.{BasicMetricBuilders, DispatcherMetrics}
 import com.typesafe.config.ConfigFactory
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
-import akka.sensors.MetricsTestUtils._
 
 class MeteredDispatcherConfiguratorSpec extends AnyFreeSpec with Matchers {
   "MeteredDispatcherConfigurator" - {
