@@ -10,8 +10,8 @@ import scala.jdk.CollectionConverters._
 class DispatcherMetricsSpec extends AnyFreeSpec with Matchers {
   "DispatcherMetrics" - {
     "registers all metrics" in {
-      val cr      = new CollectorRegistry(true)
-      val result  = DispatcherMetrics.makeAndRegister(builder, cr)
+      val cr = new CollectorRegistry(true)
+      DispatcherMetrics.makeAndRegister(builder, cr)
       val samples = cr.metricFamilySamples().asIterator().asScala.toList
       val names   = samples.map(_.name)
 
