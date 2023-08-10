@@ -7,7 +7,7 @@ import akka.sensors.{AkkaSensors, DispatcherMetrics}
 import java.lang.management.{ManagementFactory, ThreadMXBean}
 import java.util.concurrent.RejectedExecutionException
 
-private[metered] trait MeteredInstrumentedDispatcher extends Dispatcher {
+private[metered] trait MeteredDispatcherInstrumentation extends Dispatcher {
   protected def actorSystemName: String
   protected def metrics: DispatcherMetrics
 

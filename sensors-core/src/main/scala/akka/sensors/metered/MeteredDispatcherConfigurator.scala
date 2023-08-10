@@ -8,22 +8,21 @@ import com.typesafe.config.Config
 class MeteredDispatcherConfigurator(config: Config, prerequisites: DispatcherPrerequisites) extends MessageDispatcherConfigurator(config, prerequisites) {
   import Helpers._
 
-  private val instance = {
+  private val instance: MessageDispatcher = {
     val _metrics = MeteredDispatcherSetup.setupOrThrow(prerequisites).metrics
+    val settings = MeteredDispatcherSettings(
+      name = prerequisites.mailboxes.settings.name,
+      metrics = _metrics,
+      _configurator = this,
+      id = config.getString("id"),
+      throughput = config.getInt("throughput"),
+      throughputDeadlineTime = config.getNanosDuration("throughput-deadline-time"),
+      executorServiceFactoryProvider = configureExecutor(),
+      shutdownTimeout = config.getMillisDuration("shutdown-timeout")
+    )
 
-    new Dispatcher(
-      this,
-      config.getString("id"),
-      config.getInt("throughput"),
-      config.getNanosDuration("throughput-deadline-time"),
-      configureExecutor(),
-      config.getMillisDuration("shutdown-timeout")
-    ) with MeteredInstrumentedDispatcher {
-      def actorSystemName: String                       = prerequisites.mailboxes.settings.name
-      protected override def metrics: DispatcherMetrics = _metrics
-    }
+    new MeteredDispatcher(settings)
   }
 
   def dispatcher(): MessageDispatcher = instance
-
 }
