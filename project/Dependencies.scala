@@ -61,7 +61,7 @@ object Dependencies {
     val circe                = "org.http4s"       %% "http4s-circe"              % http4sVersionModules
     val dsl                  = "org.http4s"       %% "http4s-dsl"                % http4sVersionModules
     val metrics              = "org.http4s"       %% "http4s-prometheus-metrics" % http4sVersionMetrics
-    val prometheusJmx        = "io.prometheus.jmx" % "collector"                 % "0.19.0"
+    val prometheusJmx        = "io.prometheus.jmx" % "collector"                 % "0.20.0"
     val deps: Seq[ModuleID]  = Seq(server, client, circe, dsl, metrics, prometheusJmx)
   }
 
