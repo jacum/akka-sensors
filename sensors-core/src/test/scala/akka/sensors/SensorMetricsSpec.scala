@@ -5,18 +5,15 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers._
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
-import SensorMetricsSpec._
+import MetricsTestUtils._
 
 class SensorMetricsSpec extends AnyFreeSpec {
   "SensorMetrics" - {
     "registers all metrics" in {
       val cr      = new CollectorRegistry(true)
-      val builder = BasicMetricBuilders.make(TestNameSpace, TestSubSystem)
       val result  = SensorMetrics.makeAndRegister(builder, cr)
-
       val samples = cr.metricFamilySamples().asIterator().asScala.toList
-
-      val names = samples.map(_.name)
+      val names   = samples.map(_.name)
 
       // Pay attention that counter metrics does not have `_total` suffixes
       // Check io.prometheus.client.Counter.Builder.create(..) to see more
@@ -37,11 +34,4 @@ class SensorMetricsSpec extends AnyFreeSpec {
       names should contain(asMetricName("persist_rejects"))
     }
   }
-}
-
-object SensorMetricsSpec {
-  private val TestNameSpace = "test_namespace"
-  private val TestSubSystem = "test_subsystem"
-  private def asMetricName(in: String): String =
-    s"${TestNameSpace}_${TestSubSystem}_$in"
 }
