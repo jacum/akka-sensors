@@ -28,17 +28,13 @@ object Dependencies {
     val persistence      = "com.typesafe.akka" %% "akka-persistence"       % akkaVersion
     val persistenceTyped = "com.typesafe.akka" %% "akka-persistence-typed" % akkaVersion
     val persistenceQuery = "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion
-    val persistenceCassandra = "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion excludeAll (
-            ExclusionRule("com.datastax.oss"),
-            ExclusionRule("com.fasterxml.jackson.core")
-    )
 
     val cluster      = "com.typesafe.akka" %% "akka-cluster"       % akkaVersion
     val clusterTyped = "com.typesafe.akka" %% "akka-cluster-typed" % akkaVersion
     val clusterTools = "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
     val slf4j        = "com.typesafe.akka" %% "akka-slf4j"         % akkaVersion
 
-    val deps = Seq(actor, typed, persistence, persistenceTyped, persistenceQuery, persistenceCassandra, cluster, clusterTyped, clusterTools, slf4j) ++ Logging.deps
+    val deps = Seq(actor, typed, persistence, persistenceTyped, persistenceQuery, cluster, clusterTyped, clusterTools, slf4j) ++ Logging.deps
   }
 
   object Prometheus {
