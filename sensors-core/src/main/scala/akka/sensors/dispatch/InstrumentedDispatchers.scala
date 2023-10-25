@@ -13,6 +13,7 @@ import io.prometheus.client.{Gauge, Histogram}
 
 import scala.PartialFunction.condOpt
 import scala.concurrent.duration.{Duration, FiniteDuration}
+import akka.sensors.dispatch.ScalaRunnableWrapper
 
 object AkkaRunnableWrapper {
   def unapply(runnable: Runnable): Option[Run => Runnable] =
@@ -64,8 +65,8 @@ class DispatcherInstrumentationWrapper(config: Config) {
 object RunnableWrapper {
   def apply(runnableParam: Runnable, r: Run): Runnable =
     runnableParam match {
-      case AkkaRunnableWrapper(runnable)  => runnable(r)
-      case ScalaRunnableWrapper(runnable) => runnable(r)
+      case AkkaRunnableWrapper(runnable)  => runnable.apply(r)
+      case ScalaRunnableWrapper(runnable) => runnable.apply(r)
       case runnable                       => new Default(runnable, r)
     }
 

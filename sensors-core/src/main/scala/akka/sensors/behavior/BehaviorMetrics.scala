@@ -41,7 +41,7 @@ object BehaviorMetrics {
     }
 
     def withPersistenceMetrics: BehaviorMetricsBuilder[C] = {
-      val eventSourcedMetrics = (metrics: SensorMetrics, behaviorToObserve: Behavior[C]) => EventSourcedMetrics(actorLabel, metrics)(behaviorToObserve)
+      val eventSourcedMetrics = (metrics: SensorMetrics, behaviorToObserve: Behavior[C]) => EventSourcedMetrics(actorLabel, metrics).apply(behaviorToObserve)
       new BehaviorMetricsBuilder[C](actorLabel, eventSourcedMetrics :: self.createMetrics)
     }
   }

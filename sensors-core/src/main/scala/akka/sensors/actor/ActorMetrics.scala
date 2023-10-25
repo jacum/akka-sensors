@@ -6,9 +6,10 @@ import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
 
 import scala.collection.immutable
 import scala.util.control.NonFatal
+import akka.sensors.MetricOps._
 
 trait ActorMetrics extends Actor with ActorLogging {
-  _: Actor =>
+  self: Actor =>
   import akka.sensors.MetricOps._
 
   protected def actorLabel: String = ClassNameUtil.simpleName(this.getClass)

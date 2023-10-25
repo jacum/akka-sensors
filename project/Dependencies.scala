@@ -3,13 +3,6 @@ import sbt._
 //noinspection TypeAnnotation
 object Dependencies {
 
-  val akkaInmemoryJournal = ("com.github.dnvriend" %% "akka-persistence-inmemory" % "2.5.15.2")
-    .exclude("com.typesafe.akka", "akka-actor")
-    .exclude("com.typesafe.akka", "akka-persistence")
-    .exclude("com.typesafe.akka", "akka-persistence-query")
-    .exclude("com.typesafe.akka", "akka-stream")
-    .exclude("com.typesafe.akka", "akka-protobuf")
-
   object Logging {
     val slf4jversion = "2.0.7"
     val slf4jApi     = "org.slf4j"                   % "slf4j-api"     % slf4jversion
@@ -28,17 +21,13 @@ object Dependencies {
     val persistence      = "com.typesafe.akka" %% "akka-persistence"       % akkaVersion
     val persistenceTyped = "com.typesafe.akka" %% "akka-persistence-typed" % akkaVersion
     val persistenceQuery = "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion
-    val persistenceCassandra = "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion excludeAll (
-            ExclusionRule("com.datastax.oss"),
-            ExclusionRule("com.fasterxml.jackson.core")
-    )
 
     val cluster      = "com.typesafe.akka" %% "akka-cluster"       % akkaVersion
     val clusterTyped = "com.typesafe.akka" %% "akka-cluster-typed" % akkaVersion
     val clusterTools = "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
     val slf4j        = "com.typesafe.akka" %% "akka-slf4j"         % akkaVersion
 
-    val deps = Seq(actor, typed, persistence, persistenceTyped, persistenceQuery, persistenceCassandra, cluster, clusterTyped, clusterTools, slf4j) ++ Logging.deps
+    val deps = Seq(actor, typed, persistence, persistenceTyped, persistenceQuery, cluster, clusterTyped, clusterTools, slf4j) ++ Logging.deps
   }
 
   object Prometheus {
@@ -73,7 +62,7 @@ object Dependencies {
   }
 
   object Cassandra {
-    val akkaPersistenceCassandraVersion = "1.0.6"
+    val akkaPersistenceCassandraVersion = "1.1.1"
     val cassandraDriverVersion          = "4.17.0"
 
     val cassandraDriverCore         = "com.datastax.oss"      % "java-driver-core"           % cassandraDriverVersion
@@ -86,9 +75,15 @@ object Dependencies {
   }
 
   object TestTools {
+    val akkaInmemoryJournal = ("com.github.dnvriend" %% "akka-persistence-inmemory" % "2.5.15.2")
+      .exclude("com.typesafe.akka", "akka-actor")
+      .exclude("com.typesafe.akka", "akka-persistence")
+      .exclude("com.typesafe.akka", "akka-persistence-query")
+      .exclude("com.typesafe.akka", "akka-stream")
+      .exclude("com.typesafe.akka", "akka-protobuf")
     val log       = "ch.qos.logback" % "logback-classic" % "1.4.8"
     val scalaTest = "org.scalatest" %% "scalatest"       % "3.2.16"
-    val deps      = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal, log)
+    val deps      = Logging.deps ++ testDeps(scalaTest, log)
   }
 
   def scopeDeps(scope: String, modules: Seq[ModuleID]) = modules.map(m => m % scope)

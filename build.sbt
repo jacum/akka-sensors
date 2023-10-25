@@ -2,9 +2,14 @@ import Dependencies._
 import Keys._
 import sbt.file
 
+lazy val scala2                 = "2.13.12"
+lazy val scala3                 = "3.2.2"
+lazy val supportedScalaVersions = List(scala2, scala3)
+
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
         organization := "nl.pragmasoft.sensors",
-        scalaVersion := "2.13.11",
+        scalaVersion := scala2,
+        crossScalaVersions := supportedScalaVersions,
         testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
         Test / parallelExecution := false,
         Test / fork := true,
@@ -62,6 +67,7 @@ lazy val `app` = project
   .in(file("examples/app"))
   .enablePlugins(JavaAppPackaging, DockerPlugin)
   .settings(commonSettings ++ noPublishSettings)
+  .settings(crossScalaVersions := Nil)
   .settings(
     moduleName := "app",
     Compile / mainClass := Some("nl.pragmasoft.app.Main"),
@@ -77,3 +83,4 @@ lazy val `root` = project
   .aggregate(app, `sensors-core`, `sensors-cassandra`)
   .settings(commonSettings ++ noPublishSettings)
   .settings(name := "Akka Sensors")
+  .settings(crossScalaVersions := Nil)
