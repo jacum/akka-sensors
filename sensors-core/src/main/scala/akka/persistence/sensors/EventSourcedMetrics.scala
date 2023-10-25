@@ -101,21 +101,19 @@ final case class EventSourcedMetrics[C, E, S](
     }
 
   private def observeEffect(effect: EffectBuilder[E, S]): EffectBuilder[E, S] = {
-
-    def foldComposites(
-      e: EffectBuilder[E, S],
-      composites: List[CompositeEffect[E, S]]
-    ): EffectBuilder[E, S] =
+    def foldComposites[E1, S1](
+      e: EffectBuilder[E1, S1],
+      composites: List[CompositeEffect[E1, S1]]
+    ): EffectBuilder[E1, S1] =
       composites.foldLeft(e)((e, c) => c.copy(persistingEffect = e))
 
     @tailrec
-    def loop(
-      e: EffectBuilder[E, S],
-      composites: List[CompositeEffect[E, S]]
-    ): EffectBuilder[E, S] =
+    def loop[E1, S1](
+      e: EffectBuilder[E1, S1],
+      composites: List[CompositeEffect[E1, S1]]
+    ): EffectBuilder[E1, S1] =
       e match {
-
-        case eff: Persist[E, S] =>
+        case eff @ Persist(_) =>
           val withMetrics = messageLabel(eff.event).map { label =>
             metrics.persistTime
               .labels(actorLabel, label)
@@ -124,14 +122,14 @@ final case class EventSourcedMetrics[C, E, S](
             .getOrElse(eff)
           foldComposites(withMetrics, composites)
 
-        case eff: PersistAll[E, S] =>
+        case eff @ PersistAll(_) =>
           val withMetrics = metrics.persistTime
             .labels(actorLabel, "_all")
             .observeEffect(eff)
           foldComposites(withMetrics, composites)
 
-        case eff: CompositeEffect[E, S] =>
-          loop(eff.persistingEffect, eff :: composites)
+        case CompositeEffect(pe, effs) =>
+          loop(pe, CompositeEffect(pe, effs) :: composites)
 
         case other => foldComposites(other, composites)
       }

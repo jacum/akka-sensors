@@ -2,9 +2,11 @@ import Dependencies._
 import Keys._
 import sbt.file
 
+lazy val scala2                 = "2.13.12"
+
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
         organization := "nl.pragmasoft.sensors",
-        scalaVersion := "2.13.11",
+        scalaVersion := scala2,
         testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
         Test / parallelExecution := false,
         Test / fork := true,
