@@ -31,7 +31,7 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
         doc / sources := Seq.empty,
         packageSrc / publishArtifact := false,
         packageDoc / publishArtifact := true
-      ) ++ Publish.settings ++ addCommandAlias("compileAll", ";compile;Test/compile")
+      ) ++ Publish.settings
 
 lazy val noPublishSettings = Seq(
   publish / skip := true,
