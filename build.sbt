@@ -2,7 +2,7 @@ import Dependencies._
 import Keys._
 import sbt.file
 
-lazy val scala2                 = "2.13.12"
+lazy val scala2 = "2.13.12"
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
         organization := "nl.pragmasoft.sensors",
@@ -31,7 +31,7 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
         doc / sources := Seq.empty,
         packageSrc / publishArtifact := false,
         packageDoc / publishArtifact := true
-      ) ++ Publish.settings
+      ) ++ Publish.settings ++ addCommandAlias("compileAll", ";compile;Test/compile")
 
 lazy val noPublishSettings = Seq(
   publish / skip := true,
