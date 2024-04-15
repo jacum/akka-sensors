@@ -27,5 +27,5 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.13.10; clean; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
+        sbt -Divy.home=${IVY_HOME} -Dsbt.ivy.home=${IVY_HOME} "++2.13.13; clean; coverage; test; coverageReport" && bash <(curl -s https://codecov.io/bash)
       failOnStderr: false

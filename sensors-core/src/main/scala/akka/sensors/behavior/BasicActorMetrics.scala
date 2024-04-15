@@ -9,9 +9,9 @@ import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
 final case class BasicActorMetrics[C](
-                                       actorLabel: String,
-                                       metrics: SensorMetrics,
-                                       messageLabel: C => Option[String]
+  actorLabel: String,
+  metrics: SensorMetrics,
+  messageLabel: C => Option[String]
 ) {
 
   private lazy val exceptions = metrics.exceptions.labels(actorLabel)

@@ -7,9 +7,9 @@ import akka.sensors.{AkkaSensorsExtension, SensorMetrics}
 import scala.reflect.ClassTag
 
 final case class ReceiveTimeoutMetrics[C](
-                                           actorLabel: String,
-                                           metrics: SensorMetrics,
-                                           timeoutCmd: C
+  actorLabel: String,
+  metrics: SensorMetrics,
+  timeoutCmd: C
 ) {
 
   private val receiveTimeouts = metrics.receiveTimeouts.labels(actorLabel)
