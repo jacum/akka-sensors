@@ -9,7 +9,7 @@ addSbtPlugin("org.scalameta"     % "sbt-scalafmt"         % "2.5.2")
 addSbtPlugin("org.xerial.sbt"    % "sbt-sonatype"         % "3.10.0")
 addSbtPlugin("com.jsuereth"      % "sbt-pgp"              % "2.1.1")
 addSbtPlugin("no.arktekk.sbt"    % "aether-deploy"        % "0.29.1")
-addSbtPlugin("com.github.sbt"    % "sbt-release"          % "1.4.0")
+addSbtPlugin("com.github.sbt"    % "sbt-release"          % "1.0.13") // don't bump, it changes the logics
 addSbtPlugin("org.scoverage"     % "sbt-scoverage"        % "2.0.11")
 
 ThisBuild / libraryDependencySchemes ++= Seq(
