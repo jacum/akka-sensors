@@ -49,7 +49,7 @@ object Publish {
     releaseIgnoreUntrackedFiles := true,
     releaseProcess := Seq[ReleaseStep](
           checkSnapshotDependencies,
-          inquireVersions,
+//          inquireVersions,
           runClean,
 //      runTest, // can't run test w/cross-version release
           releaseStepCommandAndRemaining("+publishSigned"),
