@@ -13,7 +13,6 @@ object Publish {
   )
 
   val ReleaseToSonatype = Seq(
-      releaseVersionBump := sbtrelease.Version.Bump.NextStable,
       credentials ++= Seq(
           Credentials(
             "Sonatype Nexus Repository Manager",
