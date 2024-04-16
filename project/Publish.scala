@@ -49,8 +49,9 @@ object Publish {
     releaseIgnoreUntrackedFiles := true,
     releaseProcess := Seq[ReleaseStep](
           checkSnapshotDependencies,
-//          inquireVersions,
+          inquireVersions,
           runClean,
+          setReleaseVersion,
 //      runTest, // can't run test w/cross-version release
           releaseStepCommandAndRemaining("+publishSigned"),
           releaseStepCommand("sonatypeBundleRelease")
