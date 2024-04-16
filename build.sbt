@@ -3,6 +3,7 @@ import Keys._
 import sbt.file
 
 lazy val scala2 = "2.13.13"
+ThisBuild / versionScheme := Some("early-semver")
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
         organization := "nl.pragmasoft.sensors",
