@@ -20,12 +20,12 @@ final case class EventSourcedMetrics[C, E, S](
   metrics: SensorMetrics
 ) extends LazyLogging {
 
-  private lazy val recoveries       = metrics.recoveries.labels(actorLabel)
-  private lazy val recoveryEvents   = metrics.recoveryEvents.labels(actorLabel)
-  private lazy val recoveryTime     = metrics.recoveryTime.labels(actorLabel).startTimer()
-  private lazy val recoveryFailures = metrics.recoveryFailures.labels(actorLabel)
-  private lazy val persistFailures  = metrics.persistFailures.labels(actorLabel)
-  private lazy val persistRejects   = metrics.persistRejects.labels(actorLabel)
+  private val recoveries       = metrics.recoveries.labels(actorLabel)
+  private val recoveryEvents   = metrics.recoveryEvents.labels(actorLabel)
+  private val recoveryTime     = metrics.recoveryTime.labels(actorLabel).startTimer()
+  private val recoveryFailures = metrics.recoveryFailures.labels(actorLabel)
+  private val persistFailures  = metrics.persistFailures.labels(actorLabel)
+  private val persistRejects   = metrics.persistRejects.labels(actorLabel)
 
   def messageLabel(value: Any): Option[String] =
     Some(ClassNameUtil.simpleName(value.getClass))
