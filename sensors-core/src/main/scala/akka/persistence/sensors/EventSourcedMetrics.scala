@@ -20,12 +20,14 @@ final case class EventSourcedMetrics[C, E, S](
   metrics: SensorMetrics
 ) extends LazyLogging {
 
-  private lazy val recoveries       = metrics.recoveries.labels(actorLabel)
-  private lazy val recoveryEvents   = metrics.recoveryEvents.labels(actorLabel)
-  private val recoveryTime     = metrics.recoveryTime.labels(actorLabel).startTimer()
-  private lazy val recoveryFailures = metrics.recoveryFailures.labels(actorLabel)
-  private lazy val persistFailures  = metrics.persistFailures.labels(actorLabel)
-  private lazy val persistRejects   = metrics.persistRejects.labels(actorLabel)
+  private lazy val recoveries           = metrics.recoveries.labels(actorLabel)
+  private lazy val recoveryEvents       = metrics.recoveryEvents.labels(actorLabel)
+  private var firstEventPassed: Boolean = false
+  private val recoveryTime              = metrics.recoveryTime.labels(actorLabel).startTimer()
+  private val recoveryToFirstEventTime  = metrics.recoveryTime.labels(actorLabel).startTimer()
+  private lazy val recoveryFailures     = metrics.recoveryFailures.labels(actorLabel)
+  private lazy val persistFailures      = metrics.persistFailures.labels(actorLabel)
+  private lazy val persistRejects       = metrics.persistRejects.labels(actorLabel)
 
   def messageLabel(value: Any): Option[String] =
     Some(ClassNameUtil.simpleName(value.getClass))
@@ -42,7 +44,12 @@ final case class EventSourcedMetrics[C, E, S](
           msg match {
             case res: P.Response =>
               res match {
-                case _: P.ReplayedMessage       => recoveryEvents.inc()
+                case _: P.ReplayedMessage =>
+                  if (!firstEventPassed) {
+                    recoveryToFirstEventTime.observeDuration()
+                    firstEventPassed = true
+                  }
+                  recoveryEvents.inc()
                 case _: P.ReplayMessagesFailure => recoveryFailures.inc()
                 case _: P.WriteMessageRejected  => persistRejects.inc()
                 case _: P.WriteMessageFailure   => persistFailures.inc()

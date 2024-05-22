@@ -76,17 +76,25 @@ trait PersistentActorMetrics extends ActorMetrics with PersistentActor {
 
   protected def eventLabel(value: Any): Option[String] = messageLabel(value)
 
-  private var recovered: Boolean    = false
-  private lazy val recoveries       = metrics.recoveries.labels(actorLabel)
-  private lazy val recoveryEvents   = metrics.recoveryEvents.labels(actorLabel)
-  private lazy val recoveryTime     = metrics.recoveryTime.labels(actorLabel).startTimer()
-  private lazy val recoveryFailures = metrics.recoveryFailures.labels(actorLabel)
-  private lazy val persistFailures  = metrics.persistFailures.labels(actorLabel)
-  private lazy val persistRejects   = metrics.persistRejects.labels(actorLabel)
+  private var recovered: Boolean        = false
+  private var firstEventPassed: Boolean = false
+  private lazy val recoveries           = metrics.recoveries.labels(actorLabel)
+  private lazy val recoveryEvents       = metrics.recoveryEvents.labels(actorLabel)
+  private val recoveryTime              = metrics.recoveryTime.labels(actorLabel).startTimer()
+  private val recoveryToFirstEventTime  = metrics.recoveryTime.labels(actorLabel).startTimer()
+  private lazy val recoveryFailures     = metrics.recoveryFailures.labels(actorLabel)
+  private lazy val persistFailures      = metrics.persistFailures.labels(actorLabel)
+  private lazy val persistRejects       = metrics.persistRejects.labels(actorLabel)
 
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit = {
     if (!recoveryFinished) {
-      if (ClassNameUtil.simpleName(msg.getClass).startsWith("ReplayedMessage")) recoveryEvents.inc()
+      if (ClassNameUtil.simpleName(msg.getClass).startsWith("ReplayedMessage")) {
+        if (!firstEventPassed) {
+          recoveryToFirstEventTime.observeDuration()
+          firstEventPassed = true
+        }
+        recoveryEvents.inc()
+      }
     } else if (!recovered) {
       recoveries.inc()
       recoveryTime.observeDuration()

@@ -12,6 +12,7 @@ final case class SensorMetrics(
   clusterEvents: Counter,
   clusterMembers: Gauge,
   recoveryTime: Histogram,
+  recoveryToFirstEventTime: Histogram,
   persistTime: Histogram,
   recoveries: Counter,
   recoveryEvents: Counter,
@@ -90,6 +91,11 @@ object SensorMetrics {
       recoveryTime = millisHistogram
         .name("recovery_time_millis")
         .help(s"Millis to process recovery")
+        .labelNames("actor")
+        .create(),
+      recoveryToFirstEventTime = millisHistogram
+        .name("recovery_to_first_event_time_millis")
+        .help(s"Millis to process recovery before first event is applied")
         .labelNames("actor")
         .create(),
       persistTime = millisHistogram
