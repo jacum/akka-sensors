@@ -30,6 +30,7 @@ final case class SensorMetrics(
     clusterEvents,
     clusterMembers,
     recoveryTime,
+    recoveryToFirstEventTime,
     persistTime,
     recoveries,
     recoveryEvents,
