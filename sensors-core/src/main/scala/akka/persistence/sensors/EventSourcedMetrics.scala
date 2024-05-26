@@ -24,7 +24,7 @@ final case class EventSourcedMetrics[C, E, S](
   private lazy val recoveryEvents       = metrics.recoveryEvents.labels(actorLabel)
   private var firstEventPassed: Boolean = false
   private val recoveryTime              = metrics.recoveryTime.labels(actorLabel).startTimer()
-  private val recoveryToFirstEventTime  = metrics.recoveryTime.labels(actorLabel).startTimer()
+  private val recoveryToFirstEventTime  = metrics.recoveryToFirstEventTime.labels(actorLabel).startTimer()
   private lazy val recoveryFailures     = metrics.recoveryFailures.labels(actorLabel)
   private lazy val persistFailures      = metrics.persistFailures.labels(actorLabel)
   private lazy val persistRejects       = metrics.persistRejects.labels(actorLabel)
