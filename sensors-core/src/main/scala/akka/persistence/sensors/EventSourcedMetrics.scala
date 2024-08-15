@@ -7,13 +7,12 @@ import akka.actor.typed.scaladsl.Behaviors.{ReceiveImpl, ReceiveMessageImpl}
 import akka.actor.typed.{Behavior, BehaviorInterceptor, ExtensibleBehavior, TypedActorContext}
 import akka.persistence.typed.internal.{CompositeEffect, EventSourcedBehaviorImpl, Persist, PersistAll}
 import akka.persistence.typed.scaladsl.{EffectBuilder, EventSourcedBehavior}
-import akka.persistence.{JournalProtocol => P}
+import akka.persistence.{RecoveryPermitter, JournalProtocol => P}
 import akka.sensors.MetricOps._
-import akka.sensors.{AkkaSensorsExtension, ClassNameUtil, SensorMetrics}
+import akka.sensors.{ClassNameUtil, SensorMetrics}
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.annotation.tailrec
-import scala.reflect.ClassTag
 
 final case class EventSourcedMetrics[C, E, S](
   actorLabel: String,
@@ -28,11 +27,15 @@ final case class EventSourcedMetrics[C, E, S](
   private lazy val recoveryFailures     = metrics.recoveryFailures.labels(actorLabel)
   private lazy val persistFailures      = metrics.persistFailures.labels(actorLabel)
   private lazy val persistRejects       = metrics.persistRejects.labels(actorLabel)
+  private val waitingForRecoveryGauge   = metrics.waitingForRecovery.labels(actorLabel)
+  private val waitingForRecoveryTime    = metrics.waitingForRecoveryTime.labels(actorLabel).startTimer()
+
+  waitingForRecoveryGauge.inc()
 
   def messageLabel(value: Any): Option[String] =
     Some(ClassNameUtil.simpleName(value.getClass))
 
-  def apply(behaviorToObserve: Behavior[C])(implicit ct: ClassTag[C]): Behavior[C] = {
+  def apply(behaviorToObserve: Behavior[C]): Behavior[C] = {
 
     val interceptor = () =>
       new BehaviorInterceptor[Any, Any] {
@@ -59,6 +62,10 @@ final case class EventSourcedMetrics[C, E, S](
 
                 case _ =>
               }
+
+            case RecoveryPermitter.RecoveryPermitGranted =>
+              waitingForRecoveryGauge.dec()
+              waitingForRecoveryTime.observeDuration()
 
             case _ =>
           }

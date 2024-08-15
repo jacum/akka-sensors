@@ -4,7 +4,6 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.persistence.sensors.EventSourcedMetrics
 import akka.sensors.{AkkaSensorsExtension, ClassNameUtil, SensorMetrics}
-import io.prometheus.client.CollectorRegistry
 
 import scala.reflect.ClassTag
 

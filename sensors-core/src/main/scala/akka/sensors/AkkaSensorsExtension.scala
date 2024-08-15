@@ -113,21 +113,23 @@ class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with M
 
   val metrics: SensorMetrics = SensorMetrics.makeAndRegister(this, this.registry)
 
-  def activityTime: Histogram    = metrics.activityTime
-  def activeActors: Gauge        = metrics.activeActors
-  def unhandledMessages: Counter = metrics.unhandledMessages
-  def exceptions: Counter        = metrics.exceptions
-  def receiveTime: Histogram     = metrics.receiveTime
-  def receiveTimeouts: Counter   = metrics.receiveTimeouts
-  def clusterEvents: Counter     = metrics.clusterEvents
-  def clusterMembers: Gauge      = metrics.clusterMembers
-  def recoveryTime: Histogram    = metrics.recoveryTime
-  def persistTime: Histogram     = metrics.persistTime
-  def recoveries: Counter        = metrics.recoveries
-  def recoveryEvents: Counter    = metrics.recoveryEvents
-  def persistFailures: Counter   = metrics.persistFailures
-  def recoveryFailures: Counter  = metrics.recoveryFailures
-  def persistRejects: Counter    = metrics.persistRejects
+  def activityTime: Histogram           = metrics.activityTime
+  def activeActors: Gauge               = metrics.activeActors
+  def unhandledMessages: Counter        = metrics.unhandledMessages
+  def exceptions: Counter               = metrics.exceptions
+  def receiveTime: Histogram            = metrics.receiveTime
+  def receiveTimeouts: Counter          = metrics.receiveTimeouts
+  def clusterEvents: Counter            = metrics.clusterEvents
+  def clusterMembers: Gauge             = metrics.clusterMembers
+  def recoveryTime: Histogram           = metrics.recoveryTime
+  def persistTime: Histogram            = metrics.persistTime
+  def recoveries: Counter               = metrics.recoveries
+  def recoveryEvents: Counter           = metrics.recoveryEvents
+  def persistFailures: Counter          = metrics.persistFailures
+  def recoveryFailures: Counter         = metrics.recoveryFailures
+  def persistRejects: Counter           = metrics.persistRejects
+  def waitingForRecovery: Gauge         = metrics.waitingForRecovery
+  def waitingForRecoveryTime: Histogram = metrics.waitingForRecoveryTime
 
   def allCollectors: List[Collector] = metrics.allCollectors
 }

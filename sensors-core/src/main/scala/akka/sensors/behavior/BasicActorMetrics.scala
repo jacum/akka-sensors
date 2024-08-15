@@ -3,7 +3,7 @@ package akka.sensors.behavior
 import akka.actor.typed._
 import akka.actor.typed.scaladsl.Behaviors
 import akka.sensors.MetricOps._
-import akka.sensors.{AkkaSensorsExtension, ClassNameUtil, SensorMetrics}
+import akka.sensors.SensorMetrics
 
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal

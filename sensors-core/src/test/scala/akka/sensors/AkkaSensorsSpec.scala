@@ -205,6 +205,16 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
         _.startsWith(s"""akka_sensors_actor_recovery_events_total{actor="$actorName","""),
         _.endsWith(s" ${actors * commands}.0")
       )
+
+      assertMetrics(
+        _.startsWith(s"""akka_sensors_actor_waiting_for_recovery_permit_actors_total{actor="$actorName","""),
+        _.endsWith(s" 0.0")
+      )
+
+      assertMetrics(
+        _.startsWith(s"""akka_sensors_actor_waiting_for_recovery_permit_time_millis_count{actor="$actorName","""),
+        _.endsWith(s" ${actors * 2}.0")
+      )
     }
   }
 

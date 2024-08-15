@@ -32,6 +32,8 @@ class SensorMetricsSpec extends AnyFreeSpec {
       names should contain(asMetricName("persist_failures"))
       names should contain(asMetricName("recovery_failures"))
       names should contain(asMetricName("persist_rejects"))
+      names should contain(asMetricName("waiting_for_recovery_permit_actors_total"))
+      names should contain(asMetricName("waiting_for_recovery_permit_time_millis"))
     }
   }
 }

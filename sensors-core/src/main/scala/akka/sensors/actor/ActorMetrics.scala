@@ -1,7 +1,7 @@
 package akka.sensors.actor
 
 import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, ReceiveTimeout}
-import akka.persistence.{PersistentActor, RecoveryCompleted}
+import akka.persistence.{PersistentActor, Recovery, RecoveryCompleted}
 import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
 
 import scala.collection.immutable
@@ -85,17 +85,28 @@ trait PersistentActorMetrics extends ActorMetrics with PersistentActor {
   private lazy val recoveryFailures     = metrics.recoveryFailures.labels(actorLabel)
   private lazy val persistFailures      = metrics.persistFailures.labels(actorLabel)
   private lazy val persistRejects       = metrics.persistRejects.labels(actorLabel)
+  private val waitingForRecoveryGauge   = metrics.waitingForRecovery.labels(actorLabel)
+  private val waitingForRecoveryTime    = metrics.waitingForRecoveryTime.labels(actorLabel).startTimer()
+
+  waitingForRecoveryGauge.inc()
 
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit = {
-    if (!recoveryFinished) {
-      if (ClassNameUtil.simpleName(msg.getClass).startsWith("ReplayedMessage")) {
-        if (!firstEventPassed) {
-          recoveryToFirstEventTime.observeDuration()
-          firstEventPassed = true
-        }
-        recoveryEvents.inc()
+    if (!recoveryFinished)
+      ClassNameUtil.simpleName(msg.getClass) match {
+        case msg if msg.startsWith("ReplayedMessage") =>
+          if (!firstEventPassed) {
+            recoveryToFirstEventTime.observeDuration()
+            firstEventPassed = true
+          }
+          recoveryEvents.inc()
+
+        case msg if msg.startsWith("RecoveryPermitGranted") =>
+          waitingForRecoveryGauge.dec()
+          waitingForRecoveryTime.observeDuration()
+
+        case _ => ()
       }
-    } else if (!recovered) {
+    else if (!recovered) {
       recoveries.inc()
       recoveryTime.observeDuration()
       recovered = true

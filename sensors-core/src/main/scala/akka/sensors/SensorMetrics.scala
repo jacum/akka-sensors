@@ -18,7 +18,9 @@ final case class SensorMetrics(
   recoveryEvents: Counter,
   persistFailures: Counter,
   recoveryFailures: Counter,
-  persistRejects: Counter
+  persistRejects: Counter,
+  waitingForRecovery: Gauge,
+  waitingForRecoveryTime: Histogram
 ) {
   val allCollectors: List[Collector] = List(
     activityTime,
@@ -36,7 +38,9 @@ final case class SensorMetrics(
     recoveryEvents,
     persistFailures,
     recoveryFailures,
-    persistRejects
+    persistRejects,
+    waitingForRecovery,
+    waitingForRecoveryTime
   )
 }
 
@@ -127,6 +131,16 @@ object SensorMetrics {
       persistRejects = counter
         .name("persist_rejects_total")
         .help(s"Persist rejects")
+        .labelNames("actor")
+        .create(),
+      waitingForRecovery = gauge
+        .name("waiting_for_recovery_permit_actors_total")
+        .help(s"Actors waiting for recovery permit")
+        .labelNames("actor")
+        .create(),
+      waitingForRecoveryTime = millisHistogram
+        .name("waiting_for_recovery_permit_time_millis")
+        .help(s"Millis from actor creation to recovery permit being granted")
         .labelNames("actor")
         .create()
     )
