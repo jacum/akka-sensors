@@ -11,7 +11,7 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-protobuf")
 
   object Logging {
-    val slf4jversion = "2.0.13"
+    val slf4jversion = "2.0.16"
     val slf4jApi     = "org.slf4j"                   % "slf4j-api"     % slf4jversion
     val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5"
     val deps         = Seq(slf4jApi, scalaLogging)
@@ -49,8 +49,8 @@ object Dependencies {
   object Http4s {
     // unfortunately, http4s modules' versions not synced anymore
     val http4sVersionBase    = "0.23.16"
-    val http4sVersionModules = "0.23.26"
-    val http4sVersionMetrics = "0.24.6"
+    val http4sVersionModules = "0.23.27"
+    val http4sVersionMetrics = "0.24.7"
     val server               = "org.http4s"       %% "http4s-blaze-server"       % http4sVersionBase
     val client               = "org.http4s"       %% "http4s-blaze-client"       % http4sVersionBase
     val jdkClient            = "org.http4s"       %% "http4s-jdk-http-client"    % "0.7.0"
@@ -74,7 +74,7 @@ object Dependencies {
 
     val cassandraDriverCore         = "com.datastax.oss"      % "java-driver-core"           % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss"      % "java-driver-query-builder"  % cassandraDriverVersion
-    val cassandraDriverMetrics      = "io.dropwizard.metrics" % "metrics-jmx"                % "4.2.25"
+    val cassandraDriverMetrics      = "io.dropwizard.metrics" % "metrics-jmx"                % "4.2.26"
     val akkaPersistenceCassandra    = "com.typesafe.akka"    %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
     val cassandraUnit               = "org.cassandraunit"     % "cassandra-unit"             % "4.3.1.0"
 
@@ -82,8 +82,8 @@ object Dependencies {
   }
 
   object TestTools {
-    val log       = "ch.qos.logback" % "logback-classic" % "1.4.14"
-    val scalaTest = "org.scalatest" %% "scalatest"       % "3.2.18"
+    val log       = "ch.qos.logback" % "logback-classic" % "1.5.6"
+    val scalaTest = "org.scalatest" %% "scalatest"       % "3.2.19"
     val deps      = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal, log)
   }
 

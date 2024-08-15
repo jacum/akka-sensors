@@ -3,7 +3,6 @@ package akka.sensors.cassandra
 import java.io.CharArrayWriter
 import java.net.InetSocketAddress
 import java.util.UUID
-
 import akka.actor.{ActorLogging, ActorSystem, NoSerializationVerificationNeeded, Props}
 import akka.pattern.ask
 import akka.persistence.PersistentActor
