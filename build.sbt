@@ -2,7 +2,7 @@ import Dependencies._
 import Keys._
 import sbt.file
 
-val scala2 = "2.13.14"
+val scala2 = "2.13.16"
 ThisBuild / versionScheme := Some("early-semver")
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
