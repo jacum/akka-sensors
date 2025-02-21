@@ -10,7 +10,7 @@ addSbtPlugin("org.xerial.sbt"    % "sbt-sonatype"         % "3.11.2")
 addSbtPlugin("com.jsuereth"      % "sbt-pgp"              % "2.1.1")
 addSbtPlugin("no.arktekk.sbt"    % "aether-deploy"        % "0.29.1")
 addSbtPlugin("com.github.sbt"    % "sbt-release"          % "1.4.0")
-addSbtPlugin("org.scoverage"     % "sbt-scoverage"        % "2.0.12")
+addSbtPlugin("org.scoverage"     % "sbt-scoverage"        % "2.3.1")
 
 ThisBuild / libraryDependencySchemes ++= Seq(
   "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always,
