@@ -2,7 +2,7 @@ import Dependencies._
 import Keys._
 import sbt.file
 
-val scala2 = "2.13.14"
+val scala2 = "2.13.16"
 ThisBuild / versionScheme := Some("early-semver")
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
@@ -23,8 +23,7 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
               "utf8",
               "-Xfatal-warnings"
             ),
-        Compile / packageBin / packageOptions
-          +=
+        Compile / packageBin / packageOptions +=
             Package.ManifestAttributes(
               "Build-Time"   -> new java.util.Date().toString,
               "Build-Commit" -> git.gitHeadCommit.value.getOrElse("No Git Revision Found")
@@ -70,7 +69,7 @@ lazy val `app` = project
     Compile / mainClass := Some("nl.pragmasoft.app.Main"),
     Docker / version := Keys.version.value,
     dockerUpdateLatest := true,
-    libraryDependencies ++= App.deps :+ Cassandra.cassandraUnit,
+    libraryDependencies ++= App.deps ++ Logging.deps :+ Cassandra.cassandraUnit,
     dependencyOverrides ++= Akka.deps
   )
   .dependsOn(`sensors-core`, `sensors-cassandra`)

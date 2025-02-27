@@ -11,14 +11,15 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-protobuf")
 
   object Logging {
-    val slf4jversion = "2.0.16"
+    val slf4jversion = "2.0.17"
     val slf4jApi     = "org.slf4j"                   % "slf4j-api"     % slf4jversion
+    val slf4jSimple  = "org.slf4j"                   % "slf4j-simple"  % slf4jversion
     val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5"
-    val deps         = Seq(slf4jApi, scalaLogging)
+    val deps         = Seq(slf4jApi, slf4jSimple, scalaLogging)
   }
 
   object Akka {
-    val akkaVersion                     = "2.6.20"
+    val akkaVersion                     = "2.6.21"
     val akkaManagementVersion           = "1.0.9"
     val akkaPersistenceCassandraVersion = "1.0.5"
     val akkaHttpVersion                 = "10.2.1"
@@ -40,17 +41,17 @@ object Dependencies {
   object Prometheus {
     val hotspot   = "io.prometheus"     % "simpleclient_hotspot" % "0.16.0"
     val common    = "io.prometheus"     % "simpleclient_common"  % "0.16.0"
-    val jmx       = "io.prometheus.jmx" % "collector"            % "0.17.2" exclude ("org.yaml", "snakeyaml")
-    val snakeYaml = "org.yaml"          % "snakeyaml"            % "2.2"
+    val jmx       = "io.prometheus.jmx" % "collector"            % "0.20.0" exclude ("org.yaml", "snakeyaml")
+    val snakeYaml = "org.yaml"          % "snakeyaml"            % "2.4"
 
     val deps = Seq(hotspot, common, jmx, snakeYaml)
   }
 
   object Http4s {
     // unfortunately, http4s modules' versions not synced anymore
-    val http4sVersionBase    = "0.23.16"
-    val http4sVersionModules = "0.23.27"
-    val http4sVersionMetrics = "0.24.7"
+    val http4sVersionBase    = "0.23.17"
+    val http4sVersionModules = "0.23.30"
+    val http4sVersionMetrics = "0.25.0"
     val server               = "org.http4s"       %% "http4s-blaze-server"       % http4sVersionBase
     val client               = "org.http4s"       %% "http4s-blaze-client"       % http4sVersionBase
     val jdkClient            = "org.http4s"       %% "http4s-jdk-http-client"    % "0.7.0"
@@ -82,7 +83,7 @@ object Dependencies {
   }
 
   object TestTools {
-    val log       = "ch.qos.logback" % "logback-classic" % "1.5.6"
+    val log       = "ch.qos.logback" % "logback-classic" % "1.5.17"
     val scalaTest = "org.scalatest" %% "scalatest"       % "3.2.19"
     val deps      = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal, log)
   }

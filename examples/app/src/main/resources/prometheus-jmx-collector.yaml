@@ -1,6 +1,6 @@
 lowercaseOutputLabelNames: true
 lowercaseOutputName: true
-whitelistObjectNames: ["com.datastax.oss.driver:*", "akka:*"]
+whitelistObjectNames: ["com.datastax.oss.driver:*", "akka:*","java.lang:type=Threading"]
 rules:
   - pattern: com.datastax.oss.driver<name=(s\d).(\S+), type=(\S+)><>Count
     type: UNTYPED
@@ -59,3 +59,23 @@ rules:
     name: cassandra_$2
     labels:
       value: "min"
+
+  - pattern: 'java.lang.*<>PeakThreadCount'
+    name: jvm_virtual_threads_peak
+    type: GAUGE
+    help: "Peak number of live threads, including virtual threads"
+
+  - pattern: 'java.lang.*<>DaemonThreadCount'
+    name: jvm_virtual_threads_daemon
+    type: GAUGE
+    help: "Current number of daemon threads, including virtual threads"
+
+  - pattern: 'java.lang.*<>TotalStartedThreadCount'
+    name: jvm_virtual_threads_total_started
+    type: COUNTER
+    help: "Total number of virtual threads started by the JVM"
+
+  - pattern: 'java.lang.*<>ThreadCount'
+    name: jvm_virtual_threads_live
+    type: GAUGE
+    help: "Current number of live threads, including virtual threads"

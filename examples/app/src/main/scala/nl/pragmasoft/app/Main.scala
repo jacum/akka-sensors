@@ -13,7 +13,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper.startEmbeddedCassandra
 
 object Main extends IOApp with LazyLogging {
-  val cassandra = startEmbeddedCassandra("cassandra-server.yaml", "/tmp/cassandra")
 
   override def run(args: List[String]): IO[ExitCode] = {
     val config                                      = ConfigFactory.load()
@@ -22,14 +21,14 @@ object Main extends IOApp with LazyLogging {
 
     val mainResource: Resource[IO, Server] =
       for {
-        _ <- Resource.eval(IO.async[Unit] { callback =>
+/*        _ <- Resource.eval(IO.async[Unit] { callback =>
           IO {
             IO(Cluster(system).registerOnMemberUp {
               logger.info("Akka cluster is now up")
               callback(Right(()))
             }).some
           }
-        })
+        })*/
         _ <- MetricService.resource(
           InetSocketAddress.createUnresolved("0.0.0.0", 9095)
         )
