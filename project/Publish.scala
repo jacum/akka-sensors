@@ -23,7 +23,7 @@ object Publish {
           Credentials(
             "GnuPG Key ID",
             "gpg",
-            "E9F32B46ABCE86181ABDBF8ECE902ED363A2FA58", // key identifier
+            "80639E9F764EA1049652FDBBDA743228BD43ED35", // key identifier
             "ignored"                                   // this field is ignored; passwords are supplied by pinentry
           )
         ),
