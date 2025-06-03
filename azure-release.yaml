@@ -4,8 +4,7 @@ trigger:
     include:
     - master
 
-pool:
-  vmImage: 'ubuntu-22.04'
+pool: 'hetzner'
 
 variables:
   - group: AkkaSensors
@@ -15,14 +14,6 @@ steps:
     name: secring
     inputs:
       secureFile: secring.asc
-
-
-  - task: JavaToolInstaller@0
-    inputs:
-      versionSpec: '21'
-      jdkArchitectureOption: 'x64'
-      jdkSourceOption: 'PreInstalled'
-      cleanDestinationDirectory: false
 
   - task: Bash@3
     displayName: 'Build, sign and publish'
