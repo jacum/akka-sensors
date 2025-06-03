@@ -75,7 +75,7 @@ object Dependencies {
 
     val cassandraDriverCore         = "com.datastax.oss"      % "java-driver-core"           % cassandraDriverVersion
     val cassandraDriverQueryBuilder = "com.datastax.oss"      % "java-driver-query-builder"  % cassandraDriverVersion
-    val cassandraDriverMetrics      = "io.dropwizard.metrics" % "metrics-jmx"                % "4.2.26"
+    val cassandraDriverMetrics      = "io.dropwizard.metrics" % "metrics-jmx"                % "4.2.32"
     val akkaPersistenceCassandra    = "com.typesafe.akka"    %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
     val cassandraUnit               = "org.cassandraunit"     % "cassandra-unit"             % "4.3.1.0"
 
@@ -83,7 +83,7 @@ object Dependencies {
   }
 
   object TestTools {
-    val log       = "ch.qos.logback" % "logback-classic" % "1.5.17"
+    val log       = "ch.qos.logback" % "logback-classic" % "1.5.18"
     val scalaTest = "org.scalatest" %% "scalatest"       % "3.2.19"
     val deps      = Logging.deps ++ testDeps(scalaTest, akkaInmemoryJournal, log)
   }
