@@ -13,7 +13,7 @@ object Publish {
   )
 
   val ReleaseToSonatype = Seq(
-      credentials ++= Seq(
+    credentials ++= Seq(
           Credentials(
             "Sonatype Nexus Repository Manager",
             "oss.sonatype.org",

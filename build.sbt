@@ -4,6 +4,7 @@ import sbt.file
 
 val scala2 = "2.13.16"
 ThisBuild / versionScheme := Some("early-semver")
+ThisBuild / libraryDependencySchemes += "org.http4s" % "*" % VersionScheme.Always
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
         organization := "nl.pragmasoft.sensors",
@@ -49,33 +50,8 @@ lazy val `sensors-core` = project
     dependencyOverrides ++= Akka.deps
   )
 
-lazy val `sensors-cassandra` = project
-  .in(file("sensors-cassandra"))
-  .settings(commonSettings)
-  .settings(
-    moduleName := "sensors-cassandra",
-    libraryDependencies ++= Akka.deps ++ Prometheus.deps ++
-            (Cassandra.deps :+ Cassandra.cassandraUnit % Test) ++ Logging.deps ++ TestTools.deps,
-    dependencyOverrides ++= Akka.deps
-  )
-  .dependsOn(`sensors-core`)
-
-lazy val `app` = project
-  .in(file("examples/app"))
-  .enablePlugins(JavaAppPackaging, DockerPlugin)
-  .settings(commonSettings ++ noPublishSettings)
-  .settings(
-    moduleName := "app",
-    Compile / mainClass := Some("nl.pragmasoft.app.Main"),
-    Docker / version := Keys.version.value,
-    dockerUpdateLatest := true,
-    libraryDependencies ++= App.deps ++ Logging.deps :+ Cassandra.cassandraUnit,
-    dependencyOverrides ++= Akka.deps
-  )
-  .dependsOn(`sensors-core`, `sensors-cassandra`)
-
 lazy val `root` = project
   .in(file("."))
-  .aggregate(app, `sensors-core`, `sensors-cassandra`)
+  .aggregate(`sensors-core`)
   .settings(commonSettings ++ noPublishSettings)
   .settings(name := "Akka Sensors")

@@ -1,6 +1,8 @@
 package akka.sensors
 
-import io.prometheus.client._
+import io.prometheus.metrics.core.metrics._
+import io.prometheus.metrics.model.registry.{Collector, PrometheusRegistry}
+import akka.sensors.PrometheusCompat._
 
 final case class SensorMetrics(
   activityTime: Histogram,
@@ -45,107 +47,128 @@ final case class SensorMetrics(
 }
 
 object SensorMetrics {
-  def makeAndRegister(metricBuilders: BasicMetricBuilders, cr: CollectorRegistry): SensorMetrics = {
-    val metrics = make(metricBuilders)
-    register(metrics, cr)
-    metrics
-  }
 
-  def make(metricBuilders: BasicMetricBuilders): SensorMetrics = {
-    import metricBuilders._
+  def make(): SensorMetrics =
     SensorMetrics(
-      activityTime = secondsHistogram
-        .name("activity_time_seconds")
+      activityTime = Histogram
+        .builder()
+        .classicUpperBounds(10)
+        .name("akka_sensors_actor_activity_time_seconds")
         .help(s"Seconds of activity")
         .labelNames("actor")
         .create(),
-      activeActors = gauge
-        .name("active_actors_total")
+      activeActors = Gauge
+        .builder()
+        .name("akka_sensors_actor_active_actors")
         .help(s"Active actors")
         .labelNames("actor")
         .create(),
-      unhandledMessages = counter
-        .name("unhandled_messages_total")
+      unhandledMessages = Counter
+        .builder()
+        .name("akka_sensors_actor_unhandled_messages")
         .help(s"Unhandled messages")
         .labelNames("actor", "message")
         .create(),
-      exceptions = counter
-        .name("exceptions_total")
+      exceptions = Counter
+        .builder()
+        .name("akka_sensors_actor_exceptions")
         .help(s"Exceptions thrown by actors")
         .labelNames("actor")
         .create(),
-      receiveTime = millisHistogram
-        .name("receive_time_millis")
+      receiveTime = Histogram
+        .builder()
+        .classicUpperBounds(10000)
+        .name("akka_sensors_actor_receive_time_millis")
         .help(s"Millis to process receive")
         .labelNames("actor", "message")
         .create(),
-      receiveTimeouts = counter
-        .name("receive_timeouts_total")
+      receiveTimeouts = Counter
+        .builder()
+        .name("akka_sensors_actor_receive_timeouts")
         .help("Number of receive timeouts")
         .labelNames("actor")
         .create(),
-      clusterEvents = counter
-        .name("cluster_events_total")
+      clusterEvents = Counter
+        .builder()
+        .name("akka_sensors_actor_cluster_events")
         .help(s"Number of cluster events, per type")
         .labelNames("event", "member")
         .create(),
-      clusterMembers = gauge
-        .name("cluster_members_total")
+      clusterMembers = Gauge
+        .builder()
+        .name("akka_sensors_actor_cluster_members")
         .help(s"Cluster members")
         .create(),
-      recoveryTime = millisHistogram
-        .name("recovery_time_millis")
+      recoveryTime = Histogram
+        .builder()
+        .classicUpperBounds(10000)
+        .name("akka_sensors_actor_recovery_time_millis")
         .help(s"Millis to process recovery")
         .labelNames("actor")
         .create(),
-      recoveryToFirstEventTime = millisHistogram
-        .name("recovery_to_first_event_time_millis")
+      recoveryToFirstEventTime = Histogram
+        .builder()
+        .classicUpperBounds(10000)
+        .name("akka_sensors_actor_recovery_to_first_event_time_millis")
         .help(s"Millis to process recovery before first event is applied")
         .labelNames("actor")
         .create(),
-      persistTime = millisHistogram
-        .name("persist_time_millis")
+      persistTime = Histogram
+        .builder()
+        .classicUpperBounds(10000)
+        .name("akka_sensors_actor_persist_time_millis")
         .help(s"Millis to process single event persist")
         .labelNames("actor", "event")
         .create(),
-      recoveries = counter
-        .name("recoveries_total")
+      recoveries = Counter
+        .builder()
+        .name("akka_sensors_actor_recoveries")
         .help(s"Recoveries by actors")
         .labelNames("actor")
         .create(),
-      recoveryEvents = counter
-        .name("recovery_events_total")
+      recoveryEvents = Counter
+        .builder()
+        .name("akka_sensors_actor_recovery_events")
         .help(s"Recovery events by actors")
         .labelNames("actor")
         .create(),
-      persistFailures = counter
-        .name("persist_failures_total")
+      persistFailures = Counter
+        .builder()
+        .name("akka_sensors_actor_persist_failures")
         .help(s"Persist failures")
         .labelNames("actor")
         .create(),
-      recoveryFailures = counter
-        .name("recovery_failures_total")
+      recoveryFailures = Counter
+        .builder()
+        .name("akka_sensors_actor_recovery_failures")
         .help(s"Recovery failures")
         .labelNames("actor")
         .create(),
-      persistRejects = counter
-        .name("persist_rejects_total")
+      persistRejects = Counter
+        .builder()
+        .name("akka_sensors_actor_persist_rejects")
         .help(s"Persist rejects")
         .labelNames("actor")
         .create(),
-      waitingForRecovery = gauge
-        .name("waiting_for_recovery_permit_actors_total")
+      waitingForRecovery = Gauge
+        .builder()
+        .name("akka_sensors_actor_waiting_for_recovery_permit_actors")
         .help(s"Actors waiting for recovery permit")
         .labelNames("actor")
         .create(),
-      waitingForRecoveryTime = millisHistogram
-        .name("waiting_for_recovery_permit_time_millis")
+      waitingForRecoveryTime = Histogram
+        .builder()
+        .classicUpperBounds(10000)
+        .name("akka_sensors_actor_waiting_for_recovery_permit_time_millis")
         .help(s"Millis from actor creation to recovery permit being granted")
         .labelNames("actor")
         .create()
     )
+
+  def makeAndRegister(cr: PrometheusRegistry): SensorMetrics = {
+    val metrics = make()
+    metrics.allCollectors.foreach(c => cr.register(c))
+    metrics
   }
 
-  def register(metrics: SensorMetrics, cr: CollectorRegistry): Unit =
-    metrics.allCollectors.foreach(cr.register)
 }

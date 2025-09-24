@@ -1,25 +1,24 @@
 package akka.sensors
 
 import akka.actor.typed.Behavior
-
-import java.io.CharArrayWriter
+import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{Actor, ActorRef, ActorSystem, NoSerializationVerificationNeeded, PoisonPill, Props, ReceiveTimeout}
 import akka.pattern.ask
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
-import akka.sensors.actor.{ActorMetrics, PersistentActorMetrics}
 import akka.persistence.{PersistentActor, RecoveryCompleted}
+import akka.sensors.actor.{ActorMetrics, PersistentActorMetrics}
 import akka.sensors.behavior.BehaviorMetrics
-import akka.actor.typed.scaladsl.adapter._
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
-import io.prometheus.client.CollectorRegistry
-import io.prometheus.client.exporter.common.TextFormat
+import io.prometheus.metrics.expositionformats.PrometheusTextFormatWriter
+import io.prometheus.metrics.model.registry.PrometheusRegistry
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.time.{Millis, Seconds, Span}
 
+import java.io.ByteArrayOutputStream
 import scala.Console.println
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
@@ -31,12 +30,12 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(2, Seconds)), interval = scaled(Span(5, Millis)))
 
-  implicit val ec: ExecutionContext        = ExecutionContext.global
-  private val system: ActorSystem          = ActorSystem("instrumented")
-  private lazy val probeActor              = system.actorOf(Props(classOf[InstrumentedProbe]), s"probe")
-  private lazy val persistentActor         = system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
-  private lazy val persistentActor2        = system.actorOf(Props(classOf[AnotherPersistentInstrumentedProbe]), s"another-persistent")
-  implicit val registry: CollectorRegistry = AkkaSensors.prometheusRegistry
+  implicit val ec: ExecutionContext         = ExecutionContext.global
+  private val system: ActorSystem           = ActorSystem("instrumented")
+  private lazy val probeActor               = system.actorOf(Props(classOf[InstrumentedProbe]), s"probe")
+  private lazy val persistentActor          = system.actorOf(Props(classOf[PersistentInstrumentedProbe]), s"persistent")
+  private lazy val persistentActor2         = system.actorOf(Props(classOf[AnotherPersistentInstrumentedProbe]), s"another-persistent")
+  implicit val registry: PrometheusRegistry = AkkaSensors.prometheusRegistry
 
   "Launch akka app, and ensure it works" - {
 
@@ -80,7 +79,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       implicit val patienceConfig: PatienceConfig = PatienceConfig(20 seconds, 100 milliseconds)
       eventually {
         assertMetrics(
-          _.startsWith("akka_sensors_actor_active_actors_total{actor=\"MassProbe\""),
+          _.startsWith("akka_sensors_actor_active_actors{actor=\"MassProbe\""),
           _.endsWith(s" $actors.0")
         )
       }
@@ -91,12 +90,12 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       eventually {
         assertMetrics(
           _.startsWith("akka_sensors_actor_receive_time_millis_count{actor=\"MassProbe\""),
-          _.endsWith(s" $actors.0")
+          _.endsWith(s" $actors")
         )
       }
       eventually {
         assertMetrics(
-          _.startsWith("akka_sensors_actor_active_actors_total{actor=\"MassProbe\""),
+          _.startsWith("akka_sensors_actor_active_actors{actor=\"MassProbe\""),
           _.endsWith(s" 0.0")
         )
         assertMetrics(
@@ -106,7 +105,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       }
       assertMetrics(
         _.startsWith("akka_sensors_actor_activity_time_seconds_bucket{actor=\"MassProbe\",le=\"10.0\""),
-        _.endsWith(s" $actors.0")
+        _.endsWith(s" $actors")
       )
     }
 
@@ -137,7 +136,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
 
       eventually {
         assertMetrics(
-          _.startsWith(s"""akka_sensors_actor_active_actors_total{actor="$actorName""""),
+          _.startsWith(s"""akka_sensors_actor_active_actors{actor="$actorName""""),
           _.endsWith(s" $actors.0")
         )
       }
@@ -146,7 +145,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       }
       eventually {
         assertMetrics(
-          _.startsWith(s"""akka_sensors_actor_active_actors_total{actor="$actorName""""),
+          _.startsWith(s"""akka_sensors_actor_active_actors{actor="$actorName""""),
           _.endsWith(s" $actors.0")
         )
       }
@@ -158,13 +157,13 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       eventually {
         assertMetrics(
           _.startsWith(s"""akka_sensors_actor_persist_time_millis_count{actor="$actorName"""),
-          _.endsWith(s" ${actors * commands}.0")
+          _.endsWith(s" ${actors * commands}")
         )
       }
 
       eventually {
         assertMetrics(
-          _.startsWith(s"""akka_sensors_actor_active_actors_total{actor="$actorName""""),
+          _.startsWith(s"""akka_sensors_actor_active_actors{actor="$actorName""""),
           _.endsWith(s" 0.0")
         )
         assertMetrics(
@@ -175,19 +174,19 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
 
       assertMetrics(
         _.startsWith(s"""akka_sensors_actor_activity_time_seconds_bucket{actor="$actorName",le="10.0""""),
-        _.endsWith(s" $actors.0")
+        _.endsWith(s" $actors")
       )
 
       assertMetrics(
         _.startsWith(s"""akka_sensors_actor_persist_time_millis_count{actor="$actorName",event="ValidEvent""""),
-        _.endsWith(s" ${actors * commands}.0")
+        _.endsWith(s" ${actors * commands}")
       )
 
       val refRecovered = (1 to actors).map(createRef)
 
       eventually {
         assertMetrics(
-          _.startsWith(s"""akka_sensors_actor_active_actors_total{actor="$actorName""""),
+          _.startsWith(s"""akka_sensors_actor_active_actors{actor="$actorName""""),
           _.endsWith(s" $actors.0")
         )
       }
@@ -202,34 +201,35 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       }
 
       assertMetrics(
-        _.startsWith(s"""akka_sensors_actor_recovery_events_total{actor="$actorName","""),
+        _.startsWith(s"""akka_sensors_actor_recovery_events_total{actor="$actorName""""),
         _.endsWith(s" ${actors * commands}.0")
       )
 
       assertMetrics(
-        _.startsWith(s"""akka_sensors_actor_waiting_for_recovery_permit_actors_total{actor="$actorName","""),
+        _.startsWith(s"""akka_sensors_actor_waiting_for_recovery_permit_actors{actor="$actorName""""),
         _.endsWith(s" 0.0")
       )
 
       assertMetrics(
-        _.startsWith(s"""akka_sensors_actor_waiting_for_recovery_permit_time_millis_count{actor="$actorName","""),
-        _.endsWith(s" ${actors * 2}.0")
+        _.startsWith(s"""akka_sensors_actor_waiting_for_recovery_permit_time_millis_count{actor="$actorName""""),
+        _.endsWith(s" ${actors * 2}")
       )
     }
   }
 
-  private def assertMetrics(filter: String => Boolean, assertion: String => Boolean) =
-    metrics
-      .split("\n")
-      .find(filter)
-      .map(m => assert(assertion(m), s"assertion failed for $m"))
-      .getOrElse(
-        fail("No metric found")
-      )
+  private def assertMetrics(filter: String => Boolean, assertion: String => Boolean) = {
+    val ms = metrics
+    val m  = ms.split("\n").find(filter)
 
-  private def metrics(implicit registry: CollectorRegistry): String = {
-    val writer = new CharArrayWriter(16 * 1024)
-    TextFormat.write004(writer, registry.metricFamilySamples)
+    m.map(m => assert(assertion(m), s"assertion failed for $m: $ms"))
+      .getOrElse(
+        fail(s"No metric found in $ms")
+      )
+  }
+
+  def metrics(implicit registry: PrometheusRegistry): String = {
+    val writer = new ByteArrayOutputStream()
+    PrometheusTextFormatWriter.builder().build().write(writer, registry.scrape())
     writer.toString
   }
 

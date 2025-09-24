@@ -2,6 +2,7 @@ package akka.sensors.metered
 
 import akka.dispatch.{DispatcherPrerequisites, ExecutorServiceConfigurator, ExecutorServiceFactory, ForkJoinExecutorConfigurator, ThreadPoolExecutorConfigurator}
 import akka.sensors.AkkaSensors
+import akka.sensors.PrometheusCompat.GaugeLabelsCompat
 import com.typesafe.config.Config
 
 import java.util.concurrent.{ExecutorService, ForkJoinPool, ThreadFactory, ThreadPoolExecutor}

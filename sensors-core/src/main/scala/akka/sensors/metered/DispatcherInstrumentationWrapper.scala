@@ -1,5 +1,6 @@
 package akka.sensors.metered
 
+import akka.sensors.PrometheusCompat.HistogramLabelsCompat
 import akka.sensors.dispatch.DispatcherInstrumentationWrapper.{InstrumentedRun, Run}
 import akka.sensors.dispatch.RunnableWrapper
 import akka.sensors.{DispatcherMetrics, RunnableWatcher}

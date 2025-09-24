@@ -4,6 +4,7 @@ import akka.actor.typed._
 import akka.actor.typed.scaladsl.Behaviors
 import akka.sensors.MetricOps._
 import akka.sensors.SensorMetrics
+import akka.sensors.PrometheusCompat._
 
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal

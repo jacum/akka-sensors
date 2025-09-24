@@ -2,6 +2,7 @@ package akka.sensors.metered
 
 import akka.dispatch.{Dispatcher, Mailbox}
 import akka.event.Logging.Error
+import akka.sensors.PrometheusCompat.GaugeLabelsCompat
 import akka.sensors.{AkkaSensors, DispatcherMetrics}
 
 import java.lang.management.{ManagementFactory, ThreadMXBean}

@@ -5,7 +5,6 @@ import akka.actor.BootstrapSetup
 import akka.actor.setup.ActorSystemSetup
 import akka.actor.typed.{ActorSystem, DispatcherSelector, SpawnProtocol}
 import akka.sensors.DispatcherMetrics
-import akka.sensors.MetricsTestUtils._
 import akka.sensors.metered.MeteredDispatcherConfiguratorSpec._
 import com.typesafe.config.ConfigFactory
 import org.scalatest.freespec.AnyFreeSpec
@@ -14,7 +13,7 @@ import org.scalatest.matchers.should.Matchers
 class MeteredDispatcherConfiguratorSpec extends AnyFreeSpec with Matchers {
   "MeteredDispatcherConfigurator" - {
     "is returned if configured(MeteredDispatcherSetup is defined)" in {
-      val metrics     = DispatcherMetrics.make(builder)
+      val metrics     = DispatcherMetrics.make()
       val withConfig  = BootstrapSetup(cfg)
       val withMetrics = MeteredDispatcherSetup(metrics)
       val setup       = ActorSystemSetup.create(withConfig, withMetrics)

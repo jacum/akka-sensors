@@ -3,13 +3,12 @@ package akka.sensors.dispatch
 import java.lang.management.{ManagementFactory, ThreadInfo, ThreadMXBean}
 import java.util.concurrent._
 import java.util.concurrent.atomic.LongAdder
-
 import akka.dispatch._
 import akka.event.Logging.{Error, Warning}
+import akka.sensors.PrometheusCompat.{GaugeLabelsCompat, HistogramLabelsCompat}
 import akka.sensors.dispatch.DispatcherInstrumentationWrapper.Run
-import akka.sensors.{AkkaSensors, MetricsBuilders, RunnableWatcher}
+import akka.sensors.{AkkaSensors, RunnableWatcher}
 import com.typesafe.config.Config
-import io.prometheus.client.{Gauge, Histogram}
 
 import scala.PartialFunction.condOpt
 import scala.concurrent.duration.{Duration, FiniteDuration}

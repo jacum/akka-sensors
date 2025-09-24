@@ -5,15 +5,16 @@ import akka.actor.BootstrapSetup
 import akka.actor.setup.ActorSystemSetup
 import akka.actor.typed.{ActorSystem, DispatcherSelector, SpawnProtocol}
 import akka.sensors.DispatcherMetrics
-import akka.sensors.MetricsTestUtils.builder
 import akka.sensors.metered.MeteredInstrumentedExecutorSpec._
+import io.prometheus.metrics.model.registry.PrometheusRegistry
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 
 class MeteredInstrumentedExecutorSpec extends AnyFreeSpec with Matchers {
   "MeteredInstrumentedExecutor" - {
     "is returned if configured(MeteredDispatcherSetup is defined)" in {
-      val metrics     = DispatcherMetrics.make(builder)
+      val cr          = new PrometheusRegistry()
+      val metrics     = DispatcherMetrics.makeAndRegister(cr)
       val withConfig  = BootstrapSetup(cfg)
       val withMetrics = MeteredDispatcherSetup(metrics)
       val setup       = ActorSystemSetup.create(withConfig, withMetrics)

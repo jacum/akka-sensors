@@ -1,14 +1,14 @@
 package akka.sensors.dispatch
 
-import akka.sensors.{DispatcherMetrics, MetricsBuilders}
-import io.prometheus.client.{Gauge, Histogram}
+import akka.sensors.{AkkaSensors, DispatcherMetrics}
+import io.prometheus.metrics.core.metrics.{Gauge, Histogram}
+import io.prometheus.metrics.model.registry.PrometheusRegistry
 
 /** Creates and registers Dispatcher metrics in the global registry */
-private[dispatch] object DispatcherMetricsRegistration extends MetricsBuilders {
-  def namespace: String = "akka_sensors"
-  def subsystem: String = "dispatchers"
+private[dispatch] object DispatcherMetricsRegistration {
+  val registry: PrometheusRegistry = AkkaSensors.prometheusRegistry
 
-  private val metrics          = DispatcherMetrics.makeAndRegister(this, registry)
+  private val metrics          = DispatcherMetrics.makeAndRegister(registry)
   def queueTime: Histogram     = metrics.queueTime
   def runTime: Histogram       = metrics.runTime
   def activeThreads: Histogram = metrics.activeThreads

@@ -5,7 +5,8 @@ import akka.actor.typed.{Behavior, PostStop, PreRestart}
 import akka.cluster.ClusterEvent._
 import akka.cluster.Member
 import akka.cluster.typed.{Cluster, Subscribe, Unsubscribe}
-import io.prometheus.client.Counter
+import io.prometheus.metrics.core.metrics.Counter
+import akka.sensors.PrometheusCompat._
 object ClusterEventWatchTypedActor {
   def apply(clusterEvents: Counter): Behavior[ClusterDomainEvent] =
     Behaviors.setup { context =>

@@ -1,6 +1,8 @@
 package akka.sensors
 
-import io.prometheus.client.{Collector, CollectorRegistry, Gauge, Histogram}
+import io.prometheus.metrics.core.metrics.{Gauge, Histogram}
+import io.prometheus.metrics.model.registry.{Collector, PrometheusRegistry}
+import akka.sensors.PrometheusCompat._
 
 final case class DispatcherMetrics(
   queueTime: Histogram,
@@ -14,49 +16,52 @@ final case class DispatcherMetrics(
 }
 
 object DispatcherMetrics {
-  def make(metricsBuilders: BasicMetricBuilders): DispatcherMetrics = {
-    import metricsBuilders._
-
+  def make(): DispatcherMetrics =
     DispatcherMetrics(
-      queueTime = millisHistogram
-        .name("queue_time_millis")
+      queueTime = Histogram
+        .builder()
+        .classicUpperBounds(10000)
+        .name("akka_sensors_dispatchers_queue_time_millis")
         .help(s"Milliseconds in queue")
         .labelNames("dispatcher")
         .create(),
-      runTime = millisHistogram
-        .name("run_time_millis")
+      runTime = Histogram
+        .builder()
+        .classicUpperBounds(10000)
+        .name("akka_sensors_dispatchers_run_time_millis")
         .help(s"Milliseconds running")
         .labelNames("dispatcher")
         .create(),
-      activeThreads = valueHistogram(max = 32)
-        .name("active_threads")
+      activeThreads = Histogram
+        .builder()
+        .classicOnly()
+        .name("akka_sensors_dispatchers_active_threads")
         .help(s"Active worker threads")
         .labelNames("dispatcher")
         .create(),
-      threadStates = gauge
-        .name("thread_states")
+      threadStates = Gauge
+        .builder()
+        .name("akka_sensors_dispatchers_thread_states")
         .help("Threads per state and dispatcher")
         .labelNames("dispatcher", "state")
         .create(),
-      threads = gauge
-        .name("threads_total")
+      threads = Gauge
+        .builder()
+        .name("akka_sensors_dispatchers_threads")
         .help("Threads per dispatcher")
         .labelNames("dispatcher")
         .create(),
-      executorValue = gauge
-        .name("executor_value")
+      executorValue = Gauge
+        .builder()
+        .name("akka_sensors_dispatchers_executor_value")
         .help("Internal executor values per type")
         .labelNames("dispatcher", "value")
         .create()
     )
-  }
 
-  def register(metrics: DispatcherMetrics, cr: CollectorRegistry): Unit =
-    metrics.allCollectors.foreach(cr.register)
-
-  def makeAndRegister(metricBuilders: BasicMetricBuilders, cr: CollectorRegistry): DispatcherMetrics = {
-    val metrics = make(metricBuilders)
-    register(metrics, cr)
+  def makeAndRegister(cr: PrometheusRegistry): DispatcherMetrics = {
+    val metrics = make()
+    metrics.allCollectors.foreach(c => cr.register(c))
     metrics
   }
 }

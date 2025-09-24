@@ -3,6 +3,7 @@ package akka.sensors.actor
 import akka.actor.{Actor, ActorLogging}
 import akka.cluster.ClusterEvent._
 import akka.cluster.{Cluster, Member}
+import akka.sensors.PrometheusCompat.CounterLabelsCompat
 import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
 
 class ClusterEventWatchActor extends Actor with ActorLogging {

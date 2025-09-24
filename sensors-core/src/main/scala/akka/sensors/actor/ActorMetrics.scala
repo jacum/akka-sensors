@@ -1,27 +1,27 @@
 package akka.sensors.actor
 
-import akka.actor.{Actor, ActorContext, ActorLogging, ActorRef, ReceiveTimeout}
-import akka.persistence.{PersistentActor, Recovery, RecoveryCompleted}
+import akka.actor.{Actor, ActorLogging, ReceiveTimeout}
+import akka.persistence.PersistentActor
+import akka.sensors.MetricOps.HistogramExtensions
+import akka.sensors.PrometheusCompat.{CounterLabelsCompat, GaugeLabelsCompat, HistogramLabelsCompat}
 import akka.sensors.{AkkaSensorsExtension, ClassNameUtil}
 
 import scala.collection.immutable
 import scala.util.control.NonFatal
-import akka.sensors.MetricOps._
 
 trait ActorMetrics extends Actor with ActorLogging {
   self: Actor =>
-  import akka.sensors.MetricOps._
 
   protected def actorLabel: String = ClassNameUtil.simpleName(this.getClass)
 
   protected def messageLabel(value: Any): Option[String] = Some(ClassNameUtil.simpleName(value.getClass))
 
   protected val metrics       = AkkaSensorsExtension(this.context.system).metrics
-  private val receiveTimeouts = metrics.receiveTimeouts.labels(actorLabel)
-  private lazy val exceptions = metrics.exceptions.labels(actorLabel)
-  private val activeActors    = metrics.activeActors.labels(actorLabel)
+  private val receiveTimeouts = metrics.receiveTimeouts.labelValues(actorLabel)
+  private lazy val exceptions = metrics.exceptions.labelValues(actorLabel)
+  private val activeActors    = metrics.activeActors.labelValues(actorLabel)
 
-  private val activityTimer = metrics.activityTime.labels(actorLabel).startTimer()
+  private val activityTimer = metrics.activityTime.labelValues(actorLabel).startTimer()
 
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit =
     internalAroundReceive(receive, msg)
@@ -35,7 +35,7 @@ trait ActorMetrics extends Actor with ActorLogging {
     try messageLabel(msg)
       .map(
         metrics.receiveTime
-          .labels(actorLabel, _)
+          .labelValues(actorLabel, _)
           .observeExecution(super.aroundReceive(receive, msg))
       )
       .getOrElse(super.aroundReceive(receive, msg))
@@ -65,7 +65,6 @@ trait ActorMetrics extends Actor with ActorLogging {
 }
 
 trait PersistentActorMetrics extends ActorMetrics with PersistentActor {
-  import akka.sensors.MetricOps._
 
   // normally we don't need to watch internal akka persistence messages
   protected override def messageLabel(value: Any): Option[String] =

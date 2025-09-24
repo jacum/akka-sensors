@@ -3,6 +3,7 @@ package akka.sensors.behavior
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{Behavior, BehaviorInterceptor, TypedActorContext}
 import akka.sensors.{AkkaSensorsExtension, SensorMetrics}
+import akka.sensors.PrometheusCompat._
 
 import scala.reflect.ClassTag
 

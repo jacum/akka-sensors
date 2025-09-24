@@ -6,9 +6,12 @@ import akka.persistence.typed.scaladsl.EffectBuilder
 import akka.sensors.actor.ClusterEventWatchActor
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
-import io.prometheus.client.{Collector, CollectorRegistry, Counter, Gauge, Histogram}
+import io.prometheus.metrics.core.datapoints.DistributionDataPoint
+import io.prometheus.metrics.core.metrics.{Counter, Gauge, Histogram}
+import io.prometheus.metrics.model.registry.{Collector, PrometheusRegistry}
 
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
+import scala.annotation.tailrec
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -33,10 +36,10 @@ object AkkaSensors extends LazyLogging {
       }
     )
 
-  def prometheusRegistry: CollectorRegistry = CollectorRegistry.defaultRegistry // todo how to parametrise/hook to other metric exports?
+  val prometheusRegistry: PrometheusRegistry = PrometheusRegistry.defaultRegistry // todo how to parametrise/hook to other metric exports?
 
   /**
-   * Safer than Class obj's getSimpleName which may throw Malformed class name error in scala.
+   * Safer than Class obj's getSimpleName, which may throw Malformed class name error in scala.
    * This method mimics scalatest's getSimpleNameOfAnObjectsClass.
    */
   def getSimpleName(cls: Class[_]): String =
@@ -59,6 +62,7 @@ object AkkaSensors extends LazyLogging {
    * Remove trailing dollar signs from qualified class name,
    * and return the trailing part after the last dollar sign in the middle
    */
+  @tailrec
   private def stripDollars(s: String): String = {
     val lastDollarIndex = s.lastIndexOf('$')
     if (lastDollarIndex < s.length - 1)
@@ -75,7 +79,7 @@ object AkkaSensors extends LazyLogging {
     else {
       // The last char is a dollar sign
       // Find last non-dollar char
-      val lastNonDollarChar = s.reverse.find(_ != '$')
+      val lastNonDollarChar = s.findLast(_ != '$')
       lastNonDollarChar match {
         case None => s
         case Some(c) =>
@@ -94,24 +98,22 @@ object AkkaSensors extends LazyLogging {
 /**
  * For overrides, make a subclass and put it's name in 'akka.sensors.extension-class' config value
  */
-class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with MetricsBuilders with LazyLogging {
+class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with LazyLogging {
+
+  val registry = PrometheusRegistry.defaultRegistry
 
   logger.info(s"Akka Sensors extension has been activated: ${this.getClass.getName}")
-
-  val namespace = "akka_sensors"
-  val subsystem = "actor"
-
   if (AkkaSensors.ClusterWatchEnabled)
     system.actorOf(Props(classOf[ClusterEventWatchActor]), s"ClusterEventWatchActor")
 
   CoordinatedShutdown(system)
     .addTask(CoordinatedShutdown.PhaseBeforeActorSystemTerminate, "clearPrometheusRegistry") { () =>
-      allCollectors.foreach(this.registry.unregister)
+      allCollectors.foreach(c => this.registry.unregister(c))
       logger.info("Cleared metrics")
       Future.successful(Done)
     }
 
-  val metrics: SensorMetrics = SensorMetrics.makeAndRegister(this, this.registry)
+  val metrics: SensorMetrics = SensorMetrics.makeAndRegister(this.registry)
 
   def activityTime: Histogram           = metrics.activityTime
   def activeActors: Gauge               = metrics.activeActors
@@ -136,7 +138,7 @@ class AkkaSensorsExtension(system: ExtendedActorSystem) extends Extension with M
 
 object AkkaSensorsExtension extends ExtensionId[AkkaSensorsExtension] with ExtensionIdProvider {
   override def lookup: ExtensionId[_ <: Extension] = AkkaSensorsExtension
-  override def createExtension(system: ExtendedActorSystem) = {
+  override def createExtension(system: ExtendedActorSystem): AkkaSensorsExtension = {
     val extensionClass = ConfigFactory.load().getString("akka.sensors.extension-class")
     Class.forName(extensionClass).getDeclaredConstructor(classOf[ExtendedActorSystem]).newInstance(system) match {
       case w: AkkaSensorsExtension => w
@@ -149,7 +151,7 @@ object AkkaSensorsExtension extends ExtensionId[AkkaSensorsExtension] with Exten
 
 object MetricOps {
 
-  implicit class HistogramExtensions(val histogram: Histogram) {
+  implicit class HistogramExtensions(val histogram: DistributionDataPoint) {
     def observeExecution[A](f: => A): A = {
       val timer = histogram.startTimer()
       try f
@@ -162,21 +164,4 @@ object MetricOps {
     }
   }
 
-  implicit class HistogramChildExtensions(val histogram: Histogram.Child) {
-    def observeExecution[A](f: => A): A = {
-      val timer = histogram.startTimer()
-      try f
-      finally timer.observeDuration()
-    }
-
-    def observeEffect[E, S](eff: EffectBuilder[E, S]): EffectBuilder[E, S] = {
-      val timer = histogram.startTimer()
-      eff.thenRun(_ => timer.observeDuration())
-    }
-  }
-
-}
-
-trait MetricsBuilders extends BasicMetricBuilders {
-  val registry: CollectorRegistry = AkkaSensors.prometheusRegistry
 }
