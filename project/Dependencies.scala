@@ -12,10 +12,10 @@ object Dependencies {
 
   object Logging {
     val slf4jversion = "2.0.17"
-    val slf4jApi     = "org.slf4j"                   % "slf4j-api"     % slf4jversion
-    val slf4jSimple  = "org.slf4j"                   % "slf4j-simple"  % slf4jversion
-    val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.6"
-    val deps         = Seq(slf4jApi, slf4jSimple, scalaLogging)
+    val slf4jApi     = "org.slf4j"                   % "slf4j-api"       % slf4jversion
+    val logback      = "ch.qos.logback"              % "logback-classic" % "1.5.18"
+    val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.6"
+    val deps         = Seq(slf4jApi, scalaLogging, logback)
   }
 
   object Akka {
