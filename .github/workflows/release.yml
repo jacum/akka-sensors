@@ -17,7 +17,7 @@ jobs:
     env:
       # Trigger Publish.settings ReleaseToSonatype branch
       USERNAME: ${{ github.actor }}
-      SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+      SONATYPE_USER: ${{ secrets.SONATYPE_USER }}
       SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       # Passphrase for signing (sbt-pgp reads this)
       PGP_PASSPHRASE: ${{ secrets.GPG_PASS }}
