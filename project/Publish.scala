@@ -56,6 +56,7 @@ object Publish {
           runClean,
           setReleaseVersion,
 //      runTest, // can't run test w/cross-version release
+          releaseStepCommand("sonatypeBundleClean"),
           releaseStepCommandAndRemaining("+publishSigned"),
           releaseStepCommand("sonatypeCentralUpload"),
           releaseStepCommand("sonatypeCentralRelease")
