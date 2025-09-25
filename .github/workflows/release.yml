@@ -48,7 +48,6 @@ jobs:
             ${{ runner.os }}-sbt-
 
       - name: Import GPG private key
-        if: ${{ secrets.GPG_SECRET != '' }}
         shell: bash
         run: |
           mkdir -p ~/.gnupg
