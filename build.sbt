@@ -7,7 +7,7 @@ ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / libraryDependencySchemes += "org.http4s" % "*" % VersionScheme.Always
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
-        organization := "nl.pragmasoft.sensors",
+        organization := "nl.pragmasoft",
         scalaVersion := scala2,
         testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
         Test / parallelExecution := false,
@@ -41,17 +41,16 @@ lazy val noPublishSettings = Seq(
   publishArtifact := false
 )
 
-lazy val `sensors-core` = project
-  .in(file("sensors-core"))
+lazy val `akka-sensors` = project
+  .in(file("akka-sensors"))
   .settings(commonSettings)
   .settings(
-    moduleName := "sensors-core",
+    moduleName := "akka-sensors",
     libraryDependencies ++= Akka.deps ++ Prometheus.deps ++ Logging.deps ++ TestTools.deps,
     dependencyOverrides ++= Akka.deps
   )
 
 lazy val `root` = project
   .in(file("."))
-  .aggregate(`sensors-core`)
+  .aggregate(`akka-sensors`)
   .settings(commonSettings ++ noPublishSettings)
-  .settings(name := "Akka Sensors")

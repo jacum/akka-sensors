@@ -56,6 +56,7 @@ object Publish {
           runClean,
           setReleaseVersion,
 //      runTest, // can't run test w/cross-version release
+          releaseStepCommand("sonatypeBundleClean"),
           releaseStepCommandAndRemaining("+publishSigned"),
           releaseStepCommand("sonatypeCentralUpload"),
           releaseStepCommand("sonatypeCentralRelease")
@@ -63,8 +64,8 @@ object Publish {
   )
 
   val settings =
-    if (sys.env.contains("USERNAME")) {
-      println(s"Releasing to Sonatype as ${sys.env("USERNAME")}")
+    if (sys.env.contains("SONATYPE_USER")) {
+      println(s"Releasing to Sonatype as ${sys.env("SONATYPE_USER")}")
       ReleaseToSonatype
     } else SuppressJavaDocsAndSources
 
