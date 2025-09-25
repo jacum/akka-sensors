@@ -16,9 +16,9 @@ object Publish {
     credentials ++= Seq(
           Credentials(
             "Sonatype Nexus Repository Manager",
-            "oss.sonatype.org",
-            sys.env.getOrElse("USERNAME", ""),
-            sys.env.getOrElse("PASSWORD", "")
+            "s01.oss.sonatype.org",
+            sys.env.getOrElse("SONATYPE_USERNAME", ""),
+            sys.env.getOrElse("SONATYPE_PASSWORD", "")
           ),
           Credentials(
             "GnuPG Key ID",
@@ -27,7 +27,7 @@ object Publish {
             "ignored"                                   // this field is ignored; passwords are supplied by pinentry
           )
         ),
-    sonatypeProfileName := "nl.pragmasoft",
+    sonatypeProfileName := "nl.pragmasoft.sensors",
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/jacum/akka-sensors")),
     scmInfo := Some(ScmInfo(browseUrl = url("https://github.com/jacum/akka-sensors"), connection = "scm:git@github.com:jacum/akka-sensors.git")),
