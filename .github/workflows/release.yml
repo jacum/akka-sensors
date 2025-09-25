@@ -54,7 +54,7 @@ jobs:
           chmod 700 ~/.gnupg
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
           echo "use-agent" >> ~/.gnupg/gpg.conf
-          printf "%s" "${GPG_PRIVATE_KEY}" | gpg --batch --import
+          printf "%s" "${GPG_SECRET}" | gpg --batch --import
         env:
           GPG_SECRET: ${{ secrets.GPG_SECRET }}
 
