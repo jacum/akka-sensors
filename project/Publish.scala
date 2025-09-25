@@ -64,8 +64,8 @@ object Publish {
   )
 
   val settings =
-    if (sys.env.contains("SONATYPE_USERNAME")) {
-      println(s"Releasing to Sonatype as ${sys.env("SONATYPE_USERNAME")}")
+    if (sys.env.contains("SONATYPE_USER")) {
+      println(s"Releasing to Sonatype as ${sys.env("SONATYPE_USER")}")
       ReleaseToSonatype
     } else SuppressJavaDocsAndSources
 
