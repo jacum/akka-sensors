@@ -35,6 +35,9 @@ jobs:
           java-version: '21'
           cache: sbt
 
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+
       - name: Cache Ivy and Coursier
         uses: actions/cache@v4
         with:
