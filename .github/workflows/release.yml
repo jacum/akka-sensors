@@ -19,8 +19,10 @@ jobs:
       USERNAME: ${{ github.actor }}
       SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
       SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+      # Passphrase for signing (sbt-pgp reads this)
+      PGP_PASSPHRASE: ${{ secrets.GPG_PASS }}
       # gpg on headless runners
-      GPG_TTY: /dev/pts/0
+
     steps:
       - name: Checkout
       # sbt-release needs tags and full history
@@ -56,7 +58,10 @@ jobs:
           chmod 700 ~/.gnupg
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
           echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
           printf "%s" "${GPG_SECRET}" | gpg --batch --import
+          # reload agent to pick up allow-loopback-pinentry
+          gpgconf --kill gpg-agent || true
         env:
           GPG_SECRET: ${{ secrets.GPG_SECRET }}
 
