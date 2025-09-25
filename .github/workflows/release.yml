@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
           cache: sbt
 
       - name: Cache Ivy and Coursier
@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-sbt-
 
       - name: Import GPG private key
-        if: secrets.GPG_PRIVATE_KEY != ''
+        if: ${{ secrets.GPG_SECRET != '' }}
         shell: bash
         run: |
           mkdir -p ~/.gnupg
@@ -57,7 +57,7 @@ jobs:
           echo "use-agent" >> ~/.gnupg/gpg.conf
           printf "%s" "${GPG_PRIVATE_KEY}" | gpg --batch --import
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_SECRET: ${{ secrets.GPG_SECRET }}
 
       - name: Show GPG keys (debug)
         if: always()
