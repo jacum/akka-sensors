@@ -9,7 +9,6 @@ import akka.persistence.typed.internal.{CompositeEffect, EventSourcedBehaviorImp
 import akka.persistence.typed.scaladsl.{EffectBuilder, EventSourcedBehavior}
 import akka.persistence.{RecoveryPermitter, JournalProtocol => P}
 import akka.sensors.MetricOps._
-import akka.sensors.PrometheusCompat.{CounterLabelsCompat, GaugeLabelsCompat, HistogramLabelsCompat}
 import akka.sensors.{ClassNameUtil, SensorMetrics}
 import com.typesafe.scalalogging.LazyLogging
 
@@ -20,16 +19,16 @@ final case class EventSourcedMetrics[C, E, S](
   metrics: SensorMetrics
 ) extends LazyLogging {
 
-  private val recoveries                = metrics.recoveries.labels(actorLabel)
-  private val recoveryEvents            = metrics.recoveryEvents.labels(actorLabel)
+  private val recoveries                = metrics.recoveries.labelValues(actorLabel)
+  private val recoveryEvents            = metrics.recoveryEvents.labelValues(actorLabel)
   private var firstEventPassed: Boolean = false
-  private val recoveryTime              = metrics.recoveryTime.labels(actorLabel).startTimer()
-  private val recoveryToFirstEventTime  = metrics.recoveryToFirstEventTime.labels(actorLabel).startTimer()
-  private val recoveryFailures          = metrics.recoveryFailures.labels(actorLabel)
-  private val persistFailures           = metrics.persistFailures.labels(actorLabel)
-  private val persistRejects            = metrics.persistRejects.labels(actorLabel)
-  private val waitingForRecoveryGauge   = metrics.waitingForRecovery.labels(actorLabel)
-  private val waitingForRecoveryTime    = metrics.waitingForRecoveryTime.labels(actorLabel).startTimer()
+  private val recoveryTime              = metrics.recoveryTime.labelValues(actorLabel).startTimer()
+  private val recoveryToFirstEventTime  = metrics.recoveryToFirstEventTime.labelValues(actorLabel).startTimer()
+  private val recoveryFailures          = metrics.recoveryFailures.labelValues(actorLabel)
+  private val persistFailures           = metrics.persistFailures.labelValues(actorLabel)
+  private val persistRejects            = metrics.persistRejects.labelValues(actorLabel)
+  private val waitingForRecoveryGauge   = metrics.waitingForRecovery.labelValues(actorLabel)
+  private val waitingForRecoveryTime    = metrics.waitingForRecoveryTime.labelValues(actorLabel).startTimer()
 
   waitingForRecoveryGauge.inc()
 
@@ -131,7 +130,7 @@ final case class EventSourcedMetrics[C, E, S](
         case eff @ Persist(_) =>
           val withMetrics = messageLabel(eff.event).map { label =>
             metrics.persistTime
-              .labels(actorLabel, label)
+              .labelValues(actorLabel, label)
               .observeEffect(eff)
           }
             .getOrElse(eff)
@@ -139,7 +138,7 @@ final case class EventSourcedMetrics[C, E, S](
 
         case eff @ PersistAll(_) =>
           val withMetrics = metrics.persistTime
-            .labels(actorLabel, "_all")
+            .labelValues(actorLabel, "_all")
             .observeEffect(eff)
           foldComposites(withMetrics, composites)
 
