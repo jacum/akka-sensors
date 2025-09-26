@@ -54,3 +54,4 @@ lazy val `root` = project
   .in(file("."))
   .aggregate(`akka-sensors`)
   .settings(commonSettings ++ noPublishSettings)
+  .settings(name := "Akka Sensors")
