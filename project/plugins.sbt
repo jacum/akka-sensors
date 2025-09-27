@@ -1,6 +1,6 @@
 import sbt.addSbtPlugin
 addSbtPlugin("com.github.sbt"   % "sbt-git"              % "2.1.0")
-addSbtPlugin("org.wartremover"  % "sbt-wartremover"      % "3.3.5")
+addSbtPlugin("org.wartremover"  % "sbt-wartremover"      % "3.4.1")
 addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "5.1.0")
 addSbtPlugin("com.github.sbt"   % "sbt-native-packager"  % "1.11.3")
 addSbtPlugin("org.scalameta"    % "sbt-scalafmt"         % "2.5.5")
@@ -8,4 +8,3 @@ addSbtPlugin("org.xerial.sbt"   % "sbt-sonatype"         % "3.12.2")
 addSbtPlugin("com.github.sbt"   % "sbt-pgp"              % "2.3.1")
 addSbtPlugin("com.github.sbt"   % "sbt-release"          % "1.4.0")
 addSbtPlugin("org.scoverage"    % "sbt-scoverage"        % "2.3.1")
-
