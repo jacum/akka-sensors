@@ -13,21 +13,24 @@ object Publish {
   )
 
   val ReleaseToSonatype = Seq(
-      credentials ++= Seq(
+    credentials ++= Seq(
           Credentials(
-            "Sonatype Nexus Repository Manager",
-            "oss.sonatype.org",
-            sys.env.getOrElse("USERNAME", ""),
-            sys.env.getOrElse("PASSWORD", "")
+            "Sonatype Central",
+            "central.sonatype.com",
+            sys.env.getOrElse("SONATYPE_USER", ""),
+            sys.env.getOrElse("SONATYPE_PASSWORD", "")
           ),
           Credentials(
             "GnuPG Key ID",
             "gpg",
             "80639E9F764EA1049652FDBBDA743228BD43ED35", // key identifier
-            "ignored"                                   // this field is ignored; passwords are supplied by pinentry
+            "ignored"                                   // sbt-pgp uses PGP_PASSPHRASE; this field is ignored
           )
         ),
-    sonatypeProfileName := "nl.pragmasoft",
+    sonatypeProfileName := "nl.pragmasoft.sensors",
+    // Central Publishing Portal (OSSRH EOL)
+    sonatypeCredentialHost := "central.sonatype.com",
+    sonatypeRepository := "https://central.sonatype.com/api",
     licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
     homepage := Some(url("https://github.com/jacum/akka-sensors")),
     scmInfo := Some(ScmInfo(browseUrl = url("https://github.com/jacum/akka-sensors"), connection = "scm:git@github.com:jacum/akka-sensors.git")),
@@ -54,7 +57,8 @@ object Publish {
           setReleaseVersion,
 //      runTest, // can't run test w/cross-version release
           releaseStepCommandAndRemaining("+publishSigned"),
-          releaseStepCommand("sonatypeBundleRelease")
+          releaseStepCommand("sonatypeCentralUpload"),
+          releaseStepCommand("sonatypeCentralRelease")
         )
   )
 

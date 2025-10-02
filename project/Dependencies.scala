@@ -13,9 +13,8 @@ object Dependencies {
   object Logging {
     val slf4jversion = "2.0.17"
     val slf4jApi     = "org.slf4j"                   % "slf4j-api"     % slf4jversion
-    val slf4jSimple  = "org.slf4j"                   % "slf4j-simple"  % slf4jversion
     val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.6"
-    val deps         = Seq(slf4jApi, slf4jSimple, scalaLogging)
+    val deps         = Seq(slf4jApi, scalaLogging)
   }
 
   object Akka {
@@ -45,41 +44,6 @@ object Dependencies {
     val snakeYaml = "org.yaml"          % "snakeyaml"            % "2.5"
 
     val deps = Seq(hotspot, common, jmx, snakeYaml)
-  }
-
-  object Http4s {
-    // unfortunately, http4s modules' versions not synced anymore
-    val http4sVersionBase    = "0.23.17"
-    val http4sVersionModules = "0.23.31"
-    val http4sVersionMetrics = "0.25.0"
-    val server               = "org.http4s"       %% "http4s-blaze-server"       % http4sVersionBase
-    val client               = "org.http4s"       %% "http4s-blaze-client"       % http4sVersionBase
-    val jdkClient            = "org.http4s"       %% "http4s-jdk-http-client"    % "0.7.0"
-    val circe                = "org.http4s"       %% "http4s-circe"              % http4sVersionModules
-    val dsl                  = "org.http4s"       %% "http4s-dsl"                % http4sVersionModules
-    val metrics              = "org.http4s"       %% "http4s-prometheus-metrics" % http4sVersionMetrics
-    val prometheusJmx        = "io.prometheus.jmx" % "collector"                 % "0.20.0"
-    val deps: Seq[ModuleID]  = Seq(server, client, circe, dsl, metrics, prometheusJmx)
-  }
-
-  object App {
-
-    val deps = Seq(
-        Cassandra.cassandraUnit
-      ) ++ Http4s.deps ++ Akka.deps ++ Cassandra.deps ++ Logging.deps
-  }
-
-  object Cassandra {
-    val akkaPersistenceCassandraVersion = "1.0.6"
-    val cassandraDriverVersion          = "4.17.0"
-
-    val cassandraDriverCore         = "com.datastax.oss"      % "java-driver-core"           % cassandraDriverVersion
-    val cassandraDriverQueryBuilder = "com.datastax.oss"      % "java-driver-query-builder"  % cassandraDriverVersion
-    val cassandraDriverMetrics      = "io.dropwizard.metrics" % "metrics-jmx"                % "4.2.37"
-    val akkaPersistenceCassandra    = "com.typesafe.akka"    %% "akka-persistence-cassandra" % akkaPersistenceCassandraVersion
-    val cassandraUnit               = "org.cassandraunit"     % "cassandra-unit"             % "4.3.1.0"
-
-    val deps = Seq(akkaPersistenceCassandra, cassandraDriverCore, cassandraDriverQueryBuilder, cassandraDriverMetrics)
   }
 
   object TestTools {
