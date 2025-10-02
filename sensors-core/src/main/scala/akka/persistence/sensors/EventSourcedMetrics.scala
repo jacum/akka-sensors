@@ -5,12 +5,13 @@ import akka.actor.typed.internal.InterceptorImpl
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.Behaviors.{ReceiveImpl, ReceiveMessageImpl}
 import akka.actor.typed.{Behavior, BehaviorInterceptor, ExtensibleBehavior, TypedActorContext}
-import akka.persistence.typed.internal.{CompositeEffect, EventSourcedBehaviorImpl, Persist, PersistAll}
+import akka.persistence.typed.internal.{CompositeEffect, EffectImpl, EventSourcedBehaviorImpl, Persist, PersistAll}
 import akka.persistence.typed.scaladsl.{EffectBuilder, EventSourcedBehavior}
 import akka.persistence.{RecoveryPermitter, JournalProtocol => P}
 import akka.sensors.MetricOps._
 import akka.sensors.{ClassNameUtil, SensorMetrics}
 import com.typesafe.scalalogging.LazyLogging
+import akka.persistence.typed.scaladsl.Effect
 
 import scala.annotation.tailrec
 
@@ -89,8 +90,9 @@ final case class EventSourcedMetrics[C, E, S](
       case eventSourced: EventSourcedBehaviorImpl[C @unchecked, E @unchecked, S @unchecked] =>
         val observedCommandHandler: EventSourcedBehavior.CommandHandler[C, E, S] = (state: S, command: C) => {
           eventSourced.commandHandler(state, command) match {
-            case eff: EffectBuilder[E, S] => observeEffect(eff)
-            case other                    => other
+            case eff: EffectImpl[E, S] => observeEffect(eff)
+            // This case should never happen as `EffectImpl` is a parent for all real cases of `Effect`
+            case other => other
           }
         }
 
@@ -114,18 +116,18 @@ final case class EventSourcedMetrics[C, E, S](
       case other => other
     }
 
-  private def observeEffect(effect: EffectBuilder[E, S]): EffectBuilder[E, S] = {
+  private def observeEffect(effect: EffectImpl[E, S]): Effect[E, S] = {
     def foldComposites[E1, S1](
       e: EffectBuilder[E1, S1],
       composites: List[CompositeEffect[E1, S1]]
-    ): EffectBuilder[E1, S1] =
+    ): Effect[E1, S1] =
       composites.foldLeft(e)((e, c) => c.copy(persistingEffect = e))
 
     @tailrec
     def loop[E1, S1](
       e: EffectBuilder[E1, S1],
       composites: List[CompositeEffect[E1, S1]]
-    ): EffectBuilder[E1, S1] =
+    ): Effect[E1, S1] =
       e match {
         case eff @ Persist(_) =>
           val withMetrics = messageLabel(eff.event).map { label =>
