@@ -44,7 +44,7 @@ object Dependencies {
     val exposition     = "io.prometheus" % "prometheus-metrics-exposition-textformats" % "1.4.1"
     val exporterCommon = "io.prometheus" % "prometheus-metrics-exporter-common"        % "1.4.1"
 
-    val jmx       = "io.prometheus.jmx" % "collector" % "1.4.0"
+    val jmx       = "io.prometheus.jmx" % "collector" % "1.5.0"
     val snakeYaml = "org.yaml"          % "snakeyaml" % "2.5"
 
     val deps = Seq(hotspot, common, exporterCommon, jmx, exposition, snakeYaml)
