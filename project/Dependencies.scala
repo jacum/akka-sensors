@@ -39,10 +39,10 @@ object Dependencies {
   }
 
   object Prometheus {
-    val hotspot        = "io.prometheus" % "prometheus-metrics-instrumentation-jvm"    % "1.4.1"
-    val common         = "io.prometheus" % "prometheus-metrics-core"                   % "1.4.1"
-    val exposition     = "io.prometheus" % "prometheus-metrics-exposition-textformats" % "1.4.1"
-    val exporterCommon = "io.prometheus" % "prometheus-metrics-exporter-common"        % "1.4.1"
+    val hotspot        = "io.prometheus" % "prometheus-metrics-instrumentation-jvm"    % "1.4.3"
+    val common         = "io.prometheus" % "prometheus-metrics-core"                   % "1.4.3"
+    val exposition     = "io.prometheus" % "prometheus-metrics-exposition-textformats" % "1.4.3"
+    val exporterCommon = "io.prometheus" % "prometheus-metrics-exporter-common"        % "1.4.3"
 
     val jmx       = "io.prometheus.jmx" % "collector" % "1.5.0"
     val snakeYaml = "org.yaml"          % "snakeyaml" % "2.5"
