@@ -15,9 +15,9 @@ final case class BasicActorMetrics[C](
   messageLabel: C => Option[String]
 ) {
 
-  private lazy val exceptions = metrics.exceptions.labels(actorLabel)
-  private val activeActors    = metrics.activeActors.labels(actorLabel)
-  private val activityTimer   = metrics.activityTime.labels(actorLabel).startTimer()
+  private lazy val exceptions    = metrics.exceptions.labels(actorLabel)
+  private val activeActors       = metrics.activeActors.labels(actorLabel)
+  private val activityStartNanos = System.nanoTime()
 
   def apply(behavior: Behavior[C])(implicit ct: ClassTag[C]): Behavior[C] = {
 
@@ -31,7 +31,7 @@ final case class BasicActorMetrics[C](
           signal match {
             case PostStop =>
               activeActors.dec()
-              activityTimer.observeDuration()
+              metrics.activityTime.labels(actorLabel).observe((System.nanoTime() - activityStartNanos) / 1e9)
 
             case _ =>
           }

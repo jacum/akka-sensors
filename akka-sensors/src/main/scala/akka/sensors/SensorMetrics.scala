@@ -76,7 +76,7 @@ object SensorMetrics {
         .build(),
       receiveTime = Histogram
         .builder()
-        .classicUpperBounds(10000)
+        .classicExponentialUpperBounds(0.5, 2, 14)
         .name("akka_sensors_actor_receive_time_millis")
         .help(s"Millis to process receive")
         .labelNames("actor", "message")
@@ -100,21 +100,21 @@ object SensorMetrics {
         .build(),
       recoveryTime = Histogram
         .builder()
-        .classicUpperBounds(10000)
+        .classicExponentialUpperBounds(0.5, 2, 14)
         .name("akka_sensors_actor_recovery_time_millis")
         .help(s"Millis to process recovery")
         .labelNames("actor")
         .build(),
       recoveryToFirstEventTime = Histogram
         .builder()
-        .classicUpperBounds(10000)
+        .classicExponentialUpperBounds(0.5, 2, 14)
         .name("akka_sensors_actor_recovery_to_first_event_time_millis")
         .help(s"Millis to process recovery before first event is applied")
         .labelNames("actor")
         .build(),
       persistTime = Histogram
         .builder()
-        .classicUpperBounds(10000)
+        .classicExponentialUpperBounds(0.5, 2, 14)
         .name("akka_sensors_actor_persist_time_millis")
         .help(s"Millis to process single event persist")
         .labelNames("actor", "event")
@@ -157,7 +157,7 @@ object SensorMetrics {
         .build(),
       waitingForRecoveryTime = Histogram
         .builder()
-        .classicUpperBounds(10000)
+        .classicExponentialUpperBounds(0.5, 2, 14)
         .name("akka_sensors_actor_waiting_for_recovery_permit_time_millis")
         .help(s"Millis from actor creation to recovery permit being granted")
         .labelNames("actor")

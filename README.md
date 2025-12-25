@@ -1,5 +1,5 @@
 # Minimalist Akka Observability
-![Maven Central](https://img.shields.io/maven-central/v/nl.pragmasoft.sensors/sensors-core_2.13?color=%2300AA00)
+![Maven Central](https://img.shields.io/maven-central/v/nl.pragmasoft/akka-sensors_2.13?color=%2300AA00)
 
 **Non-intrusive native Prometheus collectors for Akka internals, negligible performance overhead, suitable for production use.**
 

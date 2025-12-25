@@ -153,14 +153,14 @@ object MetricOps {
 
   implicit class HistogramExtensions(val histogram: DistributionDataPoint) {
     def observeExecution[A](f: => A): A = {
-      val timer = histogram.startTimer()
+      val startNanos = System.nanoTime()
       try f
-      finally timer.observeDuration()
+      finally histogram.observe((System.nanoTime() - startNanos) / 1e9)
     }
 
     def observeEffect[E, S](eff: EffectBuilder[E, S]): EffectBuilder[E, S] = {
-      val timer = histogram.startTimer()
-      eff.thenRun(_ => timer.observeDuration())
+      val startNanos = System.nanoTime()
+      eff.thenRun(_ => histogram.observe((System.nanoTime() - startNanos) / 1e9))
     }
   }
 

@@ -74,7 +74,7 @@ jobs:
           git config user.name "GitHub Actions Release Bot"
 
       - name: Run tests
-        run: sbt "++2.13.16; test"
+        run: sbt "++2.13.18; test"
 
       - name: Release to Sonatype (bundle + close + release)
         run: sbt "release with-defaults"

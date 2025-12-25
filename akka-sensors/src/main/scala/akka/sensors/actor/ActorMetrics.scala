@@ -21,7 +21,7 @@ trait ActorMetrics extends Actor with ActorLogging {
   private lazy val exceptions = metrics.exceptions.labelValues(actorLabel)
   private val activeActors    = metrics.activeActors.labelValues(actorLabel)
 
-  private val activityTimer = metrics.activityTime.labelValues(actorLabel).startTimer()
+  private val activityStartNanos = System.nanoTime()
 
   protected[akka] override def aroundReceive(receive: Receive, msg: Any): Unit =
     internalAroundReceive(receive, msg)
@@ -52,7 +52,7 @@ trait ActorMetrics extends Actor with ActorLogging {
 
   protected[akka] override def aroundPostStop(): Unit = {
     activeActors.dec()
-    activityTimer.observeDuration()
+    metrics.activityTime.labelValues(actorLabel).observe((System.nanoTime() - activityStartNanos) / 1e9)
     super.aroundPostStop()
   }
 
@@ -75,17 +75,17 @@ trait PersistentActorMetrics extends ActorMetrics with PersistentActor {
 
   protected def eventLabel(value: Any): Option[String] = messageLabel(value)
 
-  private var recovered: Boolean        = false
-  private var firstEventPassed: Boolean = false
-  private lazy val recoveries           = metrics.recoveries.labels(actorLabel)
-  private lazy val recoveryEvents       = metrics.recoveryEvents.labels(actorLabel)
-  private val recoveryTime              = metrics.recoveryTime.labels(actorLabel).startTimer()
-  private val recoveryToFirstEventTime  = metrics.recoveryTime.labels(actorLabel).startTimer()
-  private lazy val recoveryFailures     = metrics.recoveryFailures.labels(actorLabel)
-  private lazy val persistFailures      = metrics.persistFailures.labels(actorLabel)
-  private lazy val persistRejects       = metrics.persistRejects.labels(actorLabel)
-  private val waitingForRecoveryGauge   = metrics.waitingForRecovery.labels(actorLabel)
-  private val waitingForRecoveryTime    = metrics.waitingForRecoveryTime.labels(actorLabel).startTimer()
+  private var recovered: Boolean             = false
+  private var firstEventPassed: Boolean      = false
+  private lazy val recoveries                = metrics.recoveries.labels(actorLabel)
+  private lazy val recoveryEvents            = metrics.recoveryEvents.labels(actorLabel)
+  private val recoveryStartNanos             = System.nanoTime()
+  private val recoveryToFirstEventStartNanos = System.nanoTime()
+  private lazy val recoveryFailures          = metrics.recoveryFailures.labels(actorLabel)
+  private lazy val persistFailures           = metrics.persistFailures.labels(actorLabel)
+  private lazy val persistRejects            = metrics.persistRejects.labels(actorLabel)
+  private val waitingForRecoveryGauge        = metrics.waitingForRecovery.labels(actorLabel)
+  private val waitingForRecoveryStartNanos   = System.nanoTime()
 
   waitingForRecoveryGauge.inc()
 
@@ -94,20 +94,26 @@ trait PersistentActorMetrics extends ActorMetrics with PersistentActor {
       ClassNameUtil.simpleName(msg.getClass) match {
         case msg if msg.startsWith("ReplayedMessage") =>
           if (!firstEventPassed) {
-            recoveryToFirstEventTime.observeDuration()
+            metrics.recoveryToFirstEventTime
+              .labelValues(actorLabel)
+              .observe((System.nanoTime() - recoveryToFirstEventStartNanos) / 1e9)
             firstEventPassed = true
           }
           recoveryEvents.inc()
 
         case msg if msg.startsWith("RecoveryPermitGranted") =>
           waitingForRecoveryGauge.dec()
-          waitingForRecoveryTime.observeDuration()
+          metrics.waitingForRecoveryTime
+            .labelValues(actorLabel)
+            .observe((System.nanoTime() - waitingForRecoveryStartNanos) / 1e9)
 
         case _ => ()
       }
     else if (!recovered) {
       recoveries.inc()
-      recoveryTime.observeDuration()
+      metrics.recoveryTime
+        .labelValues(actorLabel)
+        .observe((System.nanoTime() - recoveryStartNanos) / 1e9)
       recovered = true
     }
     internalAroundReceive(receive, msg)
