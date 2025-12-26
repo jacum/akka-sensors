@@ -1,6 +1,6 @@
 import sbt.addSbtPlugin
 addSbtPlugin("com.github.sbt"   % "sbt-git"              % "2.1.0")
-addSbtPlugin("org.wartremover"  % "sbt-wartremover"      % "3.4.3")
+addSbtPlugin("org.wartremover"  % "sbt-wartremover"      % "3.5.0")
 addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "5.1.0")
 addSbtPlugin("com.github.sbt"   % "sbt-native-packager"  % "1.11.4")
 addSbtPlugin("org.scalameta"    % "sbt-scalafmt"         % "2.5.6")
