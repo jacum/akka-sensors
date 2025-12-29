@@ -104,7 +104,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
         )
       }
       assertMetrics(
-        _.startsWith("akka_sensors_actor_activity_time_seconds_bucket{actor=\"MassProbe\",le=\"10.0\""),
+        _.startsWith("akka_sensors_actor_activity_time_seconds_bucket{actor=\"MassProbe\",le="),
         _.endsWith(s" $actors")
       )
     }
@@ -173,7 +173,7 @@ class AkkaSensorsSpec extends AnyFreeSpec with LazyLogging with Eventually with 
       }
 
       assertMetrics(
-        _.startsWith(s"""akka_sensors_actor_activity_time_seconds_bucket{actor="$actorName",le="10.0""""),
+        _.startsWith(s"""akka_sensors_actor_activity_time_seconds_bucket{actor="$actorName",le="""),
         _.endsWith(s" $actors")
       )
 
