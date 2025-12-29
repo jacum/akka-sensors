@@ -51,7 +51,7 @@ object SensorMetrics {
     SensorMetrics(
       activityTime = Histogram
         .builder()
-        .classicUpperBounds(10)
+        .classicExponentialUpperBounds(60, 2, 15)
         .name("akka_sensors_actor_activity_time_seconds")
         .help(s"Seconds of activity")
         .labelNames("actor")
