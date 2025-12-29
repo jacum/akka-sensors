@@ -2,7 +2,7 @@ import Dependencies._
 import Keys._
 import sbt.file
 
-val scala2 = "2.13.18"
+val scala2 = "2.13.16" // compatible with LTS 3.3.x
 ThisBuild / versionScheme := Some("early-semver")
 ThisBuild / libraryDependencySchemes += "org.http4s" % "*" % VersionScheme.Always
 
