@@ -13,7 +13,7 @@ object Dependencies {
   object Logging {
     val slf4jversion = "2.0.17"
     val slf4jApi     = "org.slf4j"                   % "slf4j-api"       % slf4jversion
-    val logback      = "ch.qos.logback"              % "logback-classic" % "1.5.23"
+    val logback      = "ch.qos.logback"              % "logback-classic" % "1.5.25"
     val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.6"
     val deps         = Seq(slf4jApi, scalaLogging, logback)
   }
@@ -40,10 +40,10 @@ object Dependencies {
 
   object Prometheus {
     val PrometheusVersion = "1.4.3"
-    val hotspot        = "io.prometheus" % "prometheus-metrics-instrumentation-jvm"    % PrometheusVersion
-    val common         = "io.prometheus" % "prometheus-metrics-core"                   % PrometheusVersion
-    val exposition     = "io.prometheus" % "prometheus-metrics-exposition-textformats" % PrometheusVersion
-    val exporterCommon = "io.prometheus" % "prometheus-metrics-exporter-common"        % PrometheusVersion
+    val hotspot           = "io.prometheus" % "prometheus-metrics-instrumentation-jvm"    % PrometheusVersion
+    val common            = "io.prometheus" % "prometheus-metrics-core"                   % PrometheusVersion
+    val exposition        = "io.prometheus" % "prometheus-metrics-exposition-textformats" % PrometheusVersion
+    val exporterCommon    = "io.prometheus" % "prometheus-metrics-exporter-common"        % PrometheusVersion
 
     val jmx       = "io.prometheus.jmx" % "collector" % "1.5.0"
     val snakeYaml = "org.yaml"          % "snakeyaml" % "2.5"
